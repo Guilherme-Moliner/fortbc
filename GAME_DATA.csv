@@ -1,0 +1,21 @@
+id,name,cat,type,range,star,cost,hp,atk,speed,tribute,copies,special,ability
+peon_atk,Zé Mané,Peão,ATK,melee,1,1,100,60,fast,0,3,,
+peon_def,Muralha,Peão,DEF,melee,1,1,200,30,slow,0,3,,
+peon_bal,Genérico,Peão,BAL,mid,2,2,150,50,medium,0,3,,Atirador
+peon_def2,Fortão,Peão,DEF,melee,2,2,280,40,slow,0,3,,
+arthur,Arthur,Herói,ATK,long,3,3,220,110,fast,0,1,,Long range — único herói que atira de longe
+fanta,Fanta,Herói,BAL,mid,3,3,200,70,medium,0,1,recycler,Recycler: +1 ATB ao ser tributado
+nathan,Nathan,Herói,DEF,melee,3,3,320,45,slow,0,1,,
+garopaba,Garopaba,Herói,ATK,melee,4,4,250,130,medium,0,1,deathbuff,Morte heroica: +20% ATK aliados por 10s
+bala,Bala,Herói,DEF,melee,4,4,420,50,slow,0,1,provoker,Provoker: atrai ataques inimigos
+leo,Léo,Herói,ATK,melee,4,4,260,130,medium,0,1,,
+zaga,Zaga,Herói,BAL,mid,4,4,320,95,medium,0,1,,
+vitao,Vitão,Herói,BAL,mid,5,5,350,80,medium,1,1,healer,Healer: cura aliado ferido ao entrar (+100)
+borba,Borba,Herói,DEF,melee,5,5,600,70,slow,1,1,,
+letti,Letti,Herói,ATK,melee,6,6,280,160,veryfast,1,1,rusher,"Rusher: ignora unidades, vai direto à torre"
+churrasco,Churrasco,Item,ITEM,-,0,2,0,0,-,0,3,heal_all,Cura todas as unidades +80 HP
+energetico,Energético,Item,ITEM,-,0,2,0,0,-,0,3,atk_buff,+30% ATK em campo por 15s
+rodada,Rodada,Item,ITEM,-,0,1,0,0,-,0,3,draw2,Compra 2 cartas
+turboboost,Turbo Boost,Item,ITEM,-,0,2,0,0,-,0,3,speed_buff,2x velocidade por 10s
+ressurreicao,Ressurreição,Item,ITEM,-,0,4,0,0,-,0,3,resurrect,Revive última unidade morta (50% HP)
+reforco,Reforço,Item,ITEM,-,0,3,0,0,-,0,3,next_hp_buff,Próxima unidade +50% HP
