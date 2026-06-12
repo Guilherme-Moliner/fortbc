@@ -126,9 +126,12 @@ body{background:var(--bg0);color:var(--text);font-family:'Cinzel',serif;overflow
 .dmg-float{position:absolute;font-size:.7rem;font-weight:700;pointer-events:none;z-index:20;animation:floatUp .8s forwards;transform:translateX(-50%);}
 @keyframes floatUp{0%{opacity:1;}100%{opacity:0;transform:translateX(-50%) translateY(-24px);}}
 
-/* COMBAT LINE (Fort Condor glowing red) */
-.combat-line{position:absolute;width:3px;transform:translateX(-50%);background:linear-gradient(180deg,rgba(255,40,40,0),rgba(255,80,80,1),rgba(255,40,40,0));box-shadow:0 0 8px #ff4444,0 0 16px #ff2222;z-index:9;animation:combatPulse .26s ease-out;pointer-events:none;}
-@keyframes combatPulse{0%{opacity:0;transform:translateX(-50%) scaleX(.5);}40%{opacity:1;transform:translateX(-50%) scaleX(1.5);}100%{opacity:0;transform:translateX(-50%) scaleX(1);}}
+/* PROJECTILE (attack visual) */
+.projectile{position:absolute;width:9px;height:9px;border-radius:50%;z-index:10;pointer-events:none;left:calc(50% - 4px);}
+.projectile.atk{background:#ff4444;box-shadow:0 0 8px #ff2222,0 0 16px #ff000088;}
+.projectile.def{background:#4488ff;box-shadow:0 0 8px #2266ff,0 0 16px #0044ff88;}
+.projectile.bal{background:#44dd88;box-shadow:0 0 8px #22cc66,0 0 16px #00aa4488;}
+.projectile.struct{background:#ffe066;box-shadow:0 0 8px #ffcc00,0 0 16px #ffaa0088;}
 
 /* BOTTOM / HAND */
 #bottom{flex-shrink:0;display:flex;flex-direction:column;gap:3px;transition:height .3s;}
@@ -411,7 +414,7 @@ const BASE_CARDS = [
   { id:'ressurreicao', name:'Ressurreição', type:'ITEM', range:'-', star:0, cost:4, tribute:0, copies:3, effect:'resurrect', emoji:'🔄' },
   { id:'reforco', name:'Reforço', type:'ITEM', range:'-', star:0, cost:3, tribute:0, copies:3, effect:'next_hp_buff', effectVal:0.5, emoji:'🧱' },
 ];
-const TOWER_ATK = 60;
+const TOWER_ATK = 30;
 
 // ══════════════════════════════════════════════════════
 //  BATALHA DOS AMIGOS — fortbc · v4
@@ -587,20 +590,19 @@ function addScore(p){G.score+=p;flashScore(p);}
 function flashScore(p){const el=document.getElementById('score-display');if(!el)return;el.textContent=G.score;el.style.transform='scale(1.3)';el.style.color=p>0?'#81c784':'#e63946';setTimeout(()=>{el.style.transform='scale(1)';el.style.color='var(--gold)';},400);}
 function spawnDmgFloat(unit,dmg){if(!unit.el)return;const lane=unit.el.parentElement;if(!lane)return;const laneH=getLaneH(unit.laneIdx);const d=document.createElement('div');d.className='dmg-float';d.textContent='-'+dmg;d.style.top=posToY(unit.pos,laneH)+'px';d.style.left=unit.owner==='player'?'calc(50% - 20px)':'calc(50% + 20px)';d.style.color=unit.owner==='player'?'#ff6b6b':'#81c784';lane.appendChild(d);setTimeout(()=>d.remove(),900);}
 
-// Combat connection line (Fort Condor style glowing red)
+// Projectile animation (attacker → target)
 function drawCombatLine(a,b){
   if(!a.el||!b.el)return;
   const lane=a.el.parentElement;if(!lane)return;
   const laneH=getLaneH(a.laneIdx);
   const y1=posToY(a.pos,laneH)+24, y2=posToY(b.pos,laneH)+24;
-  const x1=a.owner==='player'?'calc(50% - 20px)':'calc(50% + 20px)';
-  const line=document.createElement('div');
-  line.className='combat-line';
-  const top=Math.min(y1,y2), h=Math.abs(y1-y2);
-  line.style.top=top+'px';line.style.height=h+'px';
-  line.style.left='50%';
-  lane.appendChild(line);
-  setTimeout(()=>line.remove(),260);
+  const proj=document.createElement('div');
+  const typeClass=(a.data.type||'bal').toLowerCase();
+  proj.className='projectile '+(typeClass==='atk'?'atk':typeClass==='def'?'def':'bal');
+  proj.style.top=y1+'px';
+  lane.appendChild(proj);
+  proj.animate([{top:y1+'px',opacity:1},{top:y2+'px',opacity:.7}],{duration:220,easing:'ease-in',fill:'forwards'});
+  setTimeout(()=>proj.remove(),230);
 }
 
 function killUnit(unit){
@@ -649,6 +651,17 @@ function structRetaliate(dt){
         if(target){
           s._atkTimer=STRUCT_ATK_INTERVAL;
           dealDmg({owner,data:{atk:TOWER_ATK,type:'DEF'},fightingWith:null},target,TOWER_ATK);
+          // projectile from structure to target
+          const lEl=getLaneEl(lane);
+          if(lEl&&target.el){
+            const ty=posToY(target.pos,laneH)+24;
+            const p=document.createElement('div');
+            p.className='projectile struct';
+            p.style.top=sy+'px';
+            lEl.appendChild(p);
+            p.animate([{top:sy+'px',opacity:1},{top:ty+'px',opacity:.7}],{duration:220,easing:'ease-in',fill:'forwards'});
+            setTimeout(()=>p.remove(),230);
+          }
         }
       });
     });
