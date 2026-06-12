@@ -5,7 +5,9 @@
 
 ## 🎯 O que é
 
-**Batalha dos Amigos** (repo: `fortbc`) é um jogo de cartas de batalha em lanes, single-file HTML, inspirado no minigame **Fort Condor** de Final Fantasy VII Remake/Rebirth. As cartas-herói são feitas a partir de fotos de 10 amigos reais, com habilidades humorísticas personalizadas. Tom: engraçado, adulto, referências a álcool e cultura de amigos.
+**Batalha dos Amigos** (repo: `fortbc`) é um jogo de cartas de batalha **por turnos** (estilo Yu-Gi-Oh! Forbidden Memories), single-file HTML. As cartas-herói são feitas a partir de fotos de 10 amigos reais, com habilidades humorísticas personalizadas. Tom: engraçado, adulto, referências a álcool e cultura de amigos.
+
+> **v5 (2026-06-12):** Jogo completamente reescrito de real-time lanes → turn-based. Engine antigo (lanes/ATB) removido. Ver seção "Arquitetura" abaixo.
 
 - **Plataforma:** navegador (single-file `index.html`, sem build, sem servidor)
 - **Persistência atual:** `localStorage` (scores e níveis de carta)
@@ -31,23 +33,45 @@ fortbc/
     └── audio/          # MP3 (não OGG — melhor compat. cross-browser, inclusive iOS Safari)
 ```
 
-## 🎮 Mecânicas-chave
+## 🎮 Mecânicas-chave (v5 — Turn-Based)
 
-- **Tabuleiro:** 2 lanes verticais (Esq/Dir). Cada lado: 2 torres (400 HP, uma por lane) + 1 base central (1000 HP). Base BC = jogador (baixo), Base Floripa = IA (topo).
-- **Torre dano:** `TOWER_ATK = 30` (cortado pela metade em 2025-06-12; era 60).
-- **Projéteis de ataque:** animação de bolinha viajando do atacante ao alvo — vermelho (ATAQUE), azul (DEFESA), verde (EQUILÍBRIO), amarelo (estruturas). Torres e bases também têm projétil ao revidar.
-- **Triângulo de tipos** (nomes novos em código pendente):
-  - `ATK` → **ATAQUE** ⚔ (vermelho)
-  - `DEF` → **DEFESA** 🛡 (azul)
-  - `BAL` → **EQUILÍBRIO** ⚖ (verde)
-  - Vantagem 1.5x / desvantagem 0.67x. ATAQUE > DEFESA > EQUILÍBRIO > ATAQUE.
-- **Range:** melee (~46px) / mid (~120px) / long (~220px).
-- **Tributo:** estrelas 1-4 sem tributo; estrelas 5-6 sacrificam 1 unidade.
-- **ATB:** regenera 0.6/s (máx 10). 5 cartas na mão, compra automática.
-- **Anti-empate:** 3min Turbo (2x), 4min Turbo+ (4x), 5min Morte Súbita (1 hit mata). Deck out = derrota.
-- **Roguelike:** 3 fights, recompensa entre eles (level up / nova carta / buff de deck).
-- **Níveis:** Bronze→Prata→Ouro→Platina→Esmeralda→Diamante (×1.0 a ×1.75), em localStorage.
-- **Dificuldades:** Iniciante / Veterano / Mestre.
+### Tabuleiro
+- **Jogador (BC):** 5 slots de monstro (4 normais + 1 Comandante) + 4 slots face-down + zona de campo + cemitério
+- **IA (Floripa):** espelho do jogador
+- **Base:** 2000 LP cada lado. Não há torres separadas — dano direto à base.
+
+### Fases por turno (estilo YGO Forbidden Memories)
+1. **DRAW** — ambos compram até o limite da mão (5 cartas). Deck out = derrota.
+2. **STANDBY** — cartas em campo sobem de rank por turns survived.
+3. **DOWN FASE** — cada lado baixa 1 carta simultaneamente (player escolhe, IA decide em segredo).
+4. **LAST MINUTE** — fase de cartas rápidas (V1: auto-passa se não há quick-play).
+5. **RESOLUÇÃO** — ATK total do campo ataca os slots do adversário em ordem (slot 1→2→3→4→CMD). Overflow vai para a base do adversário.
+
+### Combate
+- `sumAtk(field)` = soma de `getEffAtk(card)` para cada slot ocupado.
+- `getEffAtk` = `atk × rankMult` onde rankMult = Bronze×1.0 / Prata×1.10 / Ouro×1.25.
+- `applyDamageToField(totalAtk, field, grave)` — desconta HP slot a slot, envia mortos ao cemitério, retorna overflow.
+- Se overflow > 0 → aplica na base inimiga.
+- Simultâneo: player e IA resolvem ao mesmo tempo.
+- Empate de bases (ambas chegam a 0): compare ATK em campo. Se igual, ambas ficam em 1 LP.
+
+### Rank de cartas (turnsOnField)
+- 0 turnos → 🥉 Bronze (×1.0)
+- 2 turnos → 🥈 Prata (×1.10)
+- 4 turnos → 🥇 Ouro (×1.25)
+
+### Triângulo de tipos (mantido no código, sem efeito ativo no V1)
+- `ATK` ⚔ / `DEF` 🛡 / `BAL` ⚖ — visível nas cartas, mecânica de vantagem a implementar.
+
+### Constantes chave
+- `HAND_LIMIT = 5` (mão máxima)
+- `BASE_HP = 2000` (LP de cada base)
+- `PHASES = ['draw','standby','main','lastminute','resolution']`
+
+### Roguelike (mantido)
+- 3 fights, recompensa entre eles (level up / nova carta / buff de deck).
+- Níveis: Bronze→Prata→Ouro→Platina→Esmeralda→Diamante (×1.0 a ×1.75), em localStorage.
+- Dificuldades: Iniciante / Veterano / Mestre.
 
 ## 🎨 Sistema de VIBES (a implementar)
 
@@ -149,25 +173,59 @@ Vibes coexistem com o triângulo ATAQUE/DEFESA/EQUILÍBRIO — funcionam como ti
 
 ## 🏗️ Arquitetura do código (index.html)
 
+### Constantes e dados
 - **`BASE_CARDS`** — array com todos os stats das cartas. Fonte da verdade; espelhar no `GAME_DATA.csv`.
-- **`TOWER_ATK`** — dano de retaliação das torres/bases. Valor atual: `30`.
-- **`HERO_IMAGES_B64`** — fallback base64 dos 10 heróis embutido.
+- **`HERO_IMAGES_B64`** — fallback base64 dos 10 heróis embutido. **NÃO MODIFICAR.**
 - **`preloadImages()`** — tenta GitHub raw, cai pro base64 se falhar (timeout 2.5s por imagem).
-- **`G`** — estado do fight atual (unidades, estruturas, ATB, etc).
-- **`APP`** — estado da run (nome, dificuldade, fight atual, deck, score total).
-- **`gameLoop()`** — loop principal (movimento, range, combate, cerco, retaliação).
-- **`drawCombatLine(a,b)`** — dispara projétil animado do atacante ao alvo (Web Animations API).
+- **`HAND_LIMIT=5`, `BASE_HP=2000`, `PHASES=[...]`** — constantes do engine turn-based.
+- **`AI_DECKS`** — configs de dificuldade (lvOverride, atkMult).
+
+### Estado do jogo
+- **`G`** — estado do fight atual:
+  - `playerField[5]`, `aiField[5]` — slots 0-3 + slot 4 (Comandante)
+  - `playerHidden[4]`, `aiHidden[4]` — slots face-down
+  - `playerBase{hp,maxHp}`, `aiBase{hp,maxHp}` — LP das bases
+  - `playerHand[]`, `aiHand[]`, `playerDeck[]`, `aiDeck[]`, `playerGrave[]`, `aiGrave[]`
+  - `turn`, `phase`, `score`, `gameOver`
+- **`APP`** — estado da run (nome, dificuldade, fightNum, totalScore, deck, extraHandSize).
+
+### Engine turn-based (linhas ~930+, substituem o engine real-time antigo)
+- **`initFight()`** → configura G, distribui mãos iniciais, chama `startPhase('draw')`
+- **`startPhase(phase)`** → dispatcher de fases
+- **`phaseDraw()`** → compra cartas
+- **`phaseStandby()`** → rank-up de cartas em campo
+- **`phaseMain()`** → player escolhe carta + slot; IA decide em segredo via `aiDecideMain()`
+- **`confirmMain()`** → revela ambas as escolhas, chama `phaseLastMinute`
+- **`phaseResolution()`** → `applyDamageToField()` para ambos os lados, verifica vitória
+- **`endFight(winner)`** → atualiza APP, vai para recompensa ou fim
+
+### UI
+- **`updateFieldUI()`** → re-renderiza todos os slots (`renderFC()` por carta)
+- **`updateBaseUI()`** → atualiza barras de LP e topbar
+- **`renderHand()`** → re-renderiza a mão do player (clicável via `selectHandCard(idx)`)
+- **`updatePhaseBanner/Badge()`** → atualiza indicador de fase
 - **Telas:** loading → start → game → reward → end (`showScreen()`).
+
+### Nota: código antigo ainda presente no arquivo
+O engine real-time (lanes, ATB, gameLoop, etc.) ainda existe nas linhas 514-825 mas é **inerte**: as novas funções com mesmo nome declaradas depois sobrescrevem-no. Não chamar nem modificar essas funções antigas.
 
 ## ✅ Próximas tarefas (backlog priorizado)
 
+### Urgente — Gameplay V1 (turn-based recém-implementado)
+- [ ] **Testar o fluxo completo** do jogo turn-based: Draw → Standby → Down Fase → Last Minute → Resolução → vitória/derrota
+- [ ] Limpar o código antigo (engine real-time linhas 514-825) — opcional, não bloqueia nada
+- [ ] Implementar triângulo de tipos na resolução (ATK bate DEF bate BAL bate ATK, multiplicador 1.5x/0.67x)
+- [ ] Implementar mecânica de "campo deve ser zerado antes de atacar a base" (opcional para V1)
+- [ ] Mecânica de comeback ligada à torre/defesa (a definir)
+
+### Conteúdo
 - [ ] Renomear ATK/DEF/BAL → ATAQUE/DEFESA/EQUILÍBRIO em toda a UI e lógica
 - [ ] Definir nomes finais das 5 Vibes (usuário vai escolher nomes engraçados/adultos)
 - [ ] Adicionar campo `vibe` em `BASE_CARDS` para todos os heróis existentes
 - [ ] Implementar sinergia passiva de Vibes (2+ cartas em campo)
 - [ ] Adicionar novos itens de debuff ao `BASE_CARDS` e CSV
 - [ ] Criar 5 peões de Vibe
-- [ ] Implementar Arapucas (novo tipo de carta com placement na lane)
+- [ ] Implementar Arapucas (face-down, ativadas por inimigos)
 - [ ] Integrar SFX e OST quando os arquivos chegarem
 - [ ] Gerar `BASE_CARDS` automaticamente a partir do CSV (hoje é manual)
 - [ ] Imagens de peões/itens (hoje são emoji)
