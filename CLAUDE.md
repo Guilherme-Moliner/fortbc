@@ -24,7 +24,8 @@ fortbc/
 ├── POLISH.md           # backlog de polish v5.1 + briefing p/ discussão no chat
 ├── README.md
 ├── ASSETS.md
-├── GAME_DESIGN.md      # ⚠️ LEGADO (descreve engine v4 real-time)
+├── GAME_DESIGN.md      # mecânicas v5 turn-based (ATUAL)
+├── gamedesignfort.md   # ⚠️ LEGADO — design v4 Fort Condor / real-time
 ├── GAME_DATA.md
 ├── GAME_DATA.csv       # fonte de verdade dos stats (edição manual, refletir em BASE_CARDS)
 ├── SETUP.md

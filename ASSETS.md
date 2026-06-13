@@ -65,24 +65,40 @@ Quando tiver as artes, suba em `assets/pawns/<id>.png` e `assets/items/<id>.png`
 
 ---
 
-## 🎵 Trilha Sonora
+## 🎵 Trilha Sonora (OST)
 
-O jogo procura:
-```
-assets/audio/bgmusic.mp3
-```
+> **Formato: `.mp3` (não `.ogg`)** — melhor compatibilidade cross-browser, inclusive iOS Safari.
+
+O plano de trilha tem várias faixas por contexto (mapa completo no `CLAUDE.md`). Arquivos em `assets/audio/`:
+
+| Arquivo | Quando toca |
+|---|---|
+| `ost_menu.mp3` | Menu principal (loop) |
+| `ost_select.mp3` | Seleção de dificuldade/nome |
+| `ost_preduel.mp3` | Tela pré-fight (stinger ~5s) |
+| `ost_battle1.mp3` | Fight 1 (loop) |
+| `ost_battle2.mp3` | Fight 2 (loop) |
+| `ost_battle3.mp3` | Fight 3 final (loop) |
+| `ost_reward.mp3` | Tela de recompensa |
+| `ost_win.mp3` | Vitória final da run |
+| `ost_lose.mp3` | Derrota / Game Over |
+| `ost_scores.mp3` | Ranking/Highscores |
 
 | Item | Valor |
 |---|---|
-| Formato | MP3 |
-| Duração | 1–3 min (toca em loop) |
-| Tamanho | < 3 MB |
-| Volume | o jogo já reduz para 35% |
-| Licença | use música livre de direitos (ex: Pixabay, Incompetech) |
+| Formato | **MP3** |
+| Duração | 1–3 min (loop) / ~5s (stingers) |
+| Tamanho | < 3 MB cada |
+| Volume | o jogo reduz automaticamente |
+| Licença | música livre de direitos (ex: Pixabay, Incompetech) |
 
-Se o arquivo não existir, o jogo roda **sem música** (sem erro). O botão 🔊 no topo controla mute.
+Se um arquivo não existir, o jogo roda **sem aquela música** (sem erro). O botão 🔊 no topo controla mute.
 
-> SFX (hit, deploy, vitória) podem ser adicionados depois em `assets/audio/sfx/`.
+## 🔊 SFX
+
+Efeitos sonoros em `assets/audio/sfx/` (mapa completo no `CLAUDE.md`): UI (compra/seleção de carta, erro), combate (hit, morte, dano na base), invocação de heróis (`hero_arthur`, etc.), especiais, arapucas/itens e estados de jogo (vitória/derrota/recompensa).
+
+> A integração de OST e SFX no código é feita pelo Claude Code **quando os arquivos chegarem** — basta avisar.
 
 ---
 
@@ -110,5 +126,6 @@ git push
 
 - [ ] `index.html` na raiz
 - [ ] 10 PNGs em `assets/heroes/` com nomes exatos
-- [ ] `assets/audio/bgmusic.mp3` (opcional)
+- [ ] Faixas de OST em `assets/audio/*.mp3` (opcional, ver tabela acima)
+- [ ] SFX em `assets/audio/sfx/*.mp3` (opcional)
 - [ ] Testar abrindo o GitHub Pages ou o `raw` de uma imagem no navegador

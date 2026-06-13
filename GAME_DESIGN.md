@@ -1,113 +1,116 @@
-# 🎲 GAME DESIGN — Batalha dos Amigos
+# 🎲 GAME DESIGN — Batalha dos Amigos (v5 · Turn-Based)
 
-> ⚠️ **LEGADO (v4 / real-time lanes).** Este documento descreve o engine ANTIGO baseado em lanes/ATB/Fort Condor, que foi **substituído na v5 pelo formato turn-based** (Yu-Gi-Oh! Forbidden Memories). Mantido apenas como referência histórica das ideias de carta/herói.
->
-> Para as mecânicas atuais, veja **`CLAUDE.md`** (seção "Mecânicas-chave v5"). Para o backlog de polish e decisões em aberto, veja **`POLISH.md`**.
-> Este arquivo será reescrito depois que as decisões de design da v5 forem fechadas no chat.
-
-Documento de referência das mecânicas (LEGADO). Para os números exatos, veja `GAME_DATA.md` / `.csv`.
+> Documento de referência das mecânicas **atuais**. O jogo é por turnos, estilo **Yu-Gi-Oh! Forbidden Memories**.
+> Para os números exatos das cartas, veja `GAME_DATA.md` / `.csv`. Para o design legado (Fort Condor/real-time), veja `gamedesignfort.md`. Para decisões de polish em aberto, veja `POLISH.md`.
 
 ---
 
 ## 🗺️ Tabuleiro
 
 ```
-            [ BASE FLORIPA ]   (topo, IA)
-         ┌──────────┬──────────┐
-         │ 🏰 Torre │ 🏰 Torre │   ← torres da IA (bloqueiam)
-         │   Esq    │   Dir    │
-         │  LANE 0  │  LANE 1  │
-         │   ESQ    │   DIR    │
-         │ 🏰 Torre │ 🏰 Torre │   ← torres do jogador
-         │   Esq    │   Dir    │
-         └──────────┴──────────┘
-            [ BASE BC ]        (baixo, jogador)
+                 [ BASE FLORIPA · 2000 LP ]      (topo, IA)
+   🪦 🌍   [ 1 ][ 2 ][ 3 ][ 4 ][ CMD ]           ← campo da IA (5 slots)
+            ▽   ▽   ▽   ▽                         ← slots face-down da IA
+   ──────────────────  VS  ──────────────────
+            △   △   △   △                         ← slots face-down do jogador
+   🪦 🌍   [ 1 ][ 2 ][ 3 ][ 4 ][ CMD ]           ← campo do jogador (5 slots)
+                 [ BASE BC · 2000 LP ]           (baixo, jogador)
 ```
 
-- **2 lanes verticais** (Esquerda / Direita), separadas por uma **zona nula** central (reservada para torres centrais futuras).
-- Cada jogador tem **2 torres** (uma por lane) + **1 base central**.
-- Unidades saem da base, sobem pela lane escolhida, e seguem em direção à base inimiga.
+Cada lado tem:
+- **5 slots de monstro**: 4 normais (1–4) + 1 **Comandante** (CMD).
+- **4 slots face-down** (cartas viradas — reservados p/ Arapucas/armadilhas, mecânica a definir).
+- **Zona de Campo** 🌍 (efeito global — mecânica a definir).
+- **Cemitério** 🪦 (cartas mortas/descartadas).
+- **Base** com **2000 LP**. Não há torres separadas — o dano que transborda do campo vai direto à base.
 
 ---
 
-## ⚔️ Fluxo de Combate (estilo Fort Condor)
+## 🔄 Fases do Turno
 
-1. Você posiciona unidades **apenas no seu lado**; elas percorrem a lane sozinhas.
-2. Unidades **não morrem** ao chegar na estrutura inimiga — ficam **atacando** (cerco).
-3. Unidades inimigas **se cruzam** livremente; só entram em combate quando ficam dentro do **alcance (range)** uma da outra.
-4. **Prioridade**: unidades sempre preferem lutar contra unidades inimigas a avançar.
-5. A **torre bloqueia** a lane: é preciso destruí-la para a unidade seguir até a base.
-6. **Torres e bases revidam** (long range): atiram na unidade inimiga mais próxima dentro do alcance.
+O turno passa por 5 fases, em ordem, para **ambos os lados simultaneamente**:
 
----
-
-## 🎯 Range (Alcance)
-
-| Range | Alcance | Indicador | Comportamento |
-|---|---|---|---|
-| ⚔️ Melee | curto | ⚪ branco | luta corpo-a-corpo |
-| 🏹 Mid | médio | 🟠 laranja | ataca à média distância |
-| 🎯 Long | longo | 🟣 roxo | bombardeia de longe |
-
-Atiradores (mid/long) são perigosos mas frágeis no corpo-a-corpo — proteja-os com tanques na frente.
-
----
-
-## 🃏 Triângulo de Poder
-
-```
-ATK ▶ vence ▶ DEF ▶ vence ▶ BAL ▶ vence ▶ ATK
-```
-- Vantagem de tipo: **1.5×** dano
-- Desvantagem: **0.67×** dano
-
----
-
-## ⭐ Estrelas e Tributo
-
-| Estrelas | Tributo necessário |
-|---|---|
-| 1–2 (peões) | nenhum |
-| 3–4 (heróis) | nenhum |
-| 5–6 (heróis) | sacrificar 1 unidade em campo |
-
-O sacrifício é **imediato** — permite o "deny" (sacrificar uma unidade prestes a morrer para não dar pontos ao inimigo, e ainda invocar um herói forte).
-
----
-
-## 🧙 Habilidades Especiais
-
-| Herói | Habilidade |
-|---|---|
-| Arthur | Único herói **long range** |
-| Fanta | **Recycler**: +1 ATB ao ser tributado |
-| Garopaba | **Morte heroica**: ao morrer, +20% ATK aos aliados por 10s |
-| Bala | **Provoker**: atrai os ataques inimigos |
-| Vitão | **Healer**: ao entrar, cura o aliado mais ferido (+100 HP) |
-| Letti | **Rusher**: ignora unidades e vai direto à torre |
-
----
-
-## 🎒 Itens
-
-| Item | Custo | Efeito |
+| # | Fase | O que acontece |
 |---|---|---|
-| 🥩 Churrasco | 2 | cura todas as unidades +80 HP |
-| ⚡ Energético | 2 | +30% ATK em campo por 15s |
-| 🍺 Rodada | 1 | compra 2 cartas |
-| 💨 Turbo Boost | 2 | 2× velocidade por 10s |
-| 🔄 Ressurreição | 4 | revive a última unidade morta (50% HP) |
-| 🧱 Reforço | 3 | próxima unidade entra com +50% HP |
+| 1 | **DRAW** | Ambos compram até o limite da mão (5 cartas). Deck vazio + mão vazia = **derrota** (Deck Out). |
+| 2 | **STANDBY** | Cartas em campo sobem de **rank** conforme turnos sobrevividos. |
+| 3 | **DOWN FASE** | Cada lado baixa **1 carta** num slot. O jogador escolhe; a **IA decide em segredo**. Revelação **simultânea**. |
+| 4 | **LAST MINUTE** | Janela de **cartas rápidas** (quick-play). No V1, auto-passa se não houver carta rápida. |
+| 5 | **RESOLUÇÃO** | O ATK total de cada campo ataca os slots do adversário. Sobra vai para a base. |
 
 ---
 
-## ⏱️ ATB e Anti-empate
+## ⚔️ Resolução (o coração do combate)
 
-- **ATB** regenera ~0.6/s (máx 10). Cada carta custa ATB para jogar.
-- **3 min** → ⚡ Turbo (2× velocidade)
-- **4 min** → 🔥 Turbo+ (4× velocidade)
-- **5 min** → 💀 Morte Súbita (um hit mata)
-- **Deck Out** (deck + mão vazios) = derrota.
+1. Soma-se o **ATK efetivo** de todas as cartas no campo de cada lado: `sumAtk(field)`.
+2. Esse total ataca os slots inimigos **em ordem**: slot 1 → 2 → 3 → 4 → Comandante.
+3. Cada slot **absorve** dano até seu HP acabar; o excesso passa para o próximo slot.
+4. Cartas que zeram o HP vão para o **cemitério** (e dão pontos ao atacante).
+5. Se sobrar dano depois de limpar o campo → **overflow** desconta da **base** inimiga.
+6. **Player e IA resolvem ao mesmo tempo** (ambos podem se machucar no mesmo turno).
+
+### ATK efetivo (rank)
+```
+ATK efetivo = ATK base × multiplicador de rank
+```
+
+### Empate de bases
+Se as duas bases chegam a 0 no mesmo turno, compara-se o ATK em campo. Maior ATK vence. Se igual, ambas ficam em **1 LP** e o jogo continua.
+
+---
+
+## 📈 Rank de Carta (tempo em campo)
+
+Quanto mais tempo uma carta sobrevive em campo, mais forte fica:
+
+| Turnos em campo | Rank | Multiplicador de ATK |
+|---|---|---|
+| 0–1 | 🥉 Bronze | ×1.00 |
+| 2–3 | 🥈 Prata | ×1.10 |
+| 4+ | 🥇 Ouro | ×1.25 |
+
+> Não confundir com os **Níveis de Carta** (Bronze→Diamante do roguelike), que são permanentes e vêm das recompensas. O rank é temporário e vale só dentro do fight.
+
+---
+
+## 🃏 Triângulo de Tipos
+
+```
+ATAQUE ⚔  ·  DEFESA 🛡  ·  EQUILÍBRIO ⚖
+(ATK)        (DEF)         (BAL)
+```
+
+Cada carta tem um tipo, visível no tabuleiro. A regra de vantagem (ATAQUE > DEFESA > EQUILÍBRIO > ATAQUE) **está presente nos dados mas ainda não afeta a resolução** no V1 — é um dos pontos de polish em aberto (`POLISH.md` #3). Renomear `ATK/DEF/BAL` → `ATAQUE/DEFESA/EQUILÍBRIO` também está pendente.
+
+---
+
+## 🎨 Vibes (a implementar)
+
+Sistema paralelo ao triângulo (funcionam como **tipos do Pokémon**: cada carta tem tipo **e** vibe). 5 vibes, com cores e mecânicas passivas já aprovadas; nomes finais a definir pelo usuário (tom engraçado/adulto).
+
+| Cor | Tema | Mecânica passiva |
+|---|---|---|
+| 🟡 Amarelo | Festa/Energia | (readaptar p/ turn-based) |
+| 🔴 Vermelho | Força bruta | Bônus de dano |
+| 🔵 Azul | Controle/Cura | Cura aliados |
+| 🟣 Roxo | Caos/Debuff | Debuff ao morrer |
+| 🟢 Verde | Sustain | Ganha stats progressivamente |
+
+**Sinergia:** 2 cartas da mesma vibe em campo → +10% no stat relevante; 3+ → +20%.
+
+Detalhes e estado em `POLISH.md` #2.
+
+---
+
+## 👑 Comandante (a definir)
+
+O slot CMD só aceita cartas marcadas como `commander`. Hoje nenhuma carta é comandante e o slot não tem bônus especial. A regra (o que torna uma carta Comandante, e que vantagem o slot dá) é um ponto de design em aberto — `POLISH.md` #6.
+
+---
+
+## ⭐ Estrelas e Tributo (a portar)
+
+Cartas têm `star` (1–6) e `tribute` (0–1). No design legado, estrelas altas exigiam sacrificar uma unidade em campo. Essa lógica **ainda não foi portada** para a Down Fase do turn-based — `POLISH.md` #8.
 
 ---
 
@@ -123,7 +126,14 @@ Início (nome + dificuldade)
 ### Recompensas possíveis
 1. **Level up** de uma carta (Bronze → ... → Diamante)
 2. **Nova carta** adicionada ao deck da run
-3. **Buff de deck** permanente (ex: +5% HP geral, −1 custo de peões)
+3. **Buff de deck** permanente (ex: +5% HP geral, +1 carta inicial na mão)
+
+### Dificuldades
+| Dificuldade | Nível das cartas da IA | Mult. de ATK |
+|---|---|---|
+| Iniciante | Bronze | ×0.8 |
+| Veterano | Prata | ×1.0 |
+| Mestre | Platina | ×1.25 |
 
 ---
 
@@ -131,19 +141,14 @@ Início (nome + dificuldade)
 
 | Evento | Pontos |
 |---|---|
-| Unidade inimiga morta | +50 a +200 (por estrela) |
-| Dano em torre/base | +1 por HP |
-| Vitória no fight | +500 |
-| Bônus velocidade (<1/2/3 min) | +500 / +300 / +100 |
-| Cartas restantes na mão | +20 cada |
-| Cartas restantes no deck | +10 cada |
-| Unidade própria perdida | −30 a −100 |
+| Carta inimiga destruída na resolução | + ATK da carta |
+| Vitória no fight | +500 + (10 × turno) |
 
-Score total acumula os 3 fights e entra no ranking local (top 10).
+> A pontuação foi simplificada na v5 (os bônus de velocidade ligados ao timer saíram com o engine real-time). Score total acumula os 3 fights e entra no ranking local (top 10). Refinamento de pontuação é polish em aberto.
 
 ---
 
-## ⭐ Níveis de Carta
+## ⭐ Níveis de Carta (persistentes)
 
 | Nível | Tier | Multiplicador | Borda |
 |---|---|---|---|
@@ -154,4 +159,16 @@ Score total acumula os 3 fights e entra no ranking local (top 10).
 | 5 | Esmeralda | ×1.50 | pulsante |
 | 6 | Diamante | ×1.75 | arco-íris |
 
-Os níveis persistem entre sessões (localStorage) e sobem via recompensas.
+Persistem entre sessões (localStorage) e sobem via recompensas roguelike entre os 3 fights.
+
+---
+
+## 🧩 Constantes do engine (`index.html`)
+
+| Constante | Valor | Significado |
+|---|---|---|
+| `HAND_LIMIT` | 5 | Tamanho máximo da mão |
+| `BASE_HP` | 2000 | LP de cada base |
+| `PHASES` | `['draw','standby','main','lastminute','resolution']` | Ordem das fases |
+
+> Funções-chave: `initFight`, `startPhase`, `phaseDraw/Standby/Main/LastMinute/Resolution`, `applyDamageToField`, `sumAtk`, `getEffAtk`, `endFight`. Ver seção "Arquitetura" no `CLAUDE.md`.
