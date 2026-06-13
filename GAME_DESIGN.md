@@ -1,6 +1,11 @@
 # 🎲 GAME DESIGN — Batalha dos Amigos
 
-Documento de referência das mecânicas. Para os números exatos, veja `GAME_DATA.md` / `.csv`.
+> ⚠️ **LEGADO (v4 / real-time lanes).** Este documento descreve o engine ANTIGO baseado em lanes/ATB/Fort Condor, que foi **substituído na v5 pelo formato turn-based** (Yu-Gi-Oh! Forbidden Memories). Mantido apenas como referência histórica das ideias de carta/herói.
+>
+> Para as mecânicas atuais, veja **`CLAUDE.md`** (seção "Mecânicas-chave v5"). Para o backlog de polish e decisões em aberto, veja **`POLISH.md`**.
+> Este arquivo será reescrito depois que as decisões de design da v5 forem fechadas no chat.
+
+Documento de referência das mecânicas (LEGADO). Para os números exatos, veja `GAME_DATA.md` / `.csv`.
 
 ---
 

@@ -21,9 +21,10 @@
 fortbc/
 ├── index.html          # o jogo completo (single-file, ~300KB com base64 fallback)
 ├── CLAUDE.md           # este arquivo
+├── POLISH.md           # backlog de polish v5.1 + briefing p/ discussão no chat
 ├── README.md
 ├── ASSETS.md
-├── GAME_DESIGN.md
+├── GAME_DESIGN.md      # ⚠️ LEGADO (descreve engine v4 real-time)
 ├── GAME_DATA.md
 ├── GAME_DATA.csv       # fonte de verdade dos stats (edição manual, refletir em BASE_CARDS)
 ├── SETUP.md
@@ -211,8 +212,12 @@ O engine real-time (lanes, ATB, gameLoop, etc.) ainda existe nas linhas 514-825 
 
 ## ✅ Próximas tarefas (backlog priorizado)
 
+> **Fase de POLISH (v5.1):** o gameplay V1 turn-based foi testado e funciona mecanicamente. O backlog de polish está detalhado em **`POLISH.md`**, separando o que precisa de decisão criativa do usuário (🗣️ CHAT) do que é implementação direta (🔧). Consultar antes de iniciar polish.
+
+### Concluído
+- [x] Testar o fluxo completo do jogo turn-based — OK (2026-06-12)
+
 ### Urgente — Gameplay V1 (turn-based recém-implementado)
-- [ ] **Testar o fluxo completo** do jogo turn-based: Draw → Standby → Down Fase → Last Minute → Resolução → vitória/derrota
 - [ ] Limpar o código antigo (engine real-time linhas 514-825) — opcional, não bloqueia nada
 - [ ] Implementar triângulo de tipos na resolução (ATK bate DEF bate BAL bate ATK, multiplicador 1.5x/0.67x)
 - [ ] Implementar mecânica de "campo deve ser zerado antes de atacar a base" (opcional para V1)
