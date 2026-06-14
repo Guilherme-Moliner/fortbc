@@ -68,6 +68,31 @@ Batalha dos Amigos (`fortbc`) — jogo de cartas turn-based single-file (`index.
 - [ ] Conteúdo narrativo da Campanha (sprite+texto digitando) — só depois
 - [ ] Wire da camada 2 (Apps Script/Sheets) em `Save.cloudSync()`
 
+## 🔎 Lista de crítica / decisões abertas (REVISAR na próxima sessão de menus)
+> Subimos a v5.1 com "está bom o suficiente". O usuário quer retomar ESTA lista quando voltar à frente de menus. Tratar como pauta de discussão.
+
+**Identidade & tom (gosto do usuário):**
+- [ ] Paleta dourado/escuro → identidade boteco/zoeira (POLISH.md #1)
+- [ ] Tom dos textos de UI mais ácido/adulto (hoje só algumas piadas; maioria neutra)
+- [ ] Logo é só tipografia (Cinzel) — sem arte real
+
+**Nomes provisórios (trocar):**
+- [ ] Vibes: `Os Festeiros / Os Brutamontes / Os Maestros / Os Caóticos / As Raízes`
+- [ ] Oponentes: `O Novato / Floripa / O Veterano de Bar / A Lenda do Boteco`
+- [ ] Boosters: `Pacote Boteco / Pacote Herói` · Licenças: `Aprendiz→Lenda`
+
+**Números chutados (rebalancear):**
+- [ ] Dinheiro inicial 300; +50/fight roguelite, +30/duelo livre
+- [ ] Boosters: 💰100 (pity 8) e 💰250 (pity 6); raridade 70/24/6%
+- [ ] Licença sobe em 0/5/15/30/60 duelos
+
+**UX a revisar:**
+- [ ] Fade ~0.3s — velocidade boa?
+- [ ] Fundo animado: 8 cartas, velocidade — polui?
+- [ ] HUD só no menu — querer em mais telas?
+- [ ] Duelo Livre: dificuldade fixa por oponente vs. oponente × dificuldade separados
+- [ ] Layout mobile-first parece pequeno no desktop largo — ajustar?
+
 ## Dependências
 - Identidade visual (POLISH.md #1) precisa ser decidida no chat antes do redesign completo
 - OST: `ost_menu.mp3` toca no menu principal (ainda não existe o arquivo)
