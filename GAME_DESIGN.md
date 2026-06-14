@@ -163,6 +163,43 @@ Persistem entre sessões (localStorage) e sobem via recompensas roguelike entre 
 
 ---
 
+## 💰 Economia & Progressão de Conta (v5.1 — implementado)
+
+> Camada de **meta-progressão** fora do combate. Vive no `Save` (localStorage, chave `fortbc_save`). Tabelas editáveis no topo do bloco `MENU SYSTEM` do `index.html`. Ver também `CONTEXT_MENUS.md`.
+
+### Conta & Coleção
+- Ao criar conta, o jogador escolhe **1 de 5 vibes** (tela `deckselect`). Isso define o **deck inicial** (`STARTER_DECKS` + `STARTER_BASE`), que vira a **coleção/histórico** do player (`Save.collection`).
+- A **Biblioteca** funciona como álbum de figurinhas: mostra todas as cartas, mas só as da coleção são reveladas; o resto aparece como **verso ("não descoberta")**. Adquirir uma carta (loja; futuramente, dropar em jogo) a revela.
+- ⚠️ Hoje o deck **jogável** ainda usa todo o `BASE_CARDS` (não a coleção) — amarrar os dois é tarefa futura.
+
+### Dinheiro (💰)
+- Começa em **300**. Ganha **+50** por fight vencido (roguelite) e **+30** por duelo livre vencido (em `endFight`).
+- Gasto na **Loja** em boosters.
+
+### Loja & Boosters (gacha estilo Duel Links)
+- Cada booster (`BOOSTERS`) tem **preço**, **tamanho** (nº de cartas), um **pool** com raridades e um valor de **pity**.
+- **Raridades** (`RARITY`): Comum (peso 70), Raro (24), Lendário (6).
+- **Sorteio** (`rarityRoll`): ponderado pelo peso da raridade.
+- **Pity**: a cada `pity` aberturas sem nenhuma carta não-comum, a última carta do pacote é **forçada** a ser Raro/Lendário. Contador por booster em `Save.pity`.
+- Boosters atuais (placeholder de balanceamento): **Pacote Boteco** (💰100, 3 cartas, pity 8) e **Pacote Herói** (💰250, 3 cartas, pity 6).
+
+### Licença de Duelista (🪪 — gate de mecânicas)
+- Nível de maturidade da conta. Evolui por **nº de duelos** (`recordDuel` em `endFight`) — ou, futuramente, por **passwords** específicos.
+- Cada tier (`LICENSE_TIERS`) libera uma **fusão**: Aprendiz→Dupla, Duelista→Tripla, Veterano→Quádrupla, Mestre→Quíntupla, Lenda→tudo.
+- ⚠️ A **mecânica de fusão em si ainda não existe** no engine (pertence à frente de Gameplay). A licença já rastreia/exibe o que estaria liberado.
+
+| Lv | Nome | Duelos | Libera |
+|---|---|---|---|
+| 1 | Aprendiz | 0 | Fusão Dupla |
+| 2 | Duelista | 5 | Fusão Tripla |
+| 3 | Veterano | 15 | Fusão Quádrupla |
+| 4 | Mestre | 30 | Fusão Quíntupla |
+| 5 | Lenda | 60 | Tudo liberado |
+
+> Os números (preços, pesos, pity, thresholds) e nomes das vibes são **placeholders** — sujeitos a balanceamento/renome.
+
+---
+
 ## 🧩 Constantes do engine (`index.html`)
 
 | Constante | Valor | Significado |

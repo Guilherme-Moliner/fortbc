@@ -232,6 +232,129 @@ body{background:var(--bg0);color:var(--text);font-family:'Cinzel',serif;overflow
 .hs-table tr:first-child td{color:var(--gold);font-weight:700;}
 ::-webkit-scrollbar{width:4px;height:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 
+/* ══ MENU SYSTEM (polish v5.1) ══ */
+#screen-title{align-items:center;justify-content:center;cursor:pointer;background:radial-gradient(ellipse at 50% 35%,#241a3e 0%,var(--bg0) 70%);}
+.title-wrap{text-align:center;position:relative;z-index:2;}
+.title-logo{font-family:'Cinzel Decorative',cursive;font-size:3.8rem;line-height:1;color:var(--gold);text-shadow:var(--glow-gold),0 0 42px rgba(240,180,41,.3);letter-spacing:5px;}
+.title-logo .small{display:block;font-size:1.2rem;letter-spacing:12px;color:var(--text);margin-top:8px;}
+.title-tagline{font-size:.74rem;color:var(--dim);letter-spacing:2px;margin:20px 0 46px;font-style:italic;}
+.title-blink{font-size:.98rem;letter-spacing:4px;color:var(--gold);animation:blink 1.1s steps(1) infinite;}
+@keyframes blink{50%{opacity:0;}}
+.title-version{position:fixed;bottom:12px;left:0;right:0;text-align:center;font-size:.55rem;color:var(--dim);letter-spacing:2px;z-index:2;}
+
+/* fade entre telas (~0.3s, dá peso à troca) */
+#fade{position:fixed;inset:0;background:var(--bg0);opacity:0;pointer-events:none;transition:opacity .15s ease;z-index:500;}
+#fade.on{opacity:1;pointer-events:all;}
+
+/* fundo animado de cartas (dica do que vem) */
+#menu-bg{position:fixed;inset:0;overflow:hidden;z-index:0;pointer-events:none;opacity:0;transition:opacity .5s;}
+#menu-bg.show{opacity:.42;}
+.bg-card{position:absolute;width:86px;height:128px;border-radius:8px;border:1px solid var(--border);box-shadow:0 8px 30px rgba(0,0,0,.6);overflow:hidden;background:var(--bg2);will-change:transform;filter:saturate(.85);animation:floaty var(--dur) ease-in-out infinite;}
+.bg-card img{width:100%;height:100%;object-fit:cover;}
+@keyframes floaty{0%{transform:translateY(0) rotate(var(--rot));}50%{transform:translateY(-28px) rotate(calc(var(--rot) + 5deg));}100%{transform:translateY(0) rotate(var(--rot));}}
+
+#screen-nameload,#screen-menu,#screen-campaign,#screen-runsetup,#screen-freeduel,#screen-password,#screen-deckselect,#screen-score,#screen-shop{align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 30%,#1a1a3e 0%,var(--bg0) 70%);}
+#screen-library{align-items:center;justify-content:flex-start;background:radial-gradient(ellipse at 50% 0%,#1a1a3e 0%,var(--bg0) 60%);}
+
+.menu-panel{position:relative;z-index:2;background:rgba(22,22,40,.93);border:1px solid var(--border);border-radius:16px;padding:32px 40px;max-width:480px;width:92%;box-shadow:var(--glow-gold),var(--shadow);}
+.menu-panel h1{font-family:'Cinzel Decorative',cursive;font-size:1.85rem;color:var(--gold);text-shadow:var(--glow-gold);letter-spacing:2px;text-align:center;margin-bottom:5px;}
+.menu-panel .who{text-align:center;font-size:.66rem;color:var(--dim);letter-spacing:2px;margin-bottom:22px;}
+.menu-panel label{display:block;font-size:.62rem;color:var(--dim);letter-spacing:2px;text-align:left;margin:0 0 7px;}
+.menu-panel input[type=text]{width:100%;padding:13px 16px;background:var(--bg1);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Cinzel',serif;font-size:.95rem;outline:none;margin-bottom:18px;text-align:center;letter-spacing:2px;}
+.menu-panel input[type=text]:focus{border-color:var(--gold);}
+.menu-hint{text-align:center;font-size:.58rem;color:var(--dim);letter-spacing:1px;margin-top:16px;}
+.back-btn{display:block;margin:18px auto 0;}
+.load-actions{display:flex;gap:10px;justify-content:center;margin-top:8px;}
+
+/* vertical menu (estilo Forbidden Memories) */
+.vmenu{list-style:none;display:flex;flex-direction:column;gap:6px;margin:4px 0;width:100%;}
+.vmenu-item{display:flex;align-items:center;gap:11px;padding:15px 22px;border:1px solid transparent;border-radius:10px;cursor:pointer;font-size:.98rem;letter-spacing:2px;color:var(--text);background:rgba(255,255,255,.02);transition:all .12s;}
+.vmenu-item .vm-cur{opacity:0;color:var(--gold);transition:opacity .12s;}
+.vmenu-item .vm-sub{font-size:.55rem;color:var(--dim);letter-spacing:1px;margin-left:auto;}
+.vmenu-item:hover,.vmenu-item.sel{border-color:var(--gold);background:rgba(240,180,41,.1);color:var(--gold);}
+.vmenu-item.sel .vm-cur{opacity:1;}
+.vmenu-item.locked{opacity:.45;cursor:not-allowed;}
+.vmenu-item.locked:hover{border-color:transparent;background:rgba(255,255,255,.02);color:var(--text);}
+
+/* HUD inferior do menu */
+#menu-hud{position:fixed;left:0;right:0;bottom:0;z-index:6;display:none;align-items:center;gap:13px;padding:9px 16px;background:linear-gradient(0deg,rgba(7,7,16,.97),rgba(7,7,16,.72));border-top:1px solid var(--border);font-size:.6rem;letter-spacing:1px;flex-wrap:wrap;}
+#menu-hud.show{display:flex;}
+.hud-name{color:var(--gold);font-weight:700;font-size:.72rem;}
+.hud-stat{color:var(--dim);display:flex;align-items:center;gap:4px;}
+.hud-stat b{color:var(--text);}
+.hud-spacer{margin-left:auto;}
+.hud-btn{background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 12px;font-size:.62rem;cursor:pointer;font-family:'Cinzel',serif;letter-spacing:1px;transition:all .15s;}
+.hud-btn:hover{border-color:var(--gold);color:var(--gold);}
+
+/* deck select (vibes) */
+.vibe-grid{display:flex;flex-direction:column;gap:9px;margin:6px 0;}
+.vibe-opt{display:flex;align-items:center;gap:12px;padding:13px 16px;border:1px solid var(--border);border-radius:10px;cursor:pointer;background:var(--bg1);transition:all .15s;text-align:left;}
+.vibe-opt:hover,.vibe-opt.sel{border-color:var(--vibe,var(--gold));background:rgba(240,180,41,.07);}
+.vibe-dot{width:18px;height:18px;border-radius:50%;flex-shrink:0;box-shadow:0 0 10px var(--vibe);}
+.vibe-info{flex:1;}
+.vibe-nm{font-size:.86rem;color:var(--text);letter-spacing:1px;}
+.vibe-tm{font-size:.56rem;color:var(--dim);margin-top:2px;}
+
+/* score / leaderboard */
+.score-panel{position:relative;z-index:2;background:rgba(22,22,40,.94);border:1px solid var(--border);border-radius:16px;padding:30px 36px;max-width:560px;width:94%;box-shadow:var(--shadow);}
+.score-panel h1{font-family:'Cinzel Decorative',cursive;font-size:1.7rem;color:var(--gold);text-align:center;letter-spacing:2px;margin-bottom:4px;}
+.score-empty{text-align:center;font-size:.62rem;color:var(--dim);padding:24px 0;letter-spacing:1px;}
+
+/* loja */
+.shop-grid{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin:8px 0;}
+.booster{width:164px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px 12px;text-align:center;cursor:pointer;transition:all .2s;}
+.booster:hover{border-color:var(--gold);transform:translateY(-4px);box-shadow:var(--glow-gold);}
+.booster .bo-icon{font-size:2.6rem;margin-bottom:8px;}
+.booster .bo-name{font-size:.74rem;color:var(--gold);letter-spacing:1px;margin-bottom:4px;}
+.booster .bo-desc{font-size:.54rem;color:var(--dim);line-height:1.5;margin-bottom:8px;}
+.booster .bo-price{font-size:.68rem;color:var(--text);}
+.booster .bo-pity{font-size:.5rem;color:var(--dim);margin-top:5px;}
+
+/* abertura de booster (gacha) */
+#booster-open{position:fixed;inset:0;background:rgba(3,3,10,.93);z-index:320;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;backdrop-filter:blur(3px);}
+#booster-open.open{display:flex;}
+.bo-results{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;max-width:700px;}
+.bo-pull{width:98px;text-align:center;animation:msgIn .4s;}
+.bo-pull .bp-img{height:66px;display:flex;align-items:center;justify-content:center;font-size:2rem;border-radius:8px;background:var(--bg1);overflow:hidden;margin-bottom:5px;border:1px solid var(--border);}
+.bo-pull .bp-img img{width:100%;height:100%;object-fit:cover;}
+.bo-pull.rare .bp-img{border-color:var(--gold);box-shadow:var(--glow-gold);}
+.bo-pull .bp-name{font-size:.56rem;color:var(--text);}
+.bo-pull .bp-tag{font-size:.46rem;letter-spacing:1px;}
+
+/* modais (settings / login) */
+.modal{position:fixed;inset:0;background:rgba(3,3,10,.82);z-index:340;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px);}
+.modal.open{display:flex;}
+.modal-box{background:var(--bg2);border:1px solid var(--gold);border-radius:14px;padding:26px 30px;max-width:340px;width:90%;text-align:center;box-shadow:var(--glow-gold),var(--shadow);}
+.modal-box h2{font-family:'Cinzel Decorative',cursive;font-size:1.25rem;color:var(--gold);margin-bottom:16px;letter-spacing:1px;}
+.modal-box label{display:block;font-size:.6rem;color:var(--dim);letter-spacing:1px;text-align:left;margin:12px 0 6px;}
+.modal-box input[type=range]{width:100%;accent-color:var(--gold);}
+.modal-row{display:flex;justify-content:space-between;align-items:center;font-size:.64rem;color:var(--text);margin:10px 0;}
+
+/* biblioteca */
+.lib-head{text-align:center;padding:20px 0 6px;}
+.lib-head h1{font-family:'Cinzel Decorative',cursive;font-size:1.6rem;color:var(--gold);text-shadow:var(--glow-gold);letter-spacing:2px;}
+.lib-sub{font-size:.56rem;color:var(--dim);letter-spacing:1px;}
+.lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(102px,1fr));gap:11px;padding:10px 18px 18px;overflow-y:auto;width:100%;max-width:920px;}
+.lib-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 6px;text-align:center;cursor:pointer;transition:all .15s;}
+.lib-card:hover{border-color:var(--gold);transform:translateY(-3px);box-shadow:var(--glow-gold);}
+.lib-card.locked{cursor:not-allowed;}
+.lib-card.locked:hover{border-color:var(--border);transform:none;box-shadow:none;}
+.lib-card .lc-img{height:66px;display:flex;align-items:center;justify-content:center;font-size:2.1rem;border-radius:6px;margin-bottom:5px;overflow:hidden;background:var(--bg1);}
+.lib-card .lc-img img{width:100%;height:100%;object-fit:cover;}
+.lib-card .lc-img.back{background:repeating-linear-gradient(45deg,#15152a,#15152a 6px,#23234a 6px,#23234a 12px);color:var(--gold);font-size:1.7rem;}
+.lib-card .lc-name{font-size:.6rem;color:var(--text);}
+.lib-card .lc-type{font-size:.5rem;color:var(--dim);margin-top:2px;}
+
+/* card viewer modal */
+#card-viewer{position:fixed;inset:0;background:rgba(3,3,10,.86);z-index:300;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px);}
+#card-viewer.open{display:flex;}
+.cv-box{background:var(--bg2);border:1px solid var(--gold);border-radius:16px;padding:26px 30px;max-width:340px;width:90%;text-align:center;box-shadow:var(--glow-gold),var(--shadow);}
+.cv-img{height:170px;display:flex;align-items:center;justify-content:center;font-size:4.5rem;border-radius:10px;margin-bottom:14px;overflow:hidden;background:var(--bg1);}
+.cv-img img{width:100%;height:100%;object-fit:cover;}
+.cv-name{font-family:'Cinzel Decorative',cursive;font-size:1.35rem;color:var(--gold);margin-bottom:6px;}
+.cv-meta{font-size:.64rem;color:var(--dim);letter-spacing:1px;margin-bottom:14px;}
+.cv-stats{display:flex;justify-content:center;gap:22px;font-size:.95rem;margin-bottom:12px;}
+
 </style>
 </head>
 <body>
@@ -245,21 +368,160 @@ body{background:var(--bg0);color:var(--text);font-family:'Cinzel',serif;overflow
   </div>
 </div>
 
-<!-- START -->
-<div id="screen-start" class="screen hidden">
-  <div class="start-box">
-    <h1>⚔ BATALHA</h1>
-    <div class="sub">DOS AMIGOS</div>
-    <label>SEU NOME</label>
-    <input type="text" id="inp-name" placeholder="Ex: Arthur" maxlength="20" onkeydown="if(event.key==='Enter')startApp()">
-    <label>DIFICULDADE</label>
-    <div class="diff-row">
-      <div class="diff-opt"><input type="radio" name="diff" id="d-easy" value="easy" checked><label for="d-easy">🌱<br>Iniciante</label></div>
-      <div class="diff-opt"><input type="radio" name="diff" id="d-med" value="medium"><label for="d-med">⚔<br>Veterano</label></div>
-      <div class="diff-opt"><input type="radio" name="diff" id="d-hard" value="hard"><label for="d-hard">💀<br>Mestre</label></div>
-    </div>
-    <button class="btn btn-primary" onclick="startApp()">⚔ INICIAR BATALHA</button>
+<!-- FUNDO ANIMADO (cartas flutuando) -->
+<div id="menu-bg"></div>
+
+<!-- TITLE -->
+<div id="screen-title" class="screen hidden" onclick="advanceTitle()">
+  <div class="title-wrap">
+    <div class="title-logo">BATALHA<span class="small">DOS AMIGOS</span></div>
+    <div class="title-tagline">a treta começa no boteco</div>
+    <div class="title-blink">▸ PRESSIONE START ◂</div>
   </div>
+  <div class="title-version">v5.1 · BC vs FLORIPA</div>
+</div>
+
+<!-- NAME / LOAD -->
+<div id="screen-nameload" class="screen hidden">
+  <div class="menu-panel">
+    <h1>QUEM É VOCÊ?</h1>
+    <div class="who" id="nl-sub">Digite seu nome de guerra</div>
+    <div id="nl-new">
+      <label>SEU NOME</label>
+      <input type="text" id="inp-name" placeholder="Ex: Arthur" maxlength="20" onkeydown="if(event.key==='Enter')confirmNewName()">
+      <button class="btn btn-primary" style="width:100%" onclick="confirmNewName()">⚔ COMEÇAR</button>
+    </div>
+    <div id="nl-load" class="hidden">
+      <div style="text-align:center;font-size:1.2rem;color:var(--gold);letter-spacing:2px;margin:2px 0 4px;" id="nl-savename">—</div>
+      <div style="text-align:center;font-size:.5rem;color:var(--dim);margin-bottom:18px;" id="nl-saveinfo"></div>
+      <div class="load-actions">
+        <button class="btn btn-primary" onclick="continueSave()">▶ CONTINUAR</button>
+        <button class="btn btn-ghost" onclick="newGameReset()">✚ NOVO JOGO</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MENU PRINCIPAL -->
+<div id="screen-menu" class="screen hidden">
+  <div class="menu-panel">
+    <h1>⚔ MENU</h1>
+    <div class="who" id="menu-who">— · BC</div>
+    <ul class="vmenu" id="menu-list">
+      <li class="vmenu-item" onclick="VMenu.click(0)"><span class="vm-cur">▶</span>🏆 CAMPANHA<span class="vm-sub">modo história</span></li>
+      <li class="vmenu-item" onclick="VMenu.click(1)"><span class="vm-cur">▶</span>🎲 ROGUELITE<span class="vm-sub">3 fights + loot</span></li>
+      <li class="vmenu-item" onclick="VMenu.click(2)"><span class="vm-cur">▶</span>🍺 DUELO LIVRE<span class="vm-sub">escolha o rival</span></li>
+      <li class="vmenu-item" onclick="VMenu.click(3)"><span class="vm-cur">▶</span>🛒 LOJA<span class="vm-sub">boosters de cartas</span></li>
+      <li class="vmenu-item" onclick="VMenu.click(4)"><span class="vm-cur">▶</span>📖 BIBLIOTECA<span class="vm-sub">sua coleção</span></li>
+      <li class="vmenu-item" onclick="VMenu.click(5)"><span class="vm-cur">▶</span>🏅 SCORE<span class="vm-sub">ranking roguelite</span></li>
+      <li class="vmenu-item" onclick="VMenu.click(6)"><span class="vm-cur">▶</span>🔑 PASSWORD<span class="vm-sub">deck por código</span></li>
+    </ul>
+    <div class="menu-hint">↑↓ navegar · ENTER selecionar</div>
+  </div>
+</div>
+
+<!-- HUD inferior do menu -->
+<div id="menu-hud">
+  <span class="hud-name" id="hud-name">—</span>
+  <span class="hud-stat">📖 <b id="hud-chapter">Cap 1</b></span>
+  <span class="hud-stat">💰 <b id="hud-money">0</b></span>
+  <span class="hud-stat" id="hud-license-wrap" title="Nível de licença de duelista">🪪 <b id="hud-license">Lv1</b></span>
+  <span class="hud-spacer"></span>
+  <button class="hud-btn" onclick="openSettings()" title="Configurações">⚙</button>
+  <button class="hud-btn" onclick="openLogin()" title="Login (em breve)">🔐 Login</button>
+</div>
+
+<!-- CAMPANHA (esqueleto — sem conteúdo narrativo) -->
+<div id="screen-campaign" class="screen hidden">
+  <div class="menu-panel">
+    <h1>🏆 CAMPANHA</h1>
+    <div class="who">modo história · em construção</div>
+    <ul class="vmenu" id="campaign-list">
+      <li class="vmenu-item" onclick="VMenu.click(0)"><span class="vm-cur">▶</span>1 · O Pré<span class="vm-sub">🚧 em breve</span></li>
+      <li class="vmenu-item" onclick="VMenu.click(1)"><span class="vm-cur">▶</span>2 · A Treta<span class="vm-sub">🔒 bloqueado</span></li>
+      <li class="vmenu-item" onclick="VMenu.click(2)"><span class="vm-cur">▶</span>3 · A Ressaca<span class="vm-sub">🔒 bloqueado</span></li>
+    </ul>
+    <button class="btn btn-ghost back-btn" onclick="showScreen('menu')">‹ VOLTAR</button>
+  </div>
+</div>
+
+<!-- ROGUELITE: setup de dificuldade -->
+<div id="screen-runsetup" class="screen hidden">
+  <div class="menu-panel">
+    <h1>🎲 ROGUELITE</h1>
+    <div class="who">3 fights · escolha a dificuldade</div>
+    <div class="diff-row">
+      <div class="diff-opt"><input type="radio" name="rsdiff" id="rs-easy" value="easy" checked><label for="rs-easy">🌱<br>Iniciante</label></div>
+      <div class="diff-opt"><input type="radio" name="rsdiff" id="rs-med" value="medium"><label for="rs-med">⚔<br>Veterano</label></div>
+      <div class="diff-opt"><input type="radio" name="rsdiff" id="rs-hard" value="hard"><label for="rs-hard">💀<br>Mestre</label></div>
+    </div>
+    <button class="btn btn-primary" style="width:100%" onclick="startRoguelite()">⚔ INICIAR RUN</button>
+    <button class="btn btn-ghost back-btn" onclick="showScreen('menu')">‹ VOLTAR</button>
+  </div>
+</div>
+
+<!-- DUELO LIVRE: lista de adversários -->
+<div id="screen-freeduel" class="screen hidden">
+  <div class="menu-panel">
+    <h1>🍺 DUELO LIVRE</h1>
+    <div class="who">escolha seu adversário · partida avulsa</div>
+    <ul class="vmenu" id="fd-opponents"></ul>
+    <button class="btn btn-ghost back-btn" onclick="showScreen('menu')">‹ VOLTAR</button>
+  </div>
+</div>
+
+<!-- PASSWORD -->
+<div id="screen-password" class="screen hidden">
+  <div class="menu-panel">
+    <h1>🔑 PASSWORD</h1>
+    <div class="who">insira um código pra carregar um deck</div>
+    <label>CÓDIGO</label>
+    <input type="text" id="inp-pass" placeholder="Ex: BOTECO" maxlength="16" style="text-transform:uppercase" onkeydown="if(event.key==='Enter')submitPassword()">
+    <button class="btn btn-primary" style="width:100%" onclick="submitPassword()">▶ CARREGAR</button>
+    <div id="pass-msg" style="font-size:.5rem;letter-spacing:1px;margin-top:10px;min-height:14px;"></div>
+    <button class="btn btn-ghost back-btn" onclick="showScreen('menu')">‹ VOLTAR</button>
+  </div>
+</div>
+
+<!-- DECK SELECT (escolha de vibe inicial, pós criação de conta) -->
+<div id="screen-deckselect" class="screen hidden">
+  <div class="menu-panel">
+    <h1>SEU PRIMEIRO BARALHO</h1>
+    <div class="who">escolha a vibe que combina com você</div>
+    <div class="vibe-grid" id="vibe-grid"></div>
+    <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="confirmStarter()">⚔ FECHAR NEGÓCIO</button>
+  </div>
+</div>
+
+<!-- SCORE / RANKING -->
+<div id="screen-score" class="screen hidden">
+  <div class="score-panel">
+    <h1>🏅 SCORE</h1>
+    <div class="who">melhores runs do modo Roguelite</div>
+    <table class="hs-table"><thead><tr><th>#</th><th>NOME</th><th>SCORE</th><th>DIFF</th><th>DATA</th></tr></thead><tbody id="score-tbody"></tbody></table>
+    <div class="score-empty hidden" id="score-empty">Nenhuma run registrada ainda. Vai lá jogar! 🍻</div>
+    <button class="btn btn-ghost back-btn" onclick="showScreen('menu')">‹ VOLTAR</button>
+  </div>
+</div>
+
+<!-- LOJA -->
+<div id="screen-shop" class="screen hidden">
+  <div class="menu-panel" style="max-width:600px">
+    <h1>🛒 LOJA</h1>
+    <div class="who">💰 <b id="shop-money" style="color:var(--gold)">0</b> · abra boosters e expanda sua coleção</div>
+    <div class="shop-grid" id="shop-grid"></div>
+    <button class="btn btn-ghost back-btn" onclick="showScreen('menu')">‹ VOLTAR</button>
+  </div>
+</div>
+
+<!-- BIBLIOTECA -->
+<div id="screen-library" class="screen hidden">
+  <div class="lib-head">
+    <h1>📖 BIBLIOTECA</h1>
+    <div class="lib-sub" id="lib-sub">—</div>
+  </div>
+  <div class="lib-grid" id="lib-grid"></div>
+  <button class="btn btn-ghost" style="margin:0 0 16px" onclick="showScreen('menu')">‹ VOLTAR AO MENU</button>
 </div>
 
 <!-- GAME -->
@@ -414,9 +676,46 @@ body{background:var(--bg0);color:var(--text);font-family:'Cinzel',serif;overflow
     <div class="end-score-big" id="end-score">0</div>
     <div class="end-info"><span id="end-name">—</span> | <span id="end-fights">—</span></div>
     <table class="hs-table"><thead><tr><th>#</th><th>NOME</th><th>SCORE</th><th>DIFF</th><th>DATA</th></tr></thead><tbody id="hs-tbody"></tbody></table>
-    <button class="btn btn-primary" onclick="showScreen('start')">🔄 Jogar Novamente</button>
+    <button class="btn btn-primary" onclick="showScreen('menu')">🔄 Voltar ao Menu</button>
   </div>
 </div>
+
+<!-- CARD VIEWER (biblioteca) -->
+<div id="card-viewer" onclick="if(event.target.id==='card-viewer')closeCardViewer()">
+  <div class="cv-box" id="cv-content"></div>
+</div>
+
+<!-- ABERTURA DE BOOSTER (gacha) -->
+<div id="booster-open" onclick="if(event.target.id==='booster-open')closeBooster()">
+  <div style="font-family:'Cinzel Decorative',cursive;font-size:1.3rem;color:var(--gold);letter-spacing:2px" id="bo-title">PACOTE ABERTO!</div>
+  <div class="bo-results" id="bo-results"></div>
+  <button class="btn btn-primary" onclick="closeBooster()">CONTINUAR</button>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div id="settings-modal" class="modal" onclick="if(event.target.id==='settings-modal')closeSettings()">
+  <div class="modal-box">
+    <h2>⚙ CONFIGURAÇÕES</h2>
+    <label>VOLUME DA MÚSICA</label>
+    <input type="range" id="vol-slider" min="0" max="100" value="35" oninput="setVolume(this.value)">
+    <div class="modal-row"><span>Mudo</span><button class="hud-btn" id="mute-toggle" onclick="toggleMute()">🔊</button></div>
+    <button class="btn btn-ghost" style="margin-top:14px" onclick="closeSettings()">FECHAR</button>
+  </div>
+</div>
+
+<!-- LOGIN MODAL (stub camada 3) -->
+<div id="login-modal" class="modal" onclick="if(event.target.id==='login-modal')closeLogin()">
+  <div class="modal-box">
+    <h2>🔐 LOGIN</h2>
+    <div style="font-size:.62rem;color:var(--dim);line-height:1.6;margin-bottom:14px">
+      Login com Google chega numa atualização futura — vai sincronizar seu progresso na nuvem.<br><br>Por enquanto seu save fica salvo só neste navegador.
+    </div>
+    <button class="btn btn-ghost" onclick="closeLogin()">ENTENDIDO</button>
+  </div>
+</div>
+
+<!-- FADE entre telas -->
+<div id="fade"></div>
 
 <div id="msg-area"></div>
 
@@ -972,13 +1271,13 @@ function endFight(winner){
   if(G.gameOver)return;G.gameOver=true;G.winner=winner;
   if(winner==='player'){addScore(500+G.turn*10);showMsg('🏆 VITÓRIA!','green');}else{showMsg('💀 Derrota...','red');}
   APP.fightScore[G.fightNum-1]=G.score;APP.totalScore+=G.score;
-  setTimeout(()=>{if(winner==='player'&&G.fightNum<3)showRewardScreen();else showEndScreen(winner);},1800);
+  if(Save.data){ Save.recordDuel(); if(winner==='player')Save.addMoney(APP.mode==='free'?30:50); }
+  setTimeout(()=>{if(APP.mode!=='free'&&winner==='player'&&G.fightNum<3)showRewardScreen();else showEndScreen(winner);},1800);
 }
 function addScore(p){G.score+=p;const el=document.getElementById('score-display');if(el){el.textContent=G.score;el.style.transform='scale(1.2)';el.style.color=p>0?'#81c784':'#e63946';setTimeout(()=>{el.style.transform='scale(1)';el.style.color='var(--gold)';},300);}}
 
-let APP={playerName:'',difficulty:'easy',fightNum:1,totalScore:0,fightScore:[0,0,0],playerDeck:[],extraHandSize:0};
-function startApp(){const name=document.getElementById('inp-name').value.trim();const diff=document.querySelector('input[name="diff"]:checked')?.value||'easy';if(!name){showMsg('Digite seu nome!','red');return;}APP.playerName=name;APP.difficulty=diff;APP.fightNum=1;APP.totalScore=0;APP.fightScore=[0,0,0];APP.playerDeck=buildPlayerDeck();APP.extraHandSize=0;startFight();}
-function startFight(){showScreen('game');initFight(APP.fightNum,APP.difficulty,APP.playerDeck,APP.extraHandSize);updateBaseUI();updateFieldUI();updateDeckUI();const fi=document.getElementById('fight-info');if(fi)fi.textContent=`Fight ${APP.fightNum}/3 · ${AI_DECKS[APP.difficulty].label}`;startMusic();showMsg(`⚔ Fight ${APP.fightNum}/3 — ${AI_DECKS[APP.difficulty].label}!`,'green');startPhase('draw');}
+let APP={playerName:'',difficulty:'easy',mode:'menu',fightNum:1,totalScore:0,fightScore:[0,0,0],playerDeck:[],extraHandSize:0};
+function startFight(){showScreen('game');initFight(APP.fightNum,APP.difficulty,APP.playerDeck,APP.extraHandSize);updateBaseUI();updateFieldUI();updateDeckUI();const lbl=APP.mode==='free'?'Duelo Livre':'Fight '+APP.fightNum+'/3';const fi=document.getElementById('fight-info');if(fi)fi.textContent=`${lbl} · ${AI_DECKS[APP.difficulty].label}`;startMusic();showMsg(`⚔ ${lbl} — ${AI_DECKS[APP.difficulty].label}!`,'green');startPhase('draw');}
 function showRewardScreen(){showScreen('reward');const opts=generateRewards(3);const cont=document.getElementById('reward-options');cont.innerHTML='';opts.forEach(opt=>{const d=document.createElement('div');d.className='reward-card';d.innerHTML=`<div class="reward-icon">${opt.icon}</div><div class="reward-title">${opt.title}</div><div class="reward-desc">${opt.desc}</div>`;d.onclick=()=>pickReward(opt);cont.appendChild(d);});document.getElementById('reward-fight-score').textContent=G.score;document.getElementById('reward-total-score').textContent=APP.totalScore;}
 function generateRewards(n){const pool=[];const up=BASE_CARDS.filter(c=>c.type!=='ITEM'&&(cardLevels[c.id]||1)<6);if(up.length){const pk=up[Math.floor(Math.random()*up.length)];const lv=cardLevels[pk.id]||1;pool.push({icon:`<span style="color:${LV_COLOR[lv+1]}">★</span>`,title:`Level Up: ${pk.name}`,desc:`${LV_NAMES[lv]} → ${LV_NAMES[lv+1]} (+${Math.round((LV_MULT[lv+1]/LV_MULT[lv]-1)*100)}% stats)`,apply:()=>{cardLevels[pk.id]=lv+1;saveLevels(cardLevels);rebuildPlayerDeck();}});}const ex=BASE_CARDS[Math.floor(Math.random()*BASE_CARDS.length)];pool.push({icon:'🃏',title:`Nova Carta: ${ex.name}`,desc:`+1x ${ex.name} no deck`,apply:()=>{APP.playerDeck.push({...applyCardLevel(ex,cardLevels),uid:uid()});}});const bf=BUFF_POOL[Math.floor(Math.random()*BUFF_POOL.length)];pool.push({icon:bf.icon,title:bf.label,desc:'Buff permanente na run',apply:()=>{bf.apply(APP.playerDeck,APP);}});return shuffle(pool).slice(0,n);}
 function rebuildPlayerDeck(){APP.playerDeck=APP.playerDeck.map(c=>{const b=BASE_CARDS.find(x=>x.id===c.id);if(!b)return c;return{...applyCardLevel(b,cardLevels),uid:c.uid};});}
@@ -986,8 +1285,341 @@ function pickReward(opt){opt.apply();APP.fightNum++;startFight();}
 function showEndScreen(winner){showScreen('end');const won=winner==='player';const t=document.getElementById('end-title');t.textContent=won?'🏆 VITÓRIA!':'💀 DERROTA';t.style.color=won?'#81c784':'#e63946';document.getElementById('end-score').textContent=APP.totalScore;document.getElementById('end-name').textContent=APP.playerName;document.getElementById('end-fights').textContent=APP.fightScore.map((s,i)=>`F${i+1}: ${s}`).join(' | ');if(won)saveScore({name:APP.playerName,score:APP.totalScore,diff:APP.difficulty,date:new Date().toLocaleDateString()});renderHighscores();stopMusic();}
 function renderHighscores(){const sc=loadScores();const tb=document.getElementById('hs-tbody');if(!tb)return;tb.innerHTML='';sc.forEach((s,i)=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${i+1}</td><td>${s.name}</td><td style="color:var(--gold)">${s.score}</td><td>${s.diff}</td><td>${s.date||''}</td>`;tb.appendChild(tr);});}
 
+// ══════════════════════════════════════════════════════
+//  MENU SYSTEM (polish v5.1) — title · save · navegação
+// ══════════════════════════════════════════════════════
+
+// ══ TABELAS DE DADOS (editáveis — placeholders de balanceamento/nomes) ══
+// VIBES: nomes provisórios; o usuário vai trocar por algo engraçado/adulto.
+const VIBES=[
+  {id:'amarelo', emoji:'🟡', color:'#f5c542', name:'Os Festeiros',   theme:'Festa & energia'},
+  {id:'vermelho',emoji:'🔴', color:'#e63946', name:'Os Brutamontes', theme:'Força bruta'},
+  {id:'azul',    emoji:'🔵', color:'#2196f3', name:'Os Maestros',    theme:'Controle & cura'},
+  {id:'roxo',    emoji:'🟣', color:'#9c27b0', name:'Os Caóticos',    theme:'Caos & debuff'},
+  {id:'verde',   emoji:'🟢', color:'#4caf50', name:'As Raízes',      theme:'Sustain progressivo'},
+];
+// STARTER DECKS: id de carta (BASE_CARDS) que viram a coleção inicial do player.
+const STARTER_BASE=['peon_atk','peon_def','peon_bal','peon_def2'];
+const STARTER_DECKS={
+  amarelo:['arthur','leo','energetico','rodada'],
+  vermelho:['garopaba','letti','churrasco','turboboost'],
+  azul:['nathan','vitao','churrasco','reforco'],
+  roxo:['zaga','fanta','turboboost','rodada'],
+  verde:['bala','borba','ressurreicao','reforco'],
+};
+function starterCollection(vibeId){ return [...new Set([...STARTER_BASE, ...(STARTER_DECKS[vibeId]||[])])]; }
+
+// OPONENTES do Duelo Livre. source:'campaign' fica trancado até a campanha (KB futura do usuário).
+const OPPONENTS=[
+  {id:'novato',   name:'O Novato',           emoji:'🐣', diff:'easy',   desc:'fácil de moer',       source:'preset',   locked:false},
+  {id:'floripa',  name:'Floripa',            emoji:'🏛', diff:'medium', desc:'a rival clássica',    source:'preset',   locked:false},
+  {id:'veterano', name:'O Veterano de Bar',  emoji:'🍺', diff:'medium', desc:'já tomou muitas',     source:'preset',   locked:false},
+  {id:'lenda',    name:'A Lenda do Boteco',  emoji:'👑', diff:'hard',   desc:'imbatível (dizem)',   source:'preset',   locked:false},
+  {id:'campanha1',name:'??? (Campanha)',     emoji:'🔒', diff:'hard',   desc:'desbloqueie na campanha',source:'campaign',locked:true},
+];
+
+// LOJA: raridades + boosters (gacha estilo Duel Links, com pity garantido).
+const RARITY={ comum:{w:70,tag:'COMUM',color:'#9aa3c0'}, raro:{w:24,tag:'RARO',color:'#4fc3f7'}, lendario:{w:6,tag:'LENDÁRIO',color:'#f0b429'} };
+const BOOSTERS=[
+  {id:'pack_basico', name:'Pacote Boteco', icon:'📦', price:100, size:3, pity:8, pool:[
+    {id:'peon_atk',r:'comum'},{id:'peon_def',r:'comum'},{id:'peon_bal',r:'comum'},{id:'peon_def2',r:'comum'},{id:'rodada',r:'comum'},{id:'churrasco',r:'comum'},
+    {id:'arthur',r:'raro'},{id:'leo',r:'raro'},{id:'nathan',r:'raro'},{id:'zaga',r:'raro'},{id:'energetico',r:'raro'},
+    {id:'garopaba',r:'lendario'},{id:'vitao',r:'lendario'},{id:'letti',r:'lendario'} ]},
+  {id:'pack_heroi', name:'Pacote Herói', icon:'🦸', price:250, size:3, pity:6, pool:[
+    {id:'fanta',r:'comum'},{id:'zaga',r:'comum'},{id:'nathan',r:'comum'},{id:'turboboost',r:'comum'},
+    {id:'arthur',r:'raro'},{id:'leo',r:'raro'},{id:'garopaba',r:'raro'},{id:'bala',r:'raro'},
+    {id:'borba',r:'lendario'},{id:'vitao',r:'lendario'},{id:'letti',r:'lendario'} ]},
+];
+
+// LICENÇA de duelista: evolui por nº de duelos; libera fusões (mecânica futura).
+const LICENSE_TIERS=[
+  {lv:1, name:'Aprendiz', duels:0,  unlock:'Fusão Dupla',     fusion:2},
+  {lv:2, name:'Duelista', duels:5,  unlock:'Fusão Tripla',    fusion:3},
+  {lv:3, name:'Veterano', duels:15, unlock:'Fusão Quádrupla', fusion:4},
+  {lv:4, name:'Mestre',   duels:30, unlock:'Fusão Quíntupla', fusion:5},
+  {lv:5, name:'Lenda',    duels:60, unlock:'Tudo liberado',   fusion:5},
+];
+function licenseFor(duels){ let t=LICENSE_TIERS[0]; for(const x of LICENSE_TIERS){ if((duels||0)>=x.duels)t=x; } return t; }
+
+const STARTING_MONEY=300;
+
+// ── SAVE: camada 1 localStorage. Camadas 2 (Google Sheets/Apps Script)
+//    e 3 (Google OAuth) ficam como stub em cloudSync() p/ plugar depois. ──
+const LS_SAVE='fortbc_save';
+const Save={
+  data:null,
+  load(){ try{ this.data=JSON.parse(localStorage.getItem(LS_SAVE))||null; }catch(e){ this.data=null; } if(this.data)this.normalize(); return this.data; },
+  has(){ return !!(this.data && this.data.name); },
+  normalize(){ const d=this.data; if(!d)return; d.vibe=d.vibe||'amarelo'; d.collection=d.collection||starterCollection(d.vibe); d.money=(d.money==null?STARTING_MONEY:d.money); d.duels=d.duels||0; d.license=licenseFor(d.duels).lv; d.campaign=d.campaign||{stage:0,chapter:1}; if(d.campaign.chapter==null)d.campaign.chapter=1; d.pity=d.pity||{}; d.runs=d.runs||0; },
+  create(name,vibeId){ this.data={ name, created:Date.now(), lastPlayed:Date.now(), vibe:vibeId||'amarelo', collection:starterCollection(vibeId), money:STARTING_MONEY, duels:0, license:1, campaign:{stage:0,chapter:1}, runs:0, pity:{} }; this.persist(); },
+  touch(){ if(this.data){ this.data.lastPlayed=Date.now(); this.persist(); } },
+  persist(){ try{ localStorage.setItem(LS_SAVE,JSON.stringify(this.data)); }catch(e){} this.cloudSync(); },
+  reset(){ this.data=null; try{ localStorage.removeItem(LS_SAVE); }catch(e){} },
+  owns(id){ return !!(this.data && this.data.collection && this.data.collection.includes(id)); },
+  addCard(id){ if(this.data && this.data.collection && !this.data.collection.includes(id)) this.data.collection.push(id); },
+  addMoney(n){ if(this.data){ this.data.money=(this.data.money||0)+n; this.persist(); } },
+  spend(n){ if(this.data && (this.data.money||0)>=n){ this.data.money-=n; this.persist(); return true; } return false; },
+  recordDuel(){ if(this.data){ this.data.duels=(this.data.duels||0)+1; this.data.license=licenseFor(this.data.duels).lv; this.persist(); } },
+  // camada 2/3 (cloud) — stub p/ futuro; não bloqueia o jogo offline
+  cloudSync(){ /* TODO: POST this.data p/ Apps Script webhook (Sheets); depois Google OAuth */ },
+};
+
+// ── navegação vertical estilo Forbidden Memories ──
+const VMenu={
+  items:[], actions:[], idx:0,
+  init(listId, actions){ const ul=document.getElementById(listId); if(!ul)return; this.items=[...ul.querySelectorAll('.vmenu-item')]; this.actions=actions; this.idx=0; this.render(); },
+  render(){ this.items.forEach((el,i)=>el.classList.toggle('sel',i===this.idx)); },
+  move(d){ if(!this.items.length)return; this.idx=(this.idx+d+this.items.length)%this.items.length; this.render(); },
+  activate(){ const a=this.actions[this.idx]; if(a)a(); },
+  click(i){ this.idx=i; this.render(); this.activate(); },
+};
+const MENU_ACTIONS=[ ()=>showScreen('campaign'), ()=>showScreen('runsetup'), ()=>showScreen('freeduel'), ()=>showScreen('shop'), ()=>showScreen('library'), ()=>showScreen('score'), ()=>showScreen('password') ];
+const CAMPAIGN_ACTIONS=[ ()=>showMsg('Capítulo em construção 🚧','orange'), ()=>showMsg('Bloqueado 🔒','orange'), ()=>showMsg('Bloqueado 🔒','orange') ];
+
+// ── TITLE ──
+let titleReady=false;
+function advanceTitle(){ if(CUR!=='title'||!titleReady)return; titleReady=false; startMusic(); showScreen('nameload'); }
+
+// ── NAME / LOAD ──
+function setupNameLoad(){
+  Save.load();
+  const isLoad=Save.has();
+  document.getElementById('nl-new').classList.toggle('hidden',isLoad);
+  document.getElementById('nl-load').classList.toggle('hidden',!isLoad);
+  document.getElementById('nl-sub').textContent=isLoad?'Continue de onde parou':'Digite seu nome de guerra';
+  if(isLoad){
+    document.getElementById('nl-savename').textContent=Save.data.name;
+    document.getElementById('nl-saveinfo').textContent='última vez: '+new Date(Save.data.lastPlayed).toLocaleDateString();
+  } else { setTimeout(()=>document.getElementById('inp-name')?.focus(),60); }
+}
+let _pendingName='';
+let _selectedVibe='amarelo';
+function confirmNewName(){ const n=document.getElementById('inp-name').value.trim(); if(!n){showMsg('Digite seu nome!','red');return;} _pendingName=n; _selectedVibe=VIBES[0].id; showScreen('deckselect'); }
+function continueSave(){ APP.playerName=Save.data.name; Save.touch(); goMenu(); }
+function newGameReset(){ Save.reset(); setupNameLoad(); }
+function goMenu(){ document.getElementById('menu-who').textContent=(APP.playerName||'—')+' · BC'; showScreen('menu'); }
+
+// ── DECK SELECT (vibe inicial = coleção/histórico do player) ──
+function renderDeckSelect(){
+  const grid=document.getElementById('vibe-grid'); if(!grid)return; grid.innerHTML='';
+  VIBES.forEach(v=>{
+    const d=document.createElement('div'); d.className='vibe-opt'+(v.id===_selectedVibe?' sel':''); d.style.setProperty('--vibe',v.color);
+    d.innerHTML=`<span class="vibe-dot" style="background:${v.color}"></span><div class="vibe-info"><div class="vibe-nm">${v.emoji} ${v.name}</div><div class="vibe-tm">${v.theme}</div></div>`;
+    d.onclick=()=>{ _selectedVibe=v.id; renderDeckSelect(); };
+    grid.appendChild(d);
+  });
+}
+function confirmStarter(){ Save.create(_pendingName,_selectedVibe); APP.playerName=_pendingName; showMsg('Bem-vindo, '+_pendingName+'! 🍻','green'); goMenu(); }
+
+// ── HUD inferior do menu ──
+function updateHud(){
+  const d=Save.data; if(!d)return;
+  document.getElementById('hud-name').textContent=d.name;
+  document.getElementById('hud-chapter').textContent='Cap '+((d.campaign&&d.campaign.chapter)||1);
+  document.getElementById('hud-money').textContent=d.money||0;
+  const lic=licenseFor(d.duels||0);
+  document.getElementById('hud-license').textContent='Lv'+lic.lv+' '+lic.name;
+  const lw=document.getElementById('hud-license-wrap'); if(lw)lw.title=`Licença ${lic.name} — ${lic.unlock} (${d.duels||0} duelos)`;
+}
+
+// ── ROGUELITE (fluxo de 3 fights existente, reconectado ao menu) ──
+function startRoguelite(){
+  const diff=document.querySelector('input[name="rsdiff"]:checked')?.value||'easy';
+  APP.mode='roguelite'; APP.playerName=APP.playerName||(Save.data&&Save.data.name)||'BC'; APP.difficulty=diff;
+  APP.fightNum=1; APP.totalScore=0; APP.fightScore=[0,0,0]; APP.playerDeck=buildPlayerDeck(); APP.extraHandSize=0;
+  if(Save.data){ Save.data.runs=(Save.data.runs||0)+1; Save.touch(); }
+  startFight();
+}
+
+// ── DUELO LIVRE (lista de adversários; fight avulso, sem recompensa) ──
+function renderOpponents(){
+  const ul=document.getElementById('fd-opponents'); if(!ul)return; ul.innerHTML='';
+  OPPONENTS.forEach(o=>{
+    const li=document.createElement('li'); const locked=o.locked;
+    li.className='vmenu-item'+(locked?' locked':'');
+    const dl=(AI_DECKS[o.diff]&&AI_DECKS[o.diff].label)||o.diff;
+    li.innerHTML=`<span class="vm-cur">▶</span>${o.emoji} ${o.name}<span class="vm-sub">${locked?'🔒 campanha':o.desc+' · '+dl}</span>`;
+    if(!locked) li.onclick=()=>startFreeDuel(o.id);
+    ul.appendChild(li);
+  });
+}
+function startFreeDuel(oppId){
+  const o=OPPONENTS.find(x=>x.id===oppId)||OPPONENTS[0];
+  APP.mode='free'; APP.opponent=o.name; APP.playerName=APP.playerName||(Save.data&&Save.data.name)||'BC'; APP.difficulty=o.diff;
+  APP.fightNum=1; APP.totalScore=0; APP.fightScore=[0,0,0]; APP.playerDeck=buildPlayerDeck(); APP.extraHandSize=0;
+  startFight();
+}
+
+// ── PASSWORD (decks pré-montados) ──
+const PASSWORD_DECKS={
+  'BOTECO':{ label:'Deck Boteco', build:()=>buildPlayerDeck() },
+  'HEROIS':{ label:'Só Heróis', build:()=>shuffle(BASE_CARDS.filter(c=>c.hero).map(c=>({...applyCardLevel(c,cardLevels),uid:uid()}))) },
+};
+function submitPassword(){
+  const code=(document.getElementById('inp-pass').value||'').trim().toUpperCase();
+  const entry=PASSWORD_DECKS[code]; const msg=document.getElementById('pass-msg');
+  if(!entry){ msg.textContent='❌ código inválido'; msg.style.color='var(--red)'; return; }
+  msg.textContent='✔ '+entry.label+' carregado'; msg.style.color='#81c784';
+  APP.mode='free'; APP.playerName=APP.playerName||'BC'; APP.difficulty='medium';
+  APP.fightNum=1; APP.totalScore=0; APP.fightScore=[0,0,0]; APP.playerDeck=entry.build(); APP.extraHandSize=0;
+  setTimeout(startFight,500);
+}
+
+// ── BIBLIOTECA ──
+function libImg(c){ return (c.hero&&HERO_IMAGES[c.id]) ? `<img src="${HERO_IMAGES[c.id]}">` : (c.emoji||TYPE_EMOJI[c.type]||'?'); }
+function renderLibrary(){
+  const grid=document.getElementById('lib-grid'); if(!grid)return; grid.innerHTML='';
+  const owned=(Save.data&&Save.data.collection)||[];
+  let cnt=0;
+  BASE_CARDS.forEach(c=>{
+    const has=owned.includes(c.id); if(has)cnt++;
+    const div=document.createElement('div'); div.className='lib-card'+(has?'':' locked');
+    if(has){
+      div.innerHTML=`<div class="lc-img">${libImg(c)}</div><div class="lc-name">${c.name}</div><div class="lc-type">${TYPE_EMOJI[c.type]||''} ${c.type}</div>`;
+      div.onclick=()=>showCardViewer(c.id);
+    } else {
+      div.innerHTML=`<div class="lc-img back">?</div><div class="lc-name" style="color:var(--dim)">———</div><div class="lc-type">não descoberta</div>`;
+    }
+    grid.appendChild(div);
+  });
+  const sub=document.getElementById('lib-sub'); if(sub)sub.textContent=`${cnt}/${BASE_CARDS.length} cartas descobertas · clique pra ver detalhes`;
+}
+function showCardViewer(id){
+  const c=BASE_CARDS.find(x=>x.id===id); if(!c)return;
+  const stats=c.type==='ITEM' ? `<div style="font-size:.6rem;color:var(--dim);margin-bottom:12px">🎒 Item · custo ${c.cost}</div>`
+    : `<div class="cv-stats"><span style="color:var(--atk)">⚔ ${c.atk}</span><span style="color:var(--def)">❤ ${c.hp}</span></div>`;
+  const role=c.special?('habilidade: '+c.special):(c.pawn?'peão':c.hero?'herói':'item');
+  document.getElementById('cv-content').innerHTML=
+    `<div class="cv-img">${libImg(c)}</div><div class="cv-name">${c.name}</div>`+
+    `<div class="cv-meta">${'★'.repeat(c.star||0)||'—'} · ${TYPE_EMOJI[c.type]||''} ${c.type}${c.range&&c.range!=='-'?' · '+c.range:''}</div>`+
+    stats+`<div style="font-size:.5rem;color:var(--dim);margin-bottom:16px">${role}</div>`+
+    `<button class="btn btn-primary" onclick="closeCardViewer()">FECHAR</button>`;
+  document.getElementById('card-viewer').classList.add('open');
+}
+function closeCardViewer(){ document.getElementById('card-viewer').classList.remove('open'); }
+
+// ── SCORE / ranking ──
+function renderScore(){
+  const sc=loadScores(); const tb=document.getElementById('score-tbody'); const empty=document.getElementById('score-empty');
+  if(!tb)return; tb.innerHTML='';
+  if(empty)empty.classList.toggle('hidden',sc.length>0);
+  sc.forEach((s,i)=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${i+1}</td><td>${s.name}</td><td style="color:var(--gold)">${s.score}</td><td>${s.diff}</td><td>${s.date||''}</td>`; tb.appendChild(tr); });
+}
+
+// ── LOJA (boosters / gacha com pity) ──
+function renderShop(){
+  const mEl=document.getElementById('shop-money'); if(mEl)mEl.textContent=(Save.data&&Save.data.money)||0;
+  const grid=document.getElementById('shop-grid'); if(!grid)return; grid.innerHTML='';
+  BOOSTERS.forEach(b=>{
+    const pity=(Save.data&&Save.data.pity&&Save.data.pity[b.id])||0;
+    const d=document.createElement('div'); d.className='booster';
+    d.innerHTML=`<div class="bo-icon">${b.icon}</div><div class="bo-name">${b.name}</div><div class="bo-desc">${b.size} cartas · rara garantida a cada ${b.pity}</div><div class="bo-price">💰 ${b.price}</div><div class="bo-pity">pity: ${pity}/${b.pity}</div>`;
+    d.onclick=()=>buyBooster(b.id);
+    grid.appendChild(d);
+  });
+}
+function rarityRoll(pool){ const total=pool.reduce((s,c)=>s+RARITY[c.r].w,0); let r=Math.random()*total; for(const c of pool){ r-=RARITY[c.r].w; if(r<=0)return c; } return pool[pool.length-1]; }
+function buyBooster(id){
+  const b=BOOSTERS.find(x=>x.id===id); if(!b)return;
+  if(!Save.data){ showMsg('Crie uma conta primeiro','red'); return; }
+  if((Save.data.money||0)<b.price){ showMsg('💰 Dinheiro insuficiente!','red'); return; }
+  Save.spend(b.price);
+  if(!Save.data.pity)Save.data.pity={};
+  let pity=Save.data.pity[b.id]||0; const pulls=[];
+  for(let i=0;i<b.size;i++){
+    let pick; const forceRare=(i===b.size-1)&&(pity+1>=b.pity)&&!pulls.some(p=>p.r!=='comum');
+    if(forceRare){ const rares=b.pool.filter(c=>c.r!=='comum'); pick=rares[Math.floor(Math.random()*rares.length)]; }
+    else pick=rarityRoll(b.pool);
+    pulls.push(pick);
+    if(pick.r!=='comum')pity=0; else pity++;
+  }
+  Save.data.pity[b.id]=pity;
+  pulls.forEach(p=>Save.addCard(p.id));
+  Save.persist();
+  showBoosterResults(b,pulls); updateHud(); renderShop();
+}
+function showBoosterResults(b,pulls){
+  const cont=document.getElementById('bo-results'); if(!cont)return; cont.innerHTML='';
+  pulls.forEach(p=>{
+    const c=BASE_CARDS.find(x=>x.id===p.id)||{name:p.id}; const rar=RARITY[p.r];
+    const div=document.createElement('div'); div.className='bo-pull'+(p.r!=='comum'?' rare':'');
+    div.innerHTML=`<div class="bp-img">${libImg(c)}</div><div class="bp-name">${c.name}</div><div class="bp-tag" style="color:${rar.color}">${rar.tag}</div>`;
+    cont.appendChild(div);
+  });
+  document.getElementById('booster-open').classList.add('open');
+}
+function closeBooster(){ document.getElementById('booster-open').classList.remove('open'); }
+
+// ── SETTINGS / LOGIN ──
+function openSettings(){ const sl=document.getElementById('vol-slider'); if(sl)sl.value=Math.round(musicVol*100); const mt=document.getElementById('mute-toggle'); if(mt)mt.textContent=musicMuted?'🔇':'🔊'; document.getElementById('settings-modal').classList.add('open'); }
+function closeSettings(){ document.getElementById('settings-modal').classList.remove('open'); }
+function setVolume(v){ musicVol=Math.max(0,Math.min(1,v/100)); if(bgMusic)bgMusic.volume=musicVol; try{localStorage.setItem('fortbc_vol',musicVol);}catch(e){} }
+function openLogin(){ document.getElementById('login-modal').classList.add('open'); }
+function closeLogin(){ document.getElementById('login-modal').classList.remove('open'); }
+
+// ── FUNDO ANIMADO (cartas flutuando — dica do que vem) ──
+let cardBgMounted=false;
+function mountCardBg(){
+  if(cardBgMounted)return; cardBgMounted=true;
+  const bg=document.getElementById('menu-bg'); if(!bg)return;
+  const N=8;
+  for(let i=0;i<N;i++){
+    const id=HERO_IDS[i%HERO_IDS.length];
+    const d=document.createElement('div'); d.className='bg-card';
+    d.style.left=((i%4)*25+3+Math.random()*7).toFixed(1)+'%';
+    d.style.top=(Math.floor(i/4)*46+5+Math.random()*10).toFixed(1)+'%';
+    d.style.setProperty('--rot',(Math.random()*20-10).toFixed(1)+'deg');
+    d.style.setProperty('--dur',(7+Math.random()*5).toFixed(1)+'s');
+    d.style.animationDelay=(-Math.random()*6).toFixed(1)+'s';
+    if(HERO_IMAGES[id])d.innerHTML=`<img src="${HERO_IMAGES[id]}">`;
+    bg.appendChild(d);
+  }
+}
+function toggleMenuBg(show){ const bg=document.getElementById('menu-bg'); if(!bg)return; if(show){ mountCardBg(); bg.classList.add('show'); } else bg.classList.remove('show'); }
+
+// ── roteamento: hook de entrada de tela ──
+let CUR='loading';
+const MENU_BG_SCREENS=new Set(['title','nameload','menu','deckselect','campaign','runsetup','freeduel','shop','score','password']);
+const SUB_SCREENS=new Set(['campaign','runsetup','freeduel','shop','library','score','password']);
+function onScreenEnter(id){
+  toggleMenuBg(MENU_BG_SCREENS.has(id));
+  const hud=document.getElementById('menu-hud'); if(hud)hud.classList.toggle('show', id==='menu');
+  if(id==='title') titleReady=true;
+  else if(id==='nameload') setupNameLoad();
+  else if(id==='deckselect') renderDeckSelect();
+  else if(id==='menu'){ VMenu.init('menu-list',MENU_ACTIONS); updateHud(); }
+  else if(id==='campaign') VMenu.init('campaign-list',CAMPAIGN_ACTIONS);
+  else if(id==='freeduel') renderOpponents();
+  else if(id==='shop') renderShop();
+  else if(id==='score') renderScore();
+  else if(id==='library') renderLibrary();
+  else if(id==='password'){ const m=document.getElementById('pass-msg'); if(m)m.textContent=''; }
+}
+
+// ── teclado global p/ navegação de menus ──
+document.addEventListener('keydown',e=>{
+  if(e.target && (e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')) return;
+  if(CUR==='title'){ advanceTitle(); return; }
+  if(CUR==='menu'||CUR==='campaign'){
+    if(e.key==='ArrowUp'){ VMenu.move(-1); e.preventDefault(); }
+    else if(e.key==='ArrowDown'){ VMenu.move(1); e.preventDefault(); }
+    else if(e.key==='Enter'){ VMenu.activate(); }
+    else if(e.key==='Escape'&&CUR==='campaign'){ showScreen('menu'); }
+  } else if(e.key==='Escape'){
+    if(document.getElementById('card-viewer').classList.contains('open')){ closeCardViewer(); return; }
+    if(document.getElementById('booster-open').classList.contains('open')){ closeBooster(); return; }
+    if(SUB_SCREENS.has(CUR)) showScreen('menu');
+  }
+});
+
 // ── UI ──
-function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));document.getElementById('screen-'+id)?.classList.remove('hidden');}
+function showScreen(id){
+  const swap=()=>{document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));document.getElementById('screen-'+id)?.classList.remove('hidden');CUR=id;onScreenEnter(id);};
+  const fade=document.getElementById('fade');
+  if(!fade){ swap(); return; }
+  fade.classList.add('on');
+  setTimeout(()=>{ swap(); fade.classList.remove('on'); },150);
+}
 function updatePhaseBanner(phase){PHASES.forEach(p=>{const el=document.getElementById('ps-'+p);if(!el)return;const idx=PHASES.indexOf(p),cur=PHASES.indexOf(phase);el.className='phase-step'+(p===phase?' active':idx<cur?' done':'');});}
 function updatePhaseBadge(phase){const lbls={draw:'DRAW',standby:'STANDBY',main:'DOWN FASE',lastminute:'LAST MINUTE',resolution:'RESOLUÇÃO'};const el=document.getElementById('phase-badge');if(el)el.textContent=lbls[phase]||phase.toUpperCase();const tn=document.getElementById('turn-num');if(tn)tn.textContent=`TURNO ${G.turn}`;}
 function updateBaseUI(){
@@ -1051,9 +1683,10 @@ function showMsg(txt,cls=''){const area=document.getElementById('msg-area');if(!
 
 // ── AUDIO ──
 let bgMusic=null,musicMuted=false;
-function startMusic(){if(!bgMusic||!AUDIO_OK)return;if(!musicMuted){bgMusic.play().catch(()=>{});}}
+let musicVol=(()=>{const v=parseFloat(localStorage.getItem('fortbc_vol'));return isNaN(v)?0.35:v;})();
+function startMusic(){if(!bgMusic||!AUDIO_OK)return;bgMusic.volume=musicVol;if(!musicMuted){bgMusic.play().catch(()=>{});}}
 function stopMusic(){if(bgMusic){bgMusic.pause();}}
-function toggleMute(){musicMuted=!musicMuted;const btn=document.getElementById('mute-btn');if(btn)btn.textContent=musicMuted?'🔇':'🔊';if(bgMusic){if(musicMuted)bgMusic.pause();else bgMusic.play().catch(()=>{});}}
+function toggleMute(){musicMuted=!musicMuted;const btn=document.getElementById('mute-btn');if(btn)btn.textContent=musicMuted?'🔇':'🔊';const mt=document.getElementById('mute-toggle');if(mt)mt.textContent=musicMuted?'🔇':'🔊';if(bgMusic){if(musicMuted)bgMusic.pause();else bgMusic.play().catch(()=>{});}}
 
 function uid(){return Math.random().toString(36).slice(2)+Date.now().toString(36);}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
@@ -1097,7 +1730,7 @@ async function boot(){
   await preloadImages();
   await preloadAudio();
   const txt=document.getElementById('load-txt');if(txt)txt.textContent='Pronto!';
-  setTimeout(()=>showScreen('start'),300);
+  setTimeout(()=>showScreen('title'),300);
 }
 boot();
 

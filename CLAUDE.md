@@ -206,7 +206,32 @@ Vibes coexistem com o triângulo ATAQUE/DEFESA/EQUILÍBRIO — funcionam como ti
 - **`updateBaseUI()`** → atualiza barras de LP e topbar
 - **`renderHand()`** → re-renderiza a mão do player (clicável via `selectHandCard(idx)`)
 - **`updatePhaseBanner/Badge()`** → atualiza indicador de fase
-- **Telas:** loading → start → game → reward → end (`showScreen()`).
+- **Telas (v5.1):** `loading → title → nameload → menu →{ campaign | runsetup | freeduel | library | password } → game → reward → end` (`showScreen()`).
+  - `showScreen(id)` agora também seta `CUR` e chama `onScreenEnter(id)` (hook que inicializa cada tela).
+
+### Sistema de Menu (v5.1 — polish, frente "Menus & Telas")
+- **`title`** — logo + "PRESSIONE START" piscando; qualquer clique/tecla → `advanceTitle()` → `nameload`.
+- **`Save`** (objeto) — persistência de **perfil** em `localStorage` (chave `fortbc_save`): `{name, created, lastPlayed, campaign, runs}`. Separado de `LS_SCORES`/`LS_LEVELS`. `cloudSync()` é **stub** preparado p/ camada 2 (Google Sheets via Apps Script) e camada 3 (OAuth).
+- **`nameload`** — se `Save.has()`: mostra nome salvo + Continuar/Novo Jogo; senão: input de nome simples (`confirmNewName()`).
+- **`menu`** — 5 opções em lista vertical; navegação por `VMenu` (cursor ↑↓/Enter + clique), estilo Forbidden Memories. `MENU_ACTIONS` mapeia cada opção a uma tela.
+- **`runsetup`** — Roguelite: escolhe dificuldade → `startRoguelite()` (fluxo de 3 fights existente; `APP.mode='roguelite'`).
+- **`freeduel`** — Duelo Livre: oponente + dificuldade → `startFreeDuel()` (1 fight, `APP.mode='free'`, `endFight` pula reward e vai direto ao `end`).
+- **`password`** — `PASSWORD_DECKS` (códigos `BOTECO`, `HEROIS`) → carrega deck e inicia fight.
+- **`library`** — `renderLibrary()` monta grid de `BASE_CARDS`; clique → `showCardViewer()` (modal `#card-viewer`).
+- **`campaign`** — só esqueleto de stage-select (sem narrativa, conforme combinado).
+- Teclado global: setas/Enter no `menu`/`campaign`, Esc volta; ignora quando foco está em `INPUT`.
+
+### Economia / progressão (v5.1 — tabelas editáveis no topo do bloco MENU SYSTEM)
+- **`VIBES`** — 5 vibes com nomes **provisórios** (`Os Festeiros`, `Os Brutamontes`, `Os Maestros`, `Os Caóticos`, `As Raízes`). O usuário vai trocar por nomes engraçados/adultos. Cores/temas seguem o quadro de VIBES do design.
+- **`STARTER_DECKS` + `STARTER_BASE`** — deck inicial por vibe (ids de `BASE_CARDS`). Ao criar conta, o player escolhe 1 vibe na tela `deckselect`; isso vira `Save.collection` (= histórico/coleção do player).
+- **`Save`** agora guarda: `vibe`, `collection[]`, `money` (início 300), `duels`, `license`, `campaign.chapter`, `pity{}`. `Save.normalize()` migra saves antigos. Helpers: `owns/addCard/addMoney/spend/recordDuel`.
+- **Biblioteca = discovery:** mostra todas as cartas; só as de `Save.collection` são reveladas/clicáveis, o resto mostra verso ("não descoberta"). Adquirir carta (loja/futuro: em jogo) revela.
+- **`OPPONENTS`** — Duelo Livre lista oponentes; `source:'campaign'` fica trancado até a KB de adversários (a ser criada pelo usuário).
+- **Loja (`BOOSTERS`+`RARITY`):** gacha estilo Duel Links. `rarityRoll()` por peso; **pity** garante uma rara a cada N aberturas (`buyBooster`). Cartas vão pra `collection`.
+- **Licença (`LICENSE_TIERS`):** nível de duelista evolui por nº de duelos; cada tier libera uma fusão (dupla→tripla→quádrupla→quíntupla). `recordDuel()` chamado em `endFight`. Mecânica de fusão em si ainda não implementada.
+- **Dinheiro:** +50 por fight ganho (roguelite) / +30 (duelo livre), em `endFight`. Gasto na loja.
+- **HUD inferior (`#menu-hud`):** só na tela `menu`. Nome, capítulo, dinheiro, licença, ⚙ (settings/volume), 🔐 login (stub camada 3).
+- **Polish:** `showScreen` faz fade via `#fade` (~0.3s). `#menu-bg` = cartas dos heróis flutuando (`mountCardBg`), visível nas telas de menu. Volume persiste em `localStorage` `fortbc_vol` (`setVolume`).
 
 ### Nota: código antigo ainda presente no arquivo
 O engine real-time (lanes, ATB, gameLoop, etc.) ainda existe nas linhas 514-825 mas é **inerte**: as novas funções com mesmo nome declaradas depois sobrescrevem-no. Não chamar nem modificar essas funções antigas.
@@ -217,6 +242,8 @@ O engine real-time (lanes, ATB, gameLoop, etc.) ainda existe nas linhas 514-825 
 
 ### Concluído
 - [x] Testar o fluxo completo do jogo turn-based — OK (2026-06-12)
+- [x] Sistema de Menu completo (title, name/load, menu, campanha-esqueleto, roguelite, duelo livre, biblioteca, password) + abstração `Save` com stub cloud — OK (2026-06-13)
+- [x] Polish + economia do menu — OK (2026-06-13): fade entre telas (~0.3s), texto maior, fundo animado de cartas, deck inicial por vibe (coleção do player), botão Score, Loja com gacha+pity, licença de duelista, HUD inferior (nome/cap/dinheiro/licença/⚙/login), discovery na Biblioteca, Duelo Livre com lista de oponentes
 
 ### Urgente — Gameplay V1 (turn-based recém-implementado)
 - [ ] Limpar o código antigo (engine real-time linhas 514-825) — opcional, não bloqueia nada
