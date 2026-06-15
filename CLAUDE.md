@@ -176,7 +176,11 @@ Vibes coexistem com o triângulo ATAQUE/DEFESA/EQUILÍBRIO — funcionam como ti
 ## 🏗️ Arquitetura do código (index.html)
 
 ### Constantes e dados
-- **`BASE_CARDS`** — array com todos os stats das cartas. Fonte da verdade; espelhar no `GAME_DATA.csv`.
+- **`CARDS_CSV` → `BASE_CARDS`** (2026-06-14): a fonte única agora é o bloco de texto **`CARDS_CSV`** (CSV embutido no topo do script). `BASE_CARDS` é **gerado** por `parseCardsCSV()` no load. Editar SÓ o `CARDS_CSV`. `GAME_DATA.csv` é espelho. Schema 19 colunas (inclui `kind` e `vibe`). Linhas `#` = comentário. Ver `CONTEXT_CARDS.md`.
+- **Bloco TUNING** (perto de `AI_DECKS`): `FIGHT_CURVE` (curva da IA por fight — Fight 1 fraco), `PLAYER_HAND_BONUS`, `VIBE_SYNERGY_ON`/`VIBE_SYN_2`/`VIBE_SYN_3`, `AI_DECKS[*].usesItems`. Todos editáveis p/ balancear.
+- **Camada de efeitos turn-based** (2026-06-14): `G.mods{player,ai}` (atkMult/atkFlat/skip por turno, reset no DRAW), `G.nextHpBuff`. `computeFieldAtk(side)` = sumAtk × vibe × mods. Itens em `applyTurnItem()` (jogados na LAST MINUTE, valem só na resolução). Arapucas em `resolveTraps()`/`applyTrap()` (auto-disparam na resolução se o inimigo ataca).
+- **Imagens de carta** (2026-06-14): coluna `img` no CSV → `cardImgSrc(card)` (img própria em `assets/cards/` > imagem de herói > emoji). Fallback via `imgFallback()`. Usado em `renderHand`/`renderFC`/`libImg`.
+- **Deck Builder + coleção com quantidade** (2026-06-14): `Save.collection` virou mapa `{id:qtd}` (migração automática no `normalize`). Tela `deckbuilder` (menu "🃏 MEU BARALHO") monta o baralho que vai pro jogo; persiste em `Save.deck`. `buildPlayerDeck()` agora usa `Save.deck` (ou `autoDeckIds()` da coleção) em Roguelite **e** Duelo Livre. Constantes `DECK_SIZE=30`/`MIN_DECK=10`. Helpers: `Save.ownedQty/collectionIds/getDeck/setDeck`, `instOf/currentDeckIds/autoDeckIds`, `DB.*`/`renderDeckBuilder`.
 - **`HERO_IMAGES_B64`** — fallback base64 dos 10 heróis embutido. **NÃO MODIFICAR.**
 - **`preloadImages()`** — tenta GitHub raw, cai pro base64 se falhar (timeout 2.5s por imagem).
 - **`HAND_LIMIT=5`, `BASE_HP=2000`, `PHASES=[...]`** — constantes do engine turn-based.
@@ -202,6 +206,10 @@ Vibes coexistem com o triângulo ATAQUE/DEFESA/EQUILÍBRIO — funcionam como ti
 - **`endFight(winner)`** → atualiza APP, vai para recompensa ou fim
 
 ### UI
+- **Palco fixo (UX, 2026-06-15):** todo o jogo vive num `<div id="stage">` de **resolução de design 1280×720 (16:9)**, escalado via `transform: scale()` e centralizado, com **letterbox**. Layout idêntico em qualquer proporção de janela. Bloco editável `const STAGE={W,H}` + `fitStage()` (recalcula `--stage-scale` no `resize`/`orientationchange`) — trocar W/H muda a proporção do jogo inteiro. CSS: `#stage` + `.screen{height:100%}`. `#fade`/`#msg-area`/`dmg-float` ficam fora do palco (cobrem a janela toda). Ver `CONTEXT_UX.md`.
+- **Camada de JUICE (UX, 2026-06-15):** bloco editável `const JUICE={...}` (timings/toggles, `JUICE.on`=master switch) + helpers genéricos: `animateNumber()` (contagem easeOut, cancela anterior; usado em `updateBaseUI`/`addScore`), `playSFXPitch()` (SFX com `playbackRate`), `juiceShake/juiceFlash/juiceLand/juiceDie`. Resolução animada estilo Balatro em `resolveSequence()`/`tallySide()` (soma carta a carta + pitch + overlay `#resolve-overlay` ATK×ATK) → `resolveApply()` (async) mantém as mutações de estado originais. **Dano carta a carta:** `animateFieldDamage(defSide,totalAtk)` aplica dano na ordem dos slots (`.being-hit` + `floatCardDmg` + HP caindo + dissolução), antes da mutação real. Compra de carta anima via `.juice-draw` (tag `card._shown`). Mão: `.card.playable`/`.card.dimmed` por fase. Ver `CONTEXT_UX.md`.
+- **Fase ITENS + recompensa contextual (UX, 2026-06-15):** "LAST MINUTE" renomeada **ITENS** (badge/faixa/hints) e **encerra ao usar 1 item** (`selectQuickCard`→`startPhase('resolution')`); só itens destacados na mão. `generateRewards()` reescrita: contextual ao baralho (`deckMonsterIds`/`dominantVibe`/`buffAffects`) — Evoluir só cartas do deck, Recrutar pela vibe dominante, Artefato só buffs que afetam o deck; chips UNIDADE×ARTEFATO. `BUFF_POOL` mais forte (+10/15/18%) e por tipo. **Fontes do tabuleiro aumentadas** (corrige disparidade carta grande × texto minúsculo).
+- **Layout de cartas/campo (UX, 2026-06-15 leva 3):** faixa de fases movida pro `#topbar` (`#phase-track`), `#phase-banner` do meio removido (mais espaço vertical). **Cartas full-bleed:** imagem cobre o card todo (`.card-img`/`.fc-img` absolute inset:0), texto em overlay no rodapé com gradiente (sem fundo sólido), fontes maiores. **Field card portrait** (`aspect-ratio:.72`, absolute `top/bottom:0` no slot) — exigiu `.mslot{display:grid;place-items:center}` + `.monster-grid{grid-template-rows:1fr}` (senão a linha colapsa). **Botão direito** em carta (mão/campo) → `showCardDetail()` reusa `#card-viewer` (imagem `contain` completa + escala de progressão de tiers).
 - **`updateFieldUI()`** → re-renderiza todos os slots (`renderFC()` por carta)
 - **`updateBaseUI()`** → atualiza barras de LP e topbar
 - **`renderHand()`** → re-renderiza a mão do player (clicável via `selectHandCard(idx)`)
@@ -264,13 +272,21 @@ O engine real-time (lanes, ATB, gameLoop, etc.) ainda existe nas linhas 514-825 
 ### Conteúdo
 - [ ] Renomear ATK/DEF/BAL → ATAQUE/DEFESA/EQUILÍBRIO em toda a UI e lógica
 - [ ] Definir nomes finais das 5 Vibes (usuário vai escolher nomes engraçados/adultos)
-- [ ] Adicionar campo `vibe` em `BASE_CARDS` para todos os heróis existentes
-- [ ] Implementar sinergia passiva de Vibes (2+ cartas em campo)
-- [ ] Adicionar novos itens de debuff ao `BASE_CARDS` e CSV
-- [ ] Criar 5 peões de Vibe
-- [ ] Implementar Arapucas (face-down, ativadas por inimigos)
+- [x] Adicionar campo `vibe` em todas as cartas — OK (2026-06-14, distribuição placeholder)
+- [x] Sinergia passiva de Vibes (+10%/+20% ATK) — OK (2026-06-14, leve; passivas individuais ainda STUB)
+- [x] Itens de debuff (5) no `CARDS_CSV` — OK (2026-06-14, stats placeholder)
+- [x] Criar 5 peões de Vibe — OK (2026-06-14, passiva própria STUB)
+- [x] Implementar Arapucas (face-down, auto-disparo na resolução) — OK (2026-06-14)
+- [x] Itens funcionais no turn-based (`applyTurnItem`, fase LAST MINUTE) — OK (2026-06-14)
+- [x] Balanceamento Fight 1 (`FIGHT_CURVE`/`PLAYER_HAND_BONUS`/`usesItems`) — OK (2026-06-14, ajustar números jogando)
+- [x] Deck Builder (tela `deckbuilder`, 2 colunas) + coleção com quantidade + baralho persistente (`Save.deck`) — OK (2026-06-14)
+- [x] Coluna `img` p/ imagem em qualquer carta (assets/cards/, fallback emoji) — OK (2026-06-14)
+- [ ] Trocar stats/nomes/efeitos placeholder; implementar passivas `vibe_*` e habilidades dos heróis no turn-based; redesenhar `turboboost`
+- [ ] Adicionar as imagens reais das cartas (preencher coluna `img` + dropar arquivos em `assets/cards/`)
+- [ ] Polish de layout do Deck Builder (no capítulo Experiência & Clareza)
+- [x] **Palco de proporção fixa 16:9 com letterbox** (capítulo Experiência & Clareza) — OK (2026-06-15, `#stage`+`STAGE`/`fitStage`)
 - [x] Integrar SFX e OST — OK (2026-06-14): gerenciador de OST com crossfade + roteamento por tela, SFX com pool, unlock iOS, preload+fallback, volumes separados OST/SFX. Placeholders de silêncio em `assets/audio/`. Ver `CONTEXT_AUDIO.md`. **Falta:** o usuário produzir os `.mp3` reais (mesmos nomes); ligar SFX dos eventos ainda não disparados (especiais/arapucas/vibes/hero-summon)
-- [ ] Gerar `BASE_CARDS` automaticamente a partir do CSV (hoje é manual)
+- [x] Gerar `BASE_CARDS` a partir do CSV — OK (2026-06-14: `CARDS_CSV` embutido + `parseCardsCSV`, fonte única)
 - [ ] Imagens de peões/itens (hoje são emoji)
 - [ ] Persistência de score via n8n (webhook)
 

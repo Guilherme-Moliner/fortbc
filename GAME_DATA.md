@@ -1,8 +1,10 @@
 # 📊 GAME DATA — Batalha dos Amigos (fortbc · v5 turn-based)
 
-> Base de referência de todos os stats. Edite o `GAME_DATA.csv` para ajustar números, e estes valores devem ser refletidos no `index.html` (constante `BASE_CARDS`).
+> **⚠️ FONTE ÚNICA (2026-06-14):** os stats agora vivem no bloco **`CARDS_CSV`** embutido no `index.html` (parseado em `BASE_CARDS` no load). `GAME_DATA.csv` é espelho. As tabelas abaixo são referência de leitura — o número que vale é o do `CARDS_CSV`. Ver `CONTEXT_CARDS.md`.
 >
-> **Nota v5:** os campos `range`, `speed` e `tribute` continuam presentes nos dados, mas estão **inertes** no engine turn-based (herança do design Fort Condor — ver `gamedesignfort.md`). Serão substituídos por efeitos de carta. O mesmo vale para efeitos de item baseados em tempo (`effectDur` em segundos).
+> **Nota v5:** os campos `range`, `speed` e `tribute` continuam nos dados mas estão **inertes** (herança Fort Condor). `effectDur` (segundos) é legado — itens agora valem **só na resolução do turno**.
+>
+> **Novidade 2026-06-14:** toda carta tem `vibe`; +15 cartas (5 itens-debuff, 5 peões de vibe, 5 arapucas); itens funcionais (jogados na LAST MINUTE); arapucas auto-disparam na resolução. Stats novos = **placeholder**.
 
 ---
 
