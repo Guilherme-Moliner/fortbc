@@ -698,6 +698,8 @@ body{background:var(--bg0);color:var(--text);font-family:'Cinzel',serif;overflow
     <h2>⚙ CONFIGURAÇÕES</h2>
     <label>VOLUME DA MÚSICA</label>
     <input type="range" id="vol-slider" min="0" max="100" value="35" oninput="setVolume(this.value)">
+    <label>VOLUME DOS EFEITOS</label>
+    <input type="range" id="sfx-slider" min="0" max="100" value="60" oninput="setSfxVolume(this.value)">
     <div class="modal-row"><span>Mudo</span><button class="hud-btn" id="mute-toggle" onclick="toggleMute()">🔊</button></div>
     <button class="btn btn-ghost" style="margin-top:14px" onclick="closeSettings()">FECHAR</button>
   </div>
@@ -1167,6 +1169,7 @@ function phaseDraw(){
   if(G.aiHand.length<HAND_LIMIT){while(G.aiHand.length<HAND_LIMIT&&G.aiDeck.length)G.aiHand.push(G.aiDeck.shift());}
   else if(G.turn>1&&G.aiDeck.length)G.aiHand.push(G.aiDeck.shift());
   if(!G.playerDeck.length&&!G.playerHand.length){showMsg('💀 Deck Out! Derrota!','red');setTimeout(()=>endFight('ai'),1000);return;}
+  playSFX('ui_card_draw');
   renderHand();updateDeckUI();startPhase('standby');
 }
 
@@ -1176,7 +1179,7 @@ function phaseStandby(){
     field.forEach(card=>{
       if(!card)return;card.turnsOnField++;
       const nr=card.turnsOnField>=4?2:card.turnsOnField>=2?1:0;
-      if(nr>card.fieldRank){card.fieldRank=nr;if(side==='player')showMsg(`★ ${card.name} virou ${['','Prata','Ouro'][nr]}!`,'orange');}
+      if(nr>card.fieldRank){card.fieldRank=nr;if(side==='player'){showMsg(`★ ${card.name} virou ${['','Prata','Ouro'][nr]}!`,'orange');playSFX('ui_atb_full');}}
     });
   });
   updateFieldUI();startPhase('main');
@@ -1191,6 +1194,7 @@ function phaseMain(){
 
 function selectHandCard(idx){
   if(G.phase!=='main'||G.mainConfirmed)return;
+  playSFX('ui_card_select');
   if(G.selectedHandIdx===idx){G.selectedHandIdx=null;G.selectedHandCard=null;clearSlotHighlights();setActionBar(`<span class="action-hint">⬇ DOWN FASE — clique na carta e depois no slot, ou passe</span><button class="play-btn pass" onclick="confirmMain(-1,-1)">Passar</button>`);}
   else{G.selectedHandIdx=idx;G.selectedHandCard=G.playerHand[idx];highlightSlots();setActionBar(`<span class="action-info">${G.selectedHandCard.name} selecionada — escolha o slot</span><button class="play-btn pass" onclick="confirmMain(-1,-1)">Passar</button>`);}
   renderHand();
@@ -1209,10 +1213,10 @@ function confirmMain(cardIdx,slotTarget){
   G.mainConfirmed=true;clearSlotHighlights();
   if(cardIdx>=0){
     const card=G.playerHand.splice(cardIdx,1)[0];
-    if(slotTarget>=0&&slotTarget<=4){const fc=makeFC(card);if(G.playerField[slotTarget])G.playerGrave.push(G.playerField[slotTarget]);G.playerField[slotTarget]=fc;}
-    else if(slotTarget>=10&&slotTarget<=13){const fc=makeFC(card);fc.faceDown=true;const hi=slotTarget-10;if(G.playerHidden[hi])G.playerGrave.push(G.playerHidden[hi]);G.playerHidden[hi]=fc;}
-    else if(slotTarget===20){if(G.playerFieldCard)G.playerGrave.push(G.playerFieldCard);G.playerFieldCard=makeFC(card);}
-    else G.playerGrave.push(card);
+    if(slotTarget>=0&&slotTarget<=4){const fc=makeFC(card);if(G.playerField[slotTarget])G.playerGrave.push(G.playerField[slotTarget]);G.playerField[slotTarget]=fc;playSFX('hit_melee');}
+    else if(slotTarget>=10&&slotTarget<=13){const fc=makeFC(card);fc.faceDown=true;const hi=slotTarget-10;if(G.playerHidden[hi])G.playerGrave.push(G.playerHidden[hi]);G.playerHidden[hi]=fc;playSFX('trap_place');}
+    else if(slotTarget===20){if(G.playerFieldCard)G.playerGrave.push(G.playerFieldCard);G.playerFieldCard=makeFC(card);playSFX('item_buff');}
+    else {G.playerGrave.push(card);playSFX('item_debuff');}
   }
   applyAiMain();updateFieldUI();renderHand();updateDeckUI();
   showMsg('⚔ Cartas reveladas!');setTimeout(()=>startPhase('lastminute'),1200);
@@ -1242,10 +1246,15 @@ function phaseResolution(){
   setActionBar(`<span class="action-hint">⚔️ RESOLUÇÃO — calculando dano...</span>`);
   const pAtk=sumAtk(G.playerField),aAtk=sumAtk(G.aiField);
   setTimeout(()=>{
+    const aliveBefore=G.aiField.filter(Boolean).length+G.playerField.filter(Boolean).length;
     const pOver=applyDamageToField(pAtk,G.aiField,G.aiGrave);
     const aOver=applyDamageToField(aAtk,G.playerField,G.playerGrave);
+    const aliveAfter=G.aiField.filter(Boolean).length+G.playerField.filter(Boolean).length;
+    if(pAtk>0||aAtk>0)playSFX('hit_melee');
+    if(aliveAfter<aliveBefore)playSFX('unit_die');
     if(pOver>0){G.aiBase.hp=Math.max(0,G.aiBase.hp-pOver);showDmgFloat(pOver,'ai');}
     if(aOver>0){G.playerBase.hp=Math.max(0,G.playerBase.hp-aOver);showDmgFloat(aOver,'player');}
+    if(pOver>0||aOver>0)playSFX('base_hit');
     updateFieldUI();updateBaseUI();updateDeckUI();
     const pDead=G.playerBase.hp<=0,aDead=G.aiBase.hp<=0;
     setTimeout(()=>{
@@ -1278,11 +1287,11 @@ function addScore(p){G.score+=p;const el=document.getElementById('score-display'
 
 let APP={playerName:'',difficulty:'easy',mode:'menu',fightNum:1,totalScore:0,fightScore:[0,0,0],playerDeck:[],extraHandSize:0};
 function startFight(){showScreen('game');initFight(APP.fightNum,APP.difficulty,APP.playerDeck,APP.extraHandSize);updateBaseUI();updateFieldUI();updateDeckUI();const lbl=APP.mode==='free'?'Duelo Livre':'Fight '+APP.fightNum+'/3';const fi=document.getElementById('fight-info');if(fi)fi.textContent=`${lbl} · ${AI_DECKS[APP.difficulty].label}`;startMusic();showMsg(`⚔ ${lbl} — ${AI_DECKS[APP.difficulty].label}!`,'green');startPhase('draw');}
-function showRewardScreen(){showScreen('reward');const opts=generateRewards(3);const cont=document.getElementById('reward-options');cont.innerHTML='';opts.forEach(opt=>{const d=document.createElement('div');d.className='reward-card';d.innerHTML=`<div class="reward-icon">${opt.icon}</div><div class="reward-title">${opt.title}</div><div class="reward-desc">${opt.desc}</div>`;d.onclick=()=>pickReward(opt);cont.appendChild(d);});document.getElementById('reward-fight-score').textContent=G.score;document.getElementById('reward-total-score').textContent=APP.totalScore;}
+function showRewardScreen(){showScreen('reward');playSFX('reward');const opts=generateRewards(3);const cont=document.getElementById('reward-options');cont.innerHTML='';opts.forEach(opt=>{const d=document.createElement('div');d.className='reward-card';d.innerHTML=`<div class="reward-icon">${opt.icon}</div><div class="reward-title">${opt.title}</div><div class="reward-desc">${opt.desc}</div>`;d.onclick=()=>pickReward(opt);cont.appendChild(d);});document.getElementById('reward-fight-score').textContent=G.score;document.getElementById('reward-total-score').textContent=APP.totalScore;}
 function generateRewards(n){const pool=[];const up=BASE_CARDS.filter(c=>c.type!=='ITEM'&&(cardLevels[c.id]||1)<6);if(up.length){const pk=up[Math.floor(Math.random()*up.length)];const lv=cardLevels[pk.id]||1;pool.push({icon:`<span style="color:${LV_COLOR[lv+1]}">★</span>`,title:`Level Up: ${pk.name}`,desc:`${LV_NAMES[lv]} → ${LV_NAMES[lv+1]} (+${Math.round((LV_MULT[lv+1]/LV_MULT[lv]-1)*100)}% stats)`,apply:()=>{cardLevels[pk.id]=lv+1;saveLevels(cardLevels);rebuildPlayerDeck();}});}const ex=BASE_CARDS[Math.floor(Math.random()*BASE_CARDS.length)];pool.push({icon:'🃏',title:`Nova Carta: ${ex.name}`,desc:`+1x ${ex.name} no deck`,apply:()=>{APP.playerDeck.push({...applyCardLevel(ex,cardLevels),uid:uid()});}});const bf=BUFF_POOL[Math.floor(Math.random()*BUFF_POOL.length)];pool.push({icon:bf.icon,title:bf.label,desc:'Buff permanente na run',apply:()=>{bf.apply(APP.playerDeck,APP);}});return shuffle(pool).slice(0,n);}
 function rebuildPlayerDeck(){APP.playerDeck=APP.playerDeck.map(c=>{const b=BASE_CARDS.find(x=>x.id===c.id);if(!b)return c;return{...applyCardLevel(b,cardLevels),uid:c.uid};});}
 function pickReward(opt){opt.apply();APP.fightNum++;startFight();}
-function showEndScreen(winner){showScreen('end');const won=winner==='player';const t=document.getElementById('end-title');t.textContent=won?'🏆 VITÓRIA!':'💀 DERROTA';t.style.color=won?'#81c784':'#e63946';document.getElementById('end-score').textContent=APP.totalScore;document.getElementById('end-name').textContent=APP.playerName;document.getElementById('end-fights').textContent=APP.fightScore.map((s,i)=>`F${i+1}: ${s}`).join(' | ');if(won)saveScore({name:APP.playerName,score:APP.totalScore,diff:APP.difficulty,date:new Date().toLocaleDateString()});renderHighscores();stopMusic();}
+function showEndScreen(winner){showScreen('end');const won=winner==='player';const t=document.getElementById('end-title');t.textContent=won?'🏆 VITÓRIA!':'💀 DERROTA';t.style.color=won?'#81c784':'#e63946';document.getElementById('end-score').textContent=APP.totalScore;document.getElementById('end-name').textContent=APP.playerName;document.getElementById('end-fights').textContent=APP.fightScore.map((s,i)=>`F${i+1}: ${s}`).join(' | ');if(won)saveScore({name:APP.playerName,score:APP.totalScore,diff:APP.difficulty,date:new Date().toLocaleDateString()});renderHighscores();}
 function renderHighscores(){const sc=loadScores();const tb=document.getElementById('hs-tbody');if(!tb)return;tb.innerHTML='';sc.forEach((s,i)=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${i+1}</td><td>${s.name}</td><td style="color:var(--gold)">${s.score}</td><td>${s.diff}</td><td>${s.date||''}</td>`;tb.appendChild(tr);});}
 
 // ══════════════════════════════════════════════════════
@@ -1370,7 +1379,7 @@ const VMenu={
   init(listId, actions){ const ul=document.getElementById(listId); if(!ul)return; this.items=[...ul.querySelectorAll('.vmenu-item')]; this.actions=actions; this.idx=0; this.render(); },
   render(){ this.items.forEach((el,i)=>el.classList.toggle('sel',i===this.idx)); },
   move(d){ if(!this.items.length)return; this.idx=(this.idx+d+this.items.length)%this.items.length; this.render(); },
-  activate(){ const a=this.actions[this.idx]; if(a)a(); },
+  activate(){ const a=this.actions[this.idx]; if(a){playSFX('ui_click');a();} },
   click(i){ this.idx=i; this.render(); this.activate(); },
 };
 const MENU_ACTIONS=[ ()=>showScreen('campaign'), ()=>showScreen('runsetup'), ()=>showScreen('freeduel'), ()=>showScreen('shop'), ()=>showScreen('library'), ()=>showScreen('score'), ()=>showScreen('password') ];
@@ -1378,7 +1387,7 @@ const CAMPAIGN_ACTIONS=[ ()=>showMsg('Capítulo em construção 🚧','orange'),
 
 // ── TITLE ──
 let titleReady=false;
-function advanceTitle(){ if(CUR!=='title'||!titleReady)return; titleReady=false; startMusic(); showScreen('nameload'); }
+function advanceTitle(){ if(CUR!=='title'||!titleReady)return; titleReady=false; unlockAudio(); playSFX('ui_click'); showScreen('nameload'); }
 
 // ── NAME / LOAD ──
 function setupNameLoad(){
@@ -1394,9 +1403,9 @@ function setupNameLoad(){
 }
 let _pendingName='';
 let _selectedVibe='amarelo';
-function confirmNewName(){ const n=document.getElementById('inp-name').value.trim(); if(!n){showMsg('Digite seu nome!','red');return;} _pendingName=n; _selectedVibe=VIBES[0].id; showScreen('deckselect'); }
-function continueSave(){ APP.playerName=Save.data.name; Save.touch(); goMenu(); }
-function newGameReset(){ Save.reset(); setupNameLoad(); }
+function confirmNewName(){ const n=document.getElementById('inp-name').value.trim(); if(!n){showMsg('Digite seu nome!','red');playSFX('ui_error');return;} playSFX('ui_click'); _pendingName=n; _selectedVibe=VIBES[0].id; showScreen('deckselect'); }
+function continueSave(){ playSFX('ui_click'); APP.playerName=Save.data.name; Save.touch(); goMenu(); }
+function newGameReset(){ playSFX('ui_click'); Save.reset(); setupNameLoad(); }
 function goMenu(){ document.getElementById('menu-who').textContent=(APP.playerName||'—')+' · BC'; showScreen('menu'); }
 
 // ── DECK SELECT (vibe inicial = coleção/histórico do player) ──
@@ -1405,11 +1414,11 @@ function renderDeckSelect(){
   VIBES.forEach(v=>{
     const d=document.createElement('div'); d.className='vibe-opt'+(v.id===_selectedVibe?' sel':''); d.style.setProperty('--vibe',v.color);
     d.innerHTML=`<span class="vibe-dot" style="background:${v.color}"></span><div class="vibe-info"><div class="vibe-nm">${v.emoji} ${v.name}</div><div class="vibe-tm">${v.theme}</div></div>`;
-    d.onclick=()=>{ _selectedVibe=v.id; renderDeckSelect(); };
+    d.onclick=()=>{ playSFX('ui_click'); _selectedVibe=v.id; renderDeckSelect(); };
     grid.appendChild(d);
   });
 }
-function confirmStarter(){ Save.create(_pendingName,_selectedVibe); APP.playerName=_pendingName; showMsg('Bem-vindo, '+_pendingName+'! 🍻','green'); goMenu(); }
+function confirmStarter(){ playSFX('ui_click'); Save.create(_pendingName,_selectedVibe); APP.playerName=_pendingName; showMsg('Bem-vindo, '+_pendingName+'! 🍻','green'); goMenu(); }
 
 // ── HUD inferior do menu ──
 function updateHud(){
@@ -1547,13 +1556,13 @@ function showBoosterResults(b,pulls){
     cont.appendChild(div);
   });
   document.getElementById('booster-open').classList.add('open');
+  playSFX(pulls.some(p=>p.r!=='comum')?'reward':'item_buff');
 }
 function closeBooster(){ document.getElementById('booster-open').classList.remove('open'); }
 
 // ── SETTINGS / LOGIN ──
-function openSettings(){ const sl=document.getElementById('vol-slider'); if(sl)sl.value=Math.round(musicVol*100); const mt=document.getElementById('mute-toggle'); if(mt)mt.textContent=musicMuted?'🔇':'🔊'; document.getElementById('settings-modal').classList.add('open'); }
+function openSettings(){ const sl=document.getElementById('vol-slider'); if(sl)sl.value=Math.round(musicVol*100); const ss=document.getElementById('sfx-slider'); if(ss)ss.value=Math.round(sfxVol*100); const mt=document.getElementById('mute-toggle'); if(mt)mt.textContent=audioMuted?'🔇':'🔊'; document.getElementById('settings-modal').classList.add('open'); }
 function closeSettings(){ document.getElementById('settings-modal').classList.remove('open'); }
-function setVolume(v){ musicVol=Math.max(0,Math.min(1,v/100)); if(bgMusic)bgMusic.volume=musicVol; try{localStorage.setItem('fortbc_vol',musicVol);}catch(e){} }
 function openLogin(){ document.getElementById('login-modal').classList.add('open'); }
 function closeLogin(){ document.getElementById('login-modal').classList.remove('open'); }
 
@@ -1582,6 +1591,7 @@ let CUR='loading';
 const MENU_BG_SCREENS=new Set(['title','nameload','menu','deckselect','campaign','runsetup','freeduel','shop','score','password']);
 const SUB_SCREENS=new Set(['campaign','runsetup','freeduel','shop','library','score','password']);
 function onScreenEnter(id){
+  playOST(ostForScreen(id));   // troca automática de trilha (crossfade)
   toggleMenuBg(MENU_BG_SCREENS.has(id));
   const hud=document.getElementById('menu-hud'); if(hud)hud.classList.toggle('show', id==='menu');
   if(id==='title') titleReady=true;
@@ -1606,9 +1616,9 @@ document.addEventListener('keydown',e=>{
     else if(e.key==='Enter'){ VMenu.activate(); }
     else if(e.key==='Escape'&&CUR==='campaign'){ showScreen('menu'); }
   } else if(e.key==='Escape'){
-    if(document.getElementById('card-viewer').classList.contains('open')){ closeCardViewer(); return; }
-    if(document.getElementById('booster-open').classList.contains('open')){ closeBooster(); return; }
-    if(SUB_SCREENS.has(CUR)) showScreen('menu');
+    if(document.getElementById('card-viewer').classList.contains('open')){ playSFX('ui_cancel'); closeCardViewer(); return; }
+    if(document.getElementById('booster-open').classList.contains('open')){ playSFX('ui_cancel'); closeBooster(); return; }
+    if(SUB_SCREENS.has(CUR)){ playSFX('ui_cancel'); showScreen('menu'); }
   }
 });
 
@@ -1681,12 +1691,104 @@ function renderHand(){
 }
 function showMsg(txt,cls=''){const area=document.getElementById('msg-area');if(!area)return;const d=document.createElement('div');d.className='msg '+(cls||'');d.textContent=txt;area.appendChild(d);setTimeout(()=>{d.style.opacity='0';setTimeout(()=>d.remove(),400);},2400);}
 
-// ── AUDIO ──
-let bgMusic=null,musicMuted=false;
+// ══════════════════════════════════════════════════════
+//  AUDIO — gerenciador de OST (crossfade) + SFX pool
+//  .mp3 only · caminho RELATIVO (preview local + GitHub Pages)
+//  arquivo faltando NUNCA quebra o jogo (catch silencioso)
+// ══════════════════════════════════════════════════════
+const AUDIO_BASE='assets/audio/';
+const SFX_BASE=AUDIO_BASE+'sfx/';
+const OST_EXT='.mp3';   // trilhas em mp3
+const SFX_EXT='.wav';   // efeitos em wav (universal, inclusive iOS Safari)
+
+// volumes mestres separados (persistidos)
 let musicVol=(()=>{const v=parseFloat(localStorage.getItem('fortbc_vol'));return isNaN(v)?0.35:v;})();
-function startMusic(){if(!bgMusic||!AUDIO_OK)return;bgMusic.volume=musicVol;if(!musicMuted){bgMusic.play().catch(()=>{});}}
-function stopMusic(){if(bgMusic){bgMusic.pause();}}
-function toggleMute(){musicMuted=!musicMuted;const btn=document.getElementById('mute-btn');if(btn)btn.textContent=musicMuted?'🔇':'🔊';const mt=document.getElementById('mute-toggle');if(mt)mt.textContent=musicMuted?'🔇':'🔊';if(bgMusic){if(musicMuted)bgMusic.pause();else bgMusic.play().catch(()=>{});}}
+let sfxVol  =(()=>{const v=parseFloat(localStorage.getItem('fortbc_sfxvol'));return isNaN(v)?0.6:v;})();
+let audioMuted=false;
+
+// ── mapa de OST por tela (EDITÁVEL) ──
+// 'game' e 'end' são resolvidos dinamicamente em ostForScreen()
+const OST_BY_SCREEN={
+  loading:null,
+  title:'ost_menu', nameload:'ost_menu', menu:'ost_menu',
+  library:'ost_menu', shop:'ost_menu', campaign:'ost_menu',
+  deckselect:'ost_select', runsetup:'ost_select', freeduel:'ost_select', password:'ost_select',
+  score:'ost_scores', reward:'ost_reward',
+  // stubs sem tela ainda: ost_preduel (stinger pré-fight), ost_sudden (morte súbita)
+};
+function ostForScreen(id){
+  if(id==='game'){ const n=(typeof APP!=='undefined'&&APP.mode==='free')?1:(typeof APP!=='undefined'?APP.fightNum:1); return 'ost_battle'+Math.max(1,Math.min(3,n||1)); }
+  if(id==='end'){ return (typeof G!=='undefined'&&G&&G.winner==='player')?'ost_win':'ost_lose'; }
+  return (id in OST_BY_SCREEN)?OST_BY_SCREEN[id]:null;
+}
+
+// ── OST: dois canais Audio p/ crossfade ──
+let ostChannels=[null,null], ostActive=0, ostCurrent=null, ostFadeTimer=null;
+function _mkOst(){ const a=new Audio(); a.loop=true; a.preload='auto'; a.volume=0; return a; }
+function playOST(name){
+  if(!name){ stopOST(); return; }
+  const act=ostChannels[ostActive];
+  if(name===ostCurrent && act && !act.paused) return; // já tocando esta faixa → não reinicia
+  ostCurrent=name;
+  const next=(ostActive+1)%2;
+  let a=ostChannels[next]; if(!a){ a=_mkOst(); ostChannels[next]=a; }
+  a.src=AUDIO_BASE+name+OST_EXT; a.volume=0;
+  const target=audioMuted?0:musicVol;
+  const p=a.play(); if(p&&p.catch)p.catch(()=>{}); // autoplay bloqueado/arquivo faltando = silêncio
+  _crossfade(next,target);
+}
+function _crossfade(next,target){
+  if(ostFadeTimer)clearInterval(ostFadeTimer);
+  const prevA=ostChannels[ostActive], nextA=ostChannels[next];
+  const step=40, n=600/step; let i=0; const startPrev=prevA?prevA.volume:0;
+  ostFadeTimer=setInterval(()=>{
+    i++; const t=i/n;
+    if(nextA)nextA.volume=Math.max(0,Math.min(target,target*t));
+    if(prevA&&prevA!==nextA)prevA.volume=Math.max(0,startPrev*(1-t));
+    if(i>=n){ clearInterval(ostFadeTimer); ostFadeTimer=null; if(prevA&&prevA!==nextA)prevA.pause(); ostActive=next; }
+  },step);
+}
+function stopOST(){
+  ostCurrent=null; if(ostFadeTimer)clearInterval(ostFadeTimer);
+  const a=ostChannels[ostActive]; if(!a)return;
+  const step=40, n=400/step; let i=0; const start=a.volume;
+  ostFadeTimer=setInterval(()=>{ i++; a.volume=Math.max(0,start*(1-i/n)); if(i>=n){clearInterval(ostFadeTimer);ostFadeTimer=null;a.pause();} },step);
+}
+function _applyOstVol(){ const a=ostChannels[ostActive]; if(a&&!a.paused)a.volume=audioMuted?0:musicVol; }
+
+// ── SFX: pool de instâncias por som (sobrepõe sem cortar) ──
+const SFX_POOL={}, SFX_POOLSIZE=4;
+function playSFX(name){
+  if(!name||audioMuted||sfxVol<=0)return;
+  try{
+    let pool=SFX_POOL[name];
+    if(!pool){ pool=[]; for(let k=0;k<SFX_POOLSIZE;k++){const a=new Audio(SFX_BASE+name+SFX_EXT);a.preload='auto';pool.push(a);} SFX_POOL[name]=pool; }
+    let inst=pool.find(a=>a.paused||a.ended); if(!inst)inst=pool[0];
+    inst.currentTime=0; inst.volume=sfxVol;
+    const p=inst.play(); if(p&&p.catch)p.catch(()=>{});
+  }catch(e){}
+}
+
+// ── controles de volume/mute (reaproveita slider + localStorage) ──
+function setVolume(v){ musicVol=Math.max(0,Math.min(1,v/100)); _applyOstVol(); try{localStorage.setItem('fortbc_vol',musicVol);}catch(e){} }
+function setSfxVolume(v){ sfxVol=Math.max(0,Math.min(1,v/100)); try{localStorage.setItem('fortbc_sfxvol',sfxVol);}catch(e){} playSFX('ui_click'); }
+function toggleMute(){
+  audioMuted=!audioMuted; const ico=audioMuted?'🔇':'🔊';
+  ['mute-btn','mute-toggle'].forEach(id=>{const b=document.getElementById(id);if(b)b.textContent=ico;});
+  _applyOstVol();
+  if(!audioMuted){ const a=ostChannels[ostActive]; if(a){const p=a.play();if(p&&p.catch)p.catch(()=>{});} }
+}
+
+// ── compat: API antiga usada pelo resto do código ──
+function startMusic(){ playOST(ostForScreen(typeof CUR!=='undefined'?CUR:'menu')||'ost_menu'); }
+function stopMusic(){ stopOST(); }
+
+// ── unlock iOS Safari: 1º áudio deve nascer de um gesto do usuário ──
+let audioUnlocked=false;
+function unlockAudio(){
+  if(audioUnlocked)return; audioUnlocked=true;
+  try{ const s=new Audio(AUDIO_BASE+'ost_menu'+OST_EXT); s.volume=0; const p=s.play(); if(p&&p.then)p.then(()=>s.pause()).catch(()=>{}); }catch(e){}
+}
 
 function uid(){return Math.random().toString(36).slice(2)+Date.now().toString(36);}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
@@ -1712,17 +1814,26 @@ function preloadImages(){
     });
   });
 }
-function preloadAudio(){
-  return new Promise(resolve=>{
-    const url=GH_BASE+'audio/bgmusic.mp3';
-    bgMusic=new Audio();
-    bgMusic.loop=true;bgMusic.volume=0.35;
-    let settled=false;
-    const timer=setTimeout(()=>{if(!settled){settled=true;AUDIO_OK=false;resolve();}},2000);
-    bgMusic.addEventListener('canplaythrough',()=>{if(!settled){settled=true;clearTimeout(timer);AUDIO_OK=true;resolve();}},{once:true});
-    bgMusic.addEventListener('error',()=>{if(!settled){settled=true;clearTimeout(timer);AUDIO_OK=false;resolve();}},{once:true});
-    bgMusic.src=url;
+// preload paralelo dos arquivos CRÍTICOS (não bloqueia boot: timeout curto, fallback silencioso individual)
+const PRELOAD_OST=['ost_menu','ost_battle1'];
+const PRELOAD_SFX=['ui_click','ui_card_draw','ui_card_select','hit_melee'];
+function _probe(url){
+  return new Promise(res=>{
+    const a=new Audio(); let done=false;
+    const t=setTimeout(()=>{if(!done){done=true;res();}},1500);
+    const fin=()=>{if(!done){done=true;clearTimeout(t);res();}};
+    a.addEventListener('canplaythrough',fin,{once:true});
+    a.addEventListener('loadedmetadata',fin,{once:true});
+    a.addEventListener('error',fin,{once:true}); // erro = segue em silêncio
+    a.preload='auto'; a.src=url;
   });
+}
+function preloadAudio(){
+  const jobs=[
+    ...PRELOAD_OST.map(n=>_probe(AUDIO_BASE+n+OST_EXT)),
+    ...PRELOAD_SFX.map(n=>_probe(SFX_BASE+n+SFX_EXT)),
+  ];
+  return Promise.all(jobs).then(()=>{AUDIO_OK=true;}).catch(()=>{AUDIO_OK=false;});
 }
 
 async function boot(){

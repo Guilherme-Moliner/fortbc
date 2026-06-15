@@ -17,6 +17,16 @@ npm-debug.log*
 *.tmp
 *.log
 
-# Áudio bruto (fontes a curar/renomear antes de versionar)
-assets/audio/*.7z
-assets/audio/*.zip
+# Tooling de preview local
+.claude/
+
+# Áudio bruto (fontes a curar/renomear — NÃO versionar)
+*.7z
+*.zip
+assets/audio/**/Placeholders/
+assets/audio/Placeholders/
+assets/audio/YTDown_*
+assets/audio/Yu-Gi-Oh*
+assets/audio/sfx/Forbidden Sound Effects/
+assets/audio/sfx/Forbidden Sound Effects.7z
+assets/audio/sfx/PC _ Computer*

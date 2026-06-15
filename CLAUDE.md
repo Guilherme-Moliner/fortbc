@@ -233,6 +233,16 @@ Vibes coexistem com o triângulo ATAQUE/DEFESA/EQUILÍBRIO — funcionam como ti
 - **HUD inferior (`#menu-hud`):** só na tela `menu`. Nome, capítulo, dinheiro, licença, ⚙ (settings/volume), 🔐 login (stub camada 3).
 - **Polish:** `showScreen` faz fade via `#fade` (~0.3s). `#menu-bg` = cartas dos heróis flutuando (`mountCardBg`), visível nas telas de menu. Volume persiste em `localStorage` `fortbc_vol` (`setVolume`).
 
+### Áudio — OST + SFX (v5.1, frente "Áudio" — 2026-06-14)
+> Detalhes completos em **`CONTEXT_AUDIO.md`**. Resumo:
+- **Caminho relativo** `assets/audio/` (+ `sfx/`) — funciona no preview local e no GitHub Pages. **Não** usa GitHub raw pra áudio. **OST `.mp3`, SFX `.wav`** (`OST_EXT`/`SFX_EXT`).
+- **OST:** `playOST(name)`/`stopOST()` com **crossfade ~600ms** em 2 canais `Audio`. `OST_BY_SCREEN` (tabela editável) + `ostForScreen(id)` (resolve `game` por `APP.fightNum`, `end` por `G.winner`). Troca automática centralizada em `onScreenEnter(id)`. Faixa igual à atual = no-op (não reinicia entre sub-telas).
+- **SFX:** `playSFX(name)` fire-and-forget com **pool de 4 instâncias** por som; não interfere na OST. Ganchos ligados em draw/select/rank-up/baixar carta/resolução/vitória/derrota/reward/booster/menu (ver tabela no CONTEXT_AUDIO).
+- **Volumes separados:** `musicVol` (`fortbc_vol`) e `sfxVol` (`fortbc_sfxvol`); 2 sliders no modal ⚙. `toggleMute` = mute geral.
+- **Unlock iOS:** `unlockAudio()` no 1º gesto (`advanceTitle`, clique na `title`).
+- **Preload + fallback:** `preloadAudio()` pré-carrega críticos com timeout; arquivo faltando = silêncio (404 com `.catch`), **nunca quebra o jogo**.
+- **Arquivos:** áudios reais já incluídos (OST `.mp3`, SFX `.wav`). Pendentes: `ost_select.mp3` e `base_hit.wav` (tocam em silêncio até chegarem). Adicionar um som = dropar com o nome certo na pasta certa; zero código muda. `fight_win`/`fight_lose` foram descartados (a tela `end` já troca pra `ost_win`/`ost_lose`).
+
 ### Nota: código antigo ainda presente no arquivo
 O engine real-time (lanes, ATB, gameLoop, etc.) ainda existe nas linhas 514-825 mas é **inerte**: as novas funções com mesmo nome declaradas depois sobrescrevem-no. Não chamar nem modificar essas funções antigas.
 
@@ -259,14 +269,14 @@ O engine real-time (lanes, ATB, gameLoop, etc.) ainda existe nas linhas 514-825 
 - [ ] Adicionar novos itens de debuff ao `BASE_CARDS` e CSV
 - [ ] Criar 5 peões de Vibe
 - [ ] Implementar Arapucas (face-down, ativadas por inimigos)
-- [ ] Integrar SFX e OST quando os arquivos chegarem
+- [x] Integrar SFX e OST — OK (2026-06-14): gerenciador de OST com crossfade + roteamento por tela, SFX com pool, unlock iOS, preload+fallback, volumes separados OST/SFX. Placeholders de silêncio em `assets/audio/`. Ver `CONTEXT_AUDIO.md`. **Falta:** o usuário produzir os `.mp3` reais (mesmos nomes); ligar SFX dos eventos ainda não disparados (especiais/arapucas/vibes/hero-summon)
 - [ ] Gerar `BASE_CARDS` automaticamente a partir do CSV (hoje é manual)
 - [ ] Imagens de peões/itens (hoje são emoji)
 - [ ] Persistência de score via n8n (webhook)
 
 ## ⚠️ Convenções importantes
 
-- **Áudio:** usar `.mp3` (não `.ogg`) — melhor compatibilidade, inclusive iOS Safari.
+- **Áudio:** **OST em `.mp3`, SFX em `.wav`** (constantes `OST_EXT`/`SFX_EXT` no bloco AUDIO). Nunca `.ogg`. Boa compat., inclusive iOS Safari.
 - Nomes de arquivos de herói: **minúsculos, sem acento** (`vitao.png`, `leo.png`).
 - Não quebrar o fallback base64: o jogo deve rodar offline.
 - Ao mudar stats: editar **tanto** `BASE_CARDS` (index.html) **quanto** `GAME_DATA.csv`.
