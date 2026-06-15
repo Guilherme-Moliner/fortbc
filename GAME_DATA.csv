@@ -1,21 +1,36 @@
-id,name,cat,type,range,star,cost,hp,atk,speed,tribute,copies,special,ability
-peon_atk,Zé Mané,Peão,ATK,melee,1,1,100,60,fast,0,3,,
-peon_def,Muralha,Peão,DEF,melee,1,1,200,30,slow,0,3,,
-peon_bal,Genérico,Peão,BAL,mid,2,2,150,50,medium,0,3,,Atirador
-peon_def2,Fortão,Peão,DEF,melee,2,2,280,40,slow,0,3,,
-arthur,Arthur,Herói,ATK,long,3,3,220,110,fast,0,1,,Long range — único herói que atira de longe
-fanta,Fanta,Herói,BAL,mid,3,3,200,70,medium,0,1,recycler,Recycler: +1 ATB ao ser tributado
-nathan,Nathan,Herói,DEF,melee,3,3,320,45,slow,0,1,,
-garopaba,Garopaba,Herói,ATK,melee,4,4,250,130,medium,0,1,deathbuff,Morte heroica: +20% ATK aliados por 10s
-bala,Bala,Herói,DEF,melee,4,4,420,50,slow,0,1,provoker,Provoker: atrai ataques inimigos
-leo,Léo,Herói,ATK,melee,4,4,260,130,medium,0,1,,
-zaga,Zaga,Herói,BAL,mid,4,4,320,95,medium,0,1,,
-vitao,Vitão,Herói,BAL,mid,5,5,350,80,medium,1,1,healer,Healer: cura aliado ferido ao entrar (+100)
-borba,Borba,Herói,DEF,melee,5,5,600,70,slow,1,1,,
-letti,Letti,Herói,ATK,melee,6,6,280,160,veryfast,1,1,rusher,"Rusher: ignora unidades, vai direto à torre"
-churrasco,Churrasco,Item,ITEM,-,0,2,0,0,-,0,3,heal_all,Cura todas as unidades +80 HP
-energetico,Energético,Item,ITEM,-,0,2,0,0,-,0,3,atk_buff,+30% ATK em campo por 15s
-rodada,Rodada,Item,ITEM,-,0,1,0,0,-,0,3,draw2,Compra 2 cartas
-turboboost,Turbo Boost,Item,ITEM,-,0,2,0,0,-,0,3,speed_buff,2x velocidade por 10s
-ressurreicao,Ressurreição,Item,ITEM,-,0,4,0,0,-,0,3,resurrect,Revive última unidade morta (50% HP)
-reforco,Reforço,Item,ITEM,-,0,3,0,0,-,0,3,next_hp_buff,Próxima unidade +50% HP
+id,name,kind,type,vibe,range,star,cost,hp,atk,speed,tribute,copies,special,effect,effectVal,effectDur,emoji,ability,img
+peon_atk,Zé Mané,pawn,ATK,vermelho,melee,1,1,100,60,fast,0,3,,,,,👊,
+peon_def,Muralha,pawn,DEF,azul,melee,1,1,200,30,slow,0,3,,,,,🧱,
+peon_bal,Genérico,pawn,BAL,verde,mid,2,2,150,50,medium,0,3,,,,,🎯,Atirador
+peon_def2,Fortão,pawn,DEF,azul,melee,2,2,280,40,slow,0,3,,,,,💪,
+arthur,Arthur,hero,ATK,amarelo,long,3,3,220,110,fast,0,1,,,,,,Long range (legado — redesenhar)
+fanta,Fanta,hero,BAL,roxo,mid,3,3,200,70,medium,0,1,recycler,,,,,Recycler (legado)
+nathan,Nathan,hero,DEF,azul,melee,3,3,320,45,slow,0,1,,,,,,
+garopaba,Garopaba,hero,ATK,vermelho,melee,4,4,250,130,medium,0,1,deathbuff,,,,,Morte heroica (legado)
+bala,Bala,hero,DEF,verde,melee,4,4,420,50,slow,0,1,provoker,,,,,Provoker (legado)
+leo,Léo,hero,ATK,amarelo,melee,4,4,260,130,medium,0,1,,,,,,
+zaga,Zaga,hero,BAL,roxo,mid,4,4,320,95,medium,0,1,,,,,,
+vitao,Vitão,hero,BAL,azul,mid,5,5,350,80,medium,1,1,healer,,,,,Healer (legado)
+borba,Borba,hero,DEF,verde,melee,5,5,600,70,slow,1,1,,,,,,
+letti,Letti,hero,ATK,vermelho,melee,6,6,280,160,veryfast,1,1,rusher,,,,,"Rusher (legado — ignora unidades)"
+churrasco,Churrasco,item,ITEM,azul,-,0,2,,,-,0,3,,heal_all,80,,🥩,Cura suas unidades +80 HP
+energetico,Energético,item,ITEM,amarelo,-,0,2,,,-,0,3,,atk_buff,0.3,,⚡,+30% ATK no seu campo nesta resolução
+rodada,Rodada,item,ITEM,amarelo,-,0,1,,,-,0,3,,draw2,2,,🍺,Compra 2 cartas
+turboboost,Turbo Boost,item,ITEM,amarelo,-,0,2,,,-,0,3,,atk_buff,0.2,,💨,"Turbo: +20% ATK neste turno (TODO redesenhar)"
+ressurreicao,Ressurreição,item,ITEM,verde,-,0,4,,,-,0,3,,resurrect,0.5,,🔄,Revive última unidade do cemitério (50% HP)
+reforco,Reforço,item,ITEM,verde,-,0,3,,,-,0,3,,next_hp_buff,0.5,,🛡,Próxima unidade que baixar +50% HP
+ressaca,Ressaca,item,ITEM,amarelo,-,0,2,,,-,0,2,,debuff_all_atk,40,,🥴,Todos inimigos −40 ATK nesta resolução
+dedinho,Dedinho Mindinho,item,ITEM,roxo,-,0,2,,,-,0,2,,debuff_strongest,0.3,,🤏,Inimigo mais forte −30% ATK
+calunia,Calúnia,item,ITEM,roxo,-,0,3,,,-,0,2,,debuff_silence,1,,🗣,Inimigo mais forte não ataca neste turno
+jogaareia,Joga Areia,item,ITEM,vermelho,-,0,1,,,-,0,2,,debuff_flat,50,,🏖,Inimigo mais forte −50 ATK nesta resolução
+barraco,Barraco,item,ITEM,roxo,-,0,4,,,-,0,1,,debuff_all_atk,30,,💢,Todos inimigos −30 ATK nesta resolução
+vp_amarelo,Festeiro,pawn,ATK,amarelo,melee,2,2,140,55,fast,0,2,vibe_party,,,,🎉,Vibe Festa (passiva TODO)
+vp_vermelho,Brutamonte,pawn,ATK,vermelho,melee,2,2,130,70,medium,0,2,vibe_charge,,,,⚔️,Vibe Força (passiva TODO)
+vp_azul,Maestrinho,pawn,DEF,azul,mid,2,2,200,35,medium,0,2,vibe_heal,,,,🌊,Vibe Controle (passiva TODO)
+vp_roxo,Caótico,pawn,BAL,roxo,mid,2,2,150,55,medium,0,2,vibe_chaos,,,,💀,Vibe Caos (passiva TODO)
+vp_verde,Brotinho,pawn,DEF,verde,melee,2,2,180,40,slow,0,2,vibe_grow,,,,🌿,Vibe Sustain (passiva TODO)
+trap_buraco,Buraco na Pista,trap,TRAP,amarelo,-,0,2,,,-,0,2,,trap_skip,1,,🕳,Arapuca: inimigo não ataca neste turno
+trap_emboscada,Emboscada,trap,TRAP,vermelho,-,0,3,,,-,0,1,,trap_double,2,,💥,Arapuca: seu dano dobra nesta resolução
+trap_rede,Rede,trap,TRAP,azul,-,0,2,,,-,0,2,,trap_net,40,,🕸,Arapuca: inimigo −40 ATK + cura um aliado
+trap_praga,Praga,trap,TRAP,verde,-,0,3,,,-,0,2,,trap_drain,50,,🦟,Arapuca: drena 50 ATK do inimigo
+trap_fumaca,Bomba de Fumaça,trap,TRAP,roxo,-,0,3,,,-,0,1,,trap_smoke,30,,🌫,"Arapuca: inimigo −30 ATK (placeholder)"
