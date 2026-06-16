@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Batalha dos Amigos · fortbc</title>
+<title>Comandantes do Caos · Memórias do Proibidão</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -588,11 +588,37 @@ body{background:#000;color:var(--text);font-family:'Cinzel',serif;overflow:hidde
 <!-- TITLE -->
 <div id="screen-title" class="screen hidden" onclick="advanceTitle()">
   <div class="title-wrap">
-    <div class="title-logo">BATALHA<span class="small">DOS AMIGOS</span></div>
+    <div class="title-logo">COMANDANTES DO CAOS<span class="small">Memórias do Proibidão</span></div>
     <div class="title-tagline">a treta começa no boteco</div>
     <div class="title-blink">▸ PRESSIONE START ◂</div>
   </div>
-  <div class="title-version">v5.1 · BC vs FLORIPA</div>
+  <div class="title-version">⚠ +18 · beta privado · de amigos pra amigos</div>
+</div>
+
+<!-- DISCLAIMER (+18) -->
+<div id="screen-disclaimer" class="screen hidden">
+  <div style="max-width:640px;margin:0 auto;padding:26px 20px;max-height:100%;overflow-y:auto;display:flex;flex-direction:column;gap:14px;text-align:left;">
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+      <span style="font-size:.62rem;letter-spacing:1px;padding:4px 10px;border-radius:20px;background:rgba(230,57,70,.16);border:1px solid var(--red,#e63946);color:#ff9a9a;font-weight:700;">⚠ +18</span>
+      <span style="font-size:.62rem;letter-spacing:1px;padding:4px 10px;border-radius:20px;background:var(--bg2);border:1px solid var(--border);color:var(--text);">🔒 Acesso Restrito</span>
+      <span style="font-size:.62rem;letter-spacing:1px;padding:4px 10px;border-radius:20px;background:var(--bg2);border:1px solid var(--border);color:var(--text);">Beta Privado</span>
+    </div>
+    <div style="text-align:center;font-family:'Cinzel Decorative',cursive;color:var(--gold);font-size:1.2rem;letter-spacing:1px;">Comandantes do Caos</div>
+    <blockquote style="margin:0;padding:14px 16px;background:rgba(240,180,41,.08);border-left:3px solid var(--gold);border-radius:8px;color:var(--text);font-size:.82rem;line-height:1.6;">Este jogo contém linguagem adulta, humor sensível e referências à cultura do grupo. O conteúdo foi criado para um público específico e pode não ser adequado para todos.</blockquote>
+    <div style="font-size:.78rem;line-height:1.7;color:var(--text);">
+      <div style="color:var(--gold);font-weight:700;letter-spacing:1px;margin-bottom:4px;">Natureza do projeto</div>
+      ❤️ <b>Projeto pessoal sem fins lucrativos.</b> Feito de amigos pra amigos. Sem monetização, sem distribuição comercial.<br>
+      🤖 <b>Alto uso de inteligência artificial</b> na produção de código, arte e conteúdo.<br>
+      📋 <b>Assets de terceiros</b> usados exclusivamente para fins educativos e de uso pessoal, sem intenção comercial. Todos os direitos pertencem aos seus respectivos criadores.
+    </div>
+    <div style="font-size:.78rem;line-height:1.7;color:var(--text);">
+      <div style="color:var(--gold);font-weight:700;letter-spacing:1px;margin-bottom:4px;">Acesso e privacidade</div>
+      🔒 <b>Distribuição restrita.</b> Destinado a um grupo fechado. Se você recebeu acesso, <b>não compartilhe o link ou o arquivo</b> sem autorização.<br>
+      🪪 <b>Personagens baseados em pessoas reais.</b> Os heróis são versões ficcionais e caricatas de amigos reais, criadas com consentimento e carinho.
+    </div>
+    <button onclick="acceptDisclaimer()" style="margin-top:4px;padding:13px;background:var(--gold);border:none;border-radius:10px;color:#000;font-family:'Cinzel',serif;font-weight:700;font-size:.82rem;letter-spacing:1px;cursor:pointer;">Entendi e aceito continuar →</button>
+    <div style="text-align:center;font-size:.6rem;color:var(--dim);line-height:1.5;">Ao continuar, você confirma que tem 18 anos ou mais e compreende o caráter pessoal e restrito deste projeto.</div>
+  </div>
 </div>
 
 <!-- NAME / LOAD -->
@@ -1051,64 +1077,78 @@ const HERO_IMAGES_B64 = {
 // ══════════════════════════════════════════════════════════════════
 const CARDS_CSV = `
 id,name,kind,type,vibe,range,star,cost,hp,atk,speed,tribute,copies,special,effect,effectVal,effectDur,emoji,ability,img
-# ── Peões base ──
-peon_atk,Zé Mané,pawn,ATK,vermelho,melee,1,1,100,60,fast,0,3,,,,,👊,
-peon_def,Muralha,pawn,DEF,azul,melee,1,1,200,30,slow,0,3,,,,,🧱,
-peon_bal,Genérico,pawn,BAL,verde,mid,2,2,150,50,medium,0,3,,,,,🎯,Atirador
-peon_def2,Fortão,pawn,DEF,azul,melee,2,2,280,40,slow,0,3,,,,,💪,
-# ── Heróis (vibe = placeholder, trocar depois) ──
-arthur,Arthur,hero,ATK,amarelo,long,3,3,220,110,fast,0,1,,,,,,Long range (legado — redesenhar)
-fanta,Fanta,hero,BAL,roxo,mid,3,3,200,70,medium,0,1,recycler,,,,,Recycler (legado)
-nathan,Nathan,hero,DEF,azul,melee,3,3,320,45,slow,0,1,,,,,,
-garopaba,Garopaba,hero,ATK,vermelho,melee,4,4,250,130,medium,0,1,deathbuff,,,,,Morte heroica (legado)
-bala,Bala,hero,DEF,verde,melee,4,4,420,50,slow,0,1,provoker,,,,,Provoker (legado)
-leo,Léo,hero,ATK,amarelo,melee,4,4,260,130,medium,0,1,,,,,,
-zaga,Zaga,hero,BAL,roxo,mid,4,4,320,95,medium,0,1,,,,,,
-vitao,Vitão,hero,BAL,azul,mid,5,5,350,80,medium,1,1,healer,,,,,Healer (legado)
-borba,Borba,hero,DEF,verde,melee,5,5,600,70,slow,1,1,,,,,,
-letti,Letti,hero,ATK,vermelho,melee,6,6,280,160,veryfast,1,1,rusher,,,,,"Rusher (legado — ignora unidades)"
-# ── Itens base (efeitos portados p/ turn-based) ──
-churrasco,Churrasco,item,ITEM,azul,-,0,2,,,-,0,3,,heal_all,80,,🥩,Cura suas unidades +80 HP
-energetico,Energético,item,ITEM,amarelo,-,0,2,,,-,0,3,,atk_buff,0.3,,⚡,+30% ATK no seu campo nesta resolução
-rodada,Rodada,item,ITEM,amarelo,-,0,1,,,-,0,3,,draw2,2,,🍺,Compra 2 cartas
-turboboost,Turbo Boost,item,ITEM,amarelo,-,0,2,,,-,0,3,,atk_buff,0.2,,💨,"Turbo: +20% ATK neste turno (TODO redesenhar)"
-ressurreicao,Ressurreição,item,ITEM,verde,-,0,4,,,-,0,3,,resurrect,0.5,,🔄,Revive última unidade do cemitério (50% HP)
-reforco,Reforço,item,ITEM,verde,-,0,3,,,-,0,3,,next_hp_buff,0.5,,🛡,Próxima unidade que baixar +50% HP
-# ── Itens-debuff (NOVOS — efeito só na próxima resolução) ──
-ressaca,Ressaca,item,ITEM,amarelo,-,0,2,,,-,0,2,,debuff_all_atk,40,,🥴,Todos inimigos −40 ATK nesta resolução
-dedinho,Dedinho Mindinho,item,ITEM,roxo,-,0,2,,,-,0,2,,debuff_strongest,0.3,,🤏,Inimigo mais forte −30% ATK
-calunia,Calúnia,item,ITEM,roxo,-,0,3,,,-,0,2,,debuff_silence,1,,🗣,Inimigo mais forte não ataca neste turno
-jogaareia,Joga Areia,item,ITEM,vermelho,-,0,1,,,-,0,2,,debuff_flat,50,,🏖,Inimigo mais forte −50 ATK nesta resolução
-barraco,Barraco,item,ITEM,roxo,-,0,4,,,-,0,1,,debuff_all_atk,30,,💢,Todos inimigos −30 ATK nesta resolução
-# ── Peões de Vibe (NOVOS — ★2; passiva ligada à vibe = STUB) ──
-vp_amarelo,Festeiro,pawn,ATK,amarelo,melee,2,2,140,55,fast,0,2,vibe_party,,,,🎉,Vibe Festa (passiva TODO)
-vp_vermelho,Brutamonte,pawn,ATK,vermelho,melee,2,2,130,70,medium,0,2,vibe_charge,,,,⚔️,Vibe Força (passiva TODO)
-vp_azul,Maestrinho,pawn,DEF,azul,mid,2,2,200,35,medium,0,2,vibe_heal,,,,🌊,Vibe Controle (passiva TODO)
-vp_roxo,Caótico,pawn,BAL,roxo,mid,2,2,150,55,medium,0,2,vibe_chaos,,,,💀,Vibe Caos (passiva TODO)
-vp_verde,Brotinho,pawn,DEF,verde,melee,2,2,180,40,slow,0,2,vibe_grow,,,,🌿,Vibe Sustain (passiva TODO)
-# ── Arapucas / Armadilhas (NOVOS — face-down, auto-disparam na resolução) ──
-trap_buraco,Buraco na Pista,trap,TRAP,amarelo,-,0,2,,,-,0,2,,trap_skip,1,,🕳,Arapuca: inimigo não ataca neste turno
-trap_emboscada,Emboscada,trap,TRAP,vermelho,-,0,3,,,-,0,1,,trap_double,2,,💥,Arapuca: seu dano dobra nesta resolução
-trap_rede,Rede,trap,TRAP,azul,-,0,2,,,-,0,2,,trap_net,40,,🕸,Arapuca: inimigo −40 ATK + cura um aliado
-trap_praga,Praga,trap,TRAP,verde,-,0,3,,,-,0,2,,trap_drain,50,,🦟,Arapuca: drena 50 ATK do inimigo
-trap_fumaca,Bomba de Fumaça,trap,TRAP,roxo,-,0,3,,,-,0,1,,trap_smoke,30,,🌫,"Arapuca: inimigo −30 ATK (placeholder)"
-# ── Cartas de FUSÃO (kind:fusion — NÃO entram em deck/loja; só surgem via fusão. Stats/img placeholder) ──
-fus_resenha,A Resenha,fusion,ATK,amarelo,melee,5,0,380,200,medium,0,0,,,,,🎊,"Fusão Festa+Festa (placeholder)",baladinha.jpg
-fus_camarote,Rei do Camarote,fusion,BAL,amarelo,mid,5,0,420,170,medium,0,0,,,,,👑,"Fusão Festa+Controle (placeholder)",reidocamarote.jpeg
-fus_climao,O Climão,fusion,ATK,vermelho,melee,5,0,300,220,medium,0,0,,,,,😤,"Fusão Força+Caos (placeholder)",bolado.jpg
-fus_brotheragem,Brotheragem Eterna,fusion,DEF,verde,melee,5,0,600,120,slow,0,0,,,,,🤝,"Fusão Sustain+Sustain (placeholder)",apoio.jpeg
-fus_lenda,Lenda do Rolê,fusion,ATK,vermelho,melee,6,0,360,240,fast,0,0,,,,,🌟,"Fusão específica Arthur+Letti (placeholder)",nobrilho.jpg
-fus_brigarole,Brigou no Rolê,fusion,ATK,vermelho,melee,5,0,320,225,medium,0,0,,,,,🥊,"Fusão Festa+Força (placeholder)",armlock.jpg
-fus_apagao,Apagão Total,fusion,BAL,roxo,mid,5,0,300,215,medium,0,0,,,,,🥴,"Fusão Festa+Caos (placeholder)",deitei.jpg
-fus_resistencia,Resistência Etílica,fusion,DEF,verde,melee,5,0,520,190,slow,0,0,,,,,🍺,"Fusão Festa+Sustain (placeholder)",torredechopp.jpg
-fus_marombeiro,Marombeiro Supremo,fusion,ATK,vermelho,melee,6,0,380,250,medium,0,0,,,,,💪,"Fusão Força+Força (placeholder)",posefitness.jpg
-fus_leaochacara,Leão de Chácara,fusion,DEF,azul,melee,5,0,480,205,slow,0,0,,,,,🛡,"Fusão Força+Controle (placeholder)",pewpew.jpg
-fus_tanque,Tanque Humano,fusion,DEF,verde,melee,6,0,600,200,slow,0,0,,,,,🦾,"Fusão Força+Sustain (placeholder)",to no shape pai.jpeg
-fus_mestrecerimonia,Mestre de Cerimônia,fusion,BAL,azul,mid,5,0,360,195,medium,0,0,,,,,🎤,"Fusão Controle+Controle (placeholder)",newalbum.jpg
-fus_mentemestra,Mente Mestra,fusion,BAL,roxo,mid,5,0,330,210,medium,0,0,,,,,🧠,"Fusão Controle+Caos (placeholder)",mindfuck.jpeg
-fus_zen,Zen Master,fusion,DEF,azul,mid,5,0,500,185,medium,0,0,,,,,🧘,"Fusão Controle+Sustain (placeholder)",sónaboa.jpg
-fus_surto,Surto Coletivo,fusion,ATK,roxo,melee,5,0,320,220,medium,0,0,,,,,🤯,"Fusão Caos+Caos (placeholder)",oloco.jpeg
-fus_mauelemento,Mau Elemento,fusion,BAL,verde,mid,5,0,420,195,medium,0,0,,,,,🚬,"Fusão Caos+Sustain (placeholder)",cigarrinho.jpg
+peon_atk,Sem Terra,pawn,ATK,vermelho,melee,1,1,100,60,fast,0,3,,,,,,,
+peon_def,Malhadinho,pawn,DEF,azul,melee,1,1,200,30,slow,0,3,,,,,,,
+peon_bal,Economista,pawn,BAL,verde,mid,2,1,150,50,medium,0,3,,,,,,,
+peon_def2,Bombado,pawn,DEF,azul,melee,2,1,280,40,slow,0,3,,,,,,,
+peon_atk2,Camarada,pawn,ATK,vermelho,melee,2,1,150,80,slow,0,3,,,,,,,
+peon_atk3,Comunista,pawn,ATK,vermelho,melee,4,1,200,100,slow,0,3,,,,,,,
+peon_atk4,PTista,pawn,ATK,vermelho,melee,6,1,240,120,slow,0,3,,,,,,,
+peon_atk5,Presidente,pawn,ATK,vermelho,melee,13,1,1313,130,slow,0,3,,,,,,,
+peon_def3,Amante do Suco,pawn,DEF,azul,melee,5,1,360,60,slow,0,3,,,,,,,
+peon_def4,Trembolono,pawn,DEF,azul,melee,6,1,500,80,slow,0,3,,,,,,,
+peon_def5,Mr Olympia,pawn,DEF,azul,melee,9,1,1500,140,slow,0,3,,,,,,,
+peon_bal2,Investidor,pawn,DEF,azul,melee,4,1,200,75,slow,0,3,,,,,,,
+peon_bal3,Rico Top 1%,pawn,BAL,verde,mid,5,1,250,100,slow,0,3,,,,,,,
+peon_bal4,Banqueiro,pawn,BAL,verde,mid,8,1,400,120,slow,0,3,,,,,,,
+peon_bal5,Schead Musk,pawn,BAL,verde,mid,10,1,900,200,slow,0,3,,,,,,,
+peon_nerd,Streamer,pawn,DEF,amarelo,melee,1,1,200,30,slow,0,3,,,,,,,
+peon_nerd2,Minezeiro,pawn,DEF,amarelo,melee,2,1,280,40,slow,0,3,,,,,,,
+peon_nerd3,BoardGaymer,pawn,DEF,amarelo,melee,3,1,360,60,slow,0,3,,,,,,,
+peon_nerd4,Suequeiro,pawn,DEF,amarelo,melee,5,1,500,80,slow,0,3,,,,,,,
+peon_nerd5,Elden Lord,pawn,DEF,amarelo,melee,6,1,1500,140,slow,0,3,,,,,,,
+peon_role,Muleque Piranha,pawn,ATK,roxo,melee,1,1,100,60,slow,0,3,,,,,,,
+peon_role2,Pegador,pawn,ATK,roxo,melee,2,1,150,80,slow,0,3,,,,,,,
+peon_role3,Boleiro,pawn,ATK,roxo,melee,4,1,200,100,slow,0,3,,,,,,,
+peon_role4,PIMP,pawn,ATK,roxo,melee,5,1,240,120,slow,0,3,,,,,,,
+peon_role5,Rei do Camarote,pawn,ATK,roxo,melee,8,1,1313,130,slow,0,3,,,,,,,
+arthur,Arthur,hero,ATK,azul,long,3,3,220,110,fast,0,1,,,,,,Long range (legado — redesenhar),
+fanta,Fanta,hero,BAL,amarelo,mid,3,3,200,70,medium,0,1,recycler,,,,,Recycler (legado),
+nathan,Nathan,hero,DEF,amarelo,melee,3,3,320,45,slow,0,1,,,,,,,
+garopaba,Garopaba,hero,ATK,vermelho,melee,4,4,250,130,medium,0,1,deathbuff,,,,,Morte heroica (legado),
+bala,Bala,hero,DEF,verde,melee,4,4,420,50,slow,0,1,provoker,,,,,Provoker (legado),
+leo,Léo,hero,ATK,roxo,melee,4,4,260,130,medium,0,1,,,,,,,
+zaga,Zaga,hero,BAL,roxo,mid,4,4,320,95,medium,0,1,,,,,,,
+vitao,Vitão,hero,BAL,azul,mid,5,5,350,80,medium,1,1,healer,,,,,Healer (legado),
+borba,Borba,hero,DEF,vermelho,melee,5,5,600,70,slow,1,1,,,,,,,
+letti,Letti,hero,ATK,verde,melee,6,6,280,160,veryfast,1,1,rusher,,,,,Rusher (legado — ignora unidades),
+churrasco,Churrasco,item,ITEM,azul,-,0,2,,,-,0,3,,heal_all,80,,🥩,Cura suas unidades +80 HP,
+energetico,Energético,item,ITEM,amarelo,-,0,2,,,-,0,3,,atk_buff,0.3,,⚡,+30% ATK no seu campo nesta resolução,
+rodada,Rodada,item,ITEM,amarelo,-,0,1,,,-,0,3,,draw2,2,,🍺,Compra 2 cartas,
+turboboost,Turbo Boost,item,ITEM,amarelo,-,0,2,,,-,0,3,,atk_buff,0.2,,💨,Turbo: +20% ATK neste turno (TODO redesenhar),
+ressurreicao,Tadalinha,item,ITEM,verde,-,0,4,,,-,0,3,,resurrect,0.5,,🔄,Revive última unidade do cemitério (50% HP),
+reforco,Reforço,item,ITEM,verde,-,0,3,,,-,0,3,,next_hp_buff,0.5,,🛡,Próxima unidade que baixar +50% HP,
+ressaca,Ressaca,item,ITEM,amarelo,-,0,2,,,-,0,2,,debuff_all_atk,40,,🥴,Todos inimigos −40 ATK nesta resolução,
+dedinho,Dedinho Mindinho,item,ITEM,roxo,-,0,2,,,-,0,2,,debuff_strongest,0.3,,🤏,Inimigo mais forte −30% ATK,
+calunia,Calúnia,item,ITEM,roxo,-,0,3,,,-,0,2,,debuff_silence,1,,🗣,Inimigo mais forte não ataca neste turno,
+jogaareia,Joga Areia,item,ITEM,vermelho,-,0,1,,,-,0,2,,debuff_flat,50,,🏖,Inimigo mais forte −50 ATK nesta resolução,
+barraco,Barraco,item,ITEM,roxo,-,0,4,,,-,0,1,,debuff_all_atk,30,,💢,Todos inimigos −30 ATK nesta resolução,
+vp_amarelo,Festeiro,pawn,ATK,amarelo,melee,2,2,140,55,fast,0,2,vibe_party,,,,🎉,Vibe Festa (passiva TODO),
+vp_vermelho,Brutamonte,pawn,ATK,vermelho,melee,2,2,130,70,medium,0,2,vibe_charge,,,,⚔️,Vibe Força (passiva TODO),
+vp_azul,Maestrinho,pawn,DEF,azul,mid,2,2,200,35,medium,0,2,vibe_heal,,,,🌊,Vibe Controle (passiva TODO),
+vp_roxo,Caótico,pawn,BAL,roxo,mid,2,2,150,55,medium,0,2,vibe_chaos,,,,💀,Vibe Caos (passiva TODO),
+vp_verde,Brotinho,pawn,DEF,verde,melee,2,2,180,40,slow,0,2,vibe_grow,,,,🌿,Vibe Sustain (passiva TODO),
+trap_buraco,Buraco na Pista,trap,TRAP,amarelo,-,0,2,,,-,0,2,,trap_skip,1,,🕳,Arapuca: inimigo não ataca neste turno,
+trap_emboscada,Emboscada,trap,TRAP,vermelho,-,0,3,,,-,0,1,,trap_double,2,,💥,Arapuca: seu dano dobra nesta resolução,
+trap_rede,Rede,trap,TRAP,azul,-,0,2,,,-,0,2,,trap_net,40,,🕸,Arapuca: inimigo −40 ATK + cura um aliado,
+trap_praga,Praga,trap,TRAP,verde,-,0,3,,,-,0,2,,trap_drain,50,,🦟,Arapuca: drena 50 ATK do inimigo,
+trap_fumaca,Bomba de Fumaça,trap,TRAP,roxo,-,0,3,,,-,0,1,,trap_smoke,30,,🌫,Arapuca: inimigo −30 ATK (placeholder),
+fus_resenha,A Resenha,fusion,ATK,amarelo,melee,5,0,380,200,medium,0,0,,,,,🎊,Fusão Festa+Festa (placeholder),baladinha.jpg
+fus_camarote,Rei do Camarote,fusion,BAL,amarelo,mid,5,0,420,170,medium,0,0,,,,,👑,Fusão Festa+Controle (placeholder),reidocamarote.jpeg
+fus_climao,O Climão,fusion,ATK,vermelho,melee,5,0,300,220,medium,0,0,,,,,😤,Fusão Força+Caos (placeholder),bolado.jpg
+fus_brotheragem,Brotheragem Eterna,fusion,DEF,verde,melee,5,0,600,120,slow,0,0,,,,,🤝,Fusão Sustain+Sustain (placeholder),apoio.jpeg
+fus_lenda,Lenda do Rolê,fusion,ATK,vermelho,melee,6,0,360,240,fast,0,0,,,,,🌟,Fusão específica Arthur+Letti (placeholder),nobrilho.jpg
+fus_brigarole,Brigou no Rolê,fusion,ATK,vermelho,melee,5,0,320,225,medium,0,0,,,,,🥊,Fusão Festa+Força (placeholder),armlock.jpg
+fus_apagao,Apagão Total,fusion,BAL,roxo,mid,5,0,300,215,medium,0,0,,,,,🥴,Fusão Festa+Caos (placeholder),deitei.jpg
+fus_resistencia,Resistência Etílica,fusion,DEF,verde,melee,5,0,520,190,slow,0,0,,,,,🍺,Fusão Festa+Sustain (placeholder),torredechopp.jpg
+fus_marombeiro,Marombeiro Supremo,fusion,ATK,vermelho,melee,6,0,380,250,medium,0,0,,,,,💪,Fusão Força+Força (placeholder),posefitness.jpg
+fus_leaochacara,Leão de Chácara,fusion,DEF,azul,melee,5,0,480,205,slow,0,0,,,,,🛡,Fusão Força+Controle (placeholder),pewpew.jpg
+fus_tanque,Tanque Humano,fusion,DEF,verde,melee,6,0,600,200,slow,0,0,,,,,🦾,Fusão Força+Sustain (placeholder),to no shape pai.jpeg
+fus_mestrecerimonia,Mestre de Cerimônia,fusion,BAL,azul,mid,5,0,360,195,medium,0,0,,,,,🎤,Fusão Controle+Controle (placeholder),newalbum.jpg
+fus_mentemestra,Mente Mestra,fusion,BAL,roxo,mid,5,0,330,210,medium,0,0,,,,,🧠,Fusão Controle+Caos (placeholder),mindfuck.jpeg
+fus_zen,Zen Master,fusion,DEF,azul,mid,5,0,500,185,medium,0,0,,,,,🧘,Fusão Controle+Sustain (placeholder),sónaboa.jpg
+fus_surto,Surto Coletivo,fusion,ATK,roxo,melee,5,0,320,220,medium,0,0,,,,,🤯,Fusão Caos+Caos (placeholder),oloco.jpeg
+fus_mauelemento,Mau Elemento,fusion,BAL,verde,mid,5,0,420,195,medium,0,0,,,,,🚬,Fusão Caos+Sustain (placeholder),cigarrinho.jpg
 `;
 
 function parseCSVLine(line){
@@ -2132,11 +2172,11 @@ function renderHighscores(){const sc=loadScores();const tb=document.getElementBy
 // ══ TABELAS DE DADOS (editáveis — placeholders de balanceamento/nomes) ══
 // VIBES: nomes provisórios; o usuário vai trocar por algo engraçado/adulto.
 const VIBES=[
-  {id:'amarelo', emoji:'🟡', color:'#f5c542', name:'Os Festeiros',   theme:'Festa & energia'},
-  {id:'vermelho',emoji:'🔴', color:'#e63946', name:'Os Brutamontes', theme:'Força bruta'},
-  {id:'azul',    emoji:'🔵', color:'#2196f3', name:'Os Maestros',    theme:'Controle & cura'},
-  {id:'roxo',    emoji:'🟣', color:'#9c27b0', name:'Os Caóticos',    theme:'Caos & debuff'},
-  {id:'verde',   emoji:'🟢', color:'#4caf50', name:'As Raízes',      theme:'Sustain progressivo'},
+  {id:'amarelo', emoji:'🟡', color:'#f5c542', name:'Nerdola',     theme:'Geek, games & internet'},
+  {id:'vermelho',emoji:'🔴', color:'#e63946', name:'Socialista',  theme:'Povo, treta & revolução'},
+  {id:'azul',    emoji:'🔵', color:'#2196f3', name:'Marombeiro',  theme:'Academia & shape'},
+  {id:'roxo',    emoji:'🟣', color:'#9c27b0', name:'Rolezeiro',   theme:'Balada, night & pegação'},
+  {id:'verde',   emoji:'🟢', color:'#4caf50', name:'Dinheirista', theme:'Grana & investimentos'},
 ];
 // ── DECK BUILDER (editável) ──
 const DECK_SIZE=30;   // tamanho ALVO do baralho
@@ -2236,7 +2276,9 @@ const CAMPAIGN_ACTIONS=[ ()=>showMsg('Capítulo em construção 🚧','orange'),
 
 // ── TITLE ──
 let titleReady=false;
-function advanceTitle(){ if(CUR!=='title'||!titleReady)return; titleReady=false; unlockAudio(); playSFX('ui_click'); showScreen('nameload'); }
+function disclaimerAccepted(){ try{return localStorage.getItem('ccdc_disclaimer')==='1';}catch(e){return false;} }
+function acceptDisclaimer(){ try{localStorage.setItem('ccdc_disclaimer','1');}catch(e){} playSFX('ui_click'); showScreen('nameload'); }
+function advanceTitle(){ if(CUR!=='title'||!titleReady)return; titleReady=false; unlockAudio(); playSFX('ui_click'); showScreen(disclaimerAccepted()?'nameload':'disclaimer'); }
 
 // ── NAME / LOAD ──
 function setupNameLoad(){
@@ -2491,7 +2533,7 @@ function toggleMenuBg(show){ const bg=document.getElementById('menu-bg'); if(!bg
 
 // ── roteamento: hook de entrada de tela ──
 let CUR='loading';
-const MENU_BG_SCREENS=new Set(['title','nameload','menu','deckselect','campaign','runsetup','freeduel','shop','score','password']);
+const MENU_BG_SCREENS=new Set(['title','disclaimer','nameload','menu','deckselect','campaign','runsetup','freeduel','shop','score','password']);
 const SUB_SCREENS=new Set(['campaign','runsetup','freeduel','shop','library','score','password']);
 function onScreenEnter(id){
   playOST(ostForScreen(id));   // troca automática de trilha (crossfade)
@@ -2843,7 +2885,7 @@ let audioMuted=false;
 // 'game' e 'end' são resolvidos dinamicamente em ostForScreen()
 const OST_BY_SCREEN={
   loading:null,
-  title:'ost_menu', nameload:'ost_menu', menu:'ost_menu',
+  title:'ost_menu', disclaimer:'ost_menu', nameload:'ost_menu', menu:'ost_menu',
   library:'ost_menu', shop:'ost_menu', campaign:'ost_menu', deckbuilder:'ost_menu',
   deckselect:'ost_select', runsetup:'ost_select', freeduel:'ost_select', password:'ost_select',
   score:'ost_scores', reward:'ost_reward',
