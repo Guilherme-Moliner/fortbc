@@ -1195,32 +1195,42 @@ const BASE_CARDS = parseCardsCSV(CARDS_CSV);
 //  mode=general → a,b são VIBES; mode=specific → a,b são IDs de carta (specific tem prioridade).
 const FUSIONS_CSV = `
 mode,a,b,result,note
-# Fusões gerais: par de VIBES → carta kind:fusion
-general,amarelo,amarelo,fus_resenha,Festa + Festa
-general,amarelo,vermelho,fus_brigarole,Festa + Força
-general,amarelo,azul,fus_camarote,Festa + Controle
-general,amarelo,roxo,fus_apagao,Festa + Caos
-general,amarelo,verde,fus_resistencia,Festa + Sustain
-general,vermelho,vermelho,fus_marombeiro,Força + Força
-general,vermelho,azul,fus_leaochacara,Força + Controle
-general,vermelho,roxo,fus_climao,Força + Caos
-general,vermelho,verde,fus_tanque,Força + Sustain
-general,azul,azul,fus_mestrecerimonia,Controle + Controle
-general,azul,roxo,fus_mentemestra,Controle + Caos
-general,azul,verde,fus_zen,Controle + Sustain
-general,roxo,roxo,fus_surto,Caos + Caos
-general,roxo,verde,fus_mauelemento,Caos + Sustain
-general,verde,verde,fus_brotheragem,Sustain + Sustain
-# Fusões específicas: par de IDs de carta (têm prioridade sobre a geral)
+# Receitas por CARACTERÍSTICA (chave:valor). Chaves: vibe · postura (type: ATK=briga / DEF=muro / BAL=labia).
+# Cada receita = 2 requisitos (1 por material). Ordem dos materiais não importa.
+# Por POSTURA (tem prioridade sobre vibe — exercita a característica nova):
+recipe,postura:muro,postura:muro,fus_tanque,Dois Muros → Tanque
+recipe,postura:labia,postura:labia,fus_mestrecerimonia,Duas Lábias → Mestre de Cerimônia
+# Par de vibes (fallback):
+recipe,vibe:amarelo,vibe:amarelo,fus_resenha,Nerdola + Nerdola
+recipe,vibe:amarelo,vibe:vermelho,fus_brigarole,Nerdola + Socialista
+recipe,vibe:amarelo,vibe:azul,fus_camarote,Nerdola + Marombeiro
+recipe,vibe:amarelo,vibe:roxo,fus_apagao,Nerdola + Rolezeiro
+recipe,vibe:amarelo,vibe:verde,fus_resistencia,Nerdola + Dinheirista
+recipe,vibe:vermelho,vibe:vermelho,fus_marombeiro,Socialista + Socialista
+recipe,vibe:vermelho,vibe:azul,fus_leaochacara,Socialista + Marombeiro
+recipe,vibe:vermelho,vibe:roxo,fus_climao,Socialista + Rolezeiro
+recipe,vibe:vermelho,vibe:verde,fus_tanque,Socialista + Dinheirista
+recipe,vibe:azul,vibe:azul,fus_mestrecerimonia,Marombeiro + Marombeiro
+recipe,vibe:azul,vibe:roxo,fus_mentemestra,Marombeiro + Rolezeiro
+recipe,vibe:azul,vibe:verde,fus_zen,Marombeiro + Dinheirista
+recipe,vibe:roxo,vibe:roxo,fus_surto,Rolezeiro + Rolezeiro
+recipe,vibe:roxo,vibe:verde,fus_mauelemento,Rolezeiro + Dinheirista
+recipe,vibe:verde,vibe:verde,fus_brotheragem,Dinheirista + Dinheirista
+# Específicas (par de IDs, prioridade máxima):
 specific,arthur,letti,fus_lenda,Arthur + Letti = Lenda do Rolê
 `;
 function fuseKey(a,b){return [a,b].sort().join('|');}
+// Características da carta usadas nas receitas de fusão. (type/range/cost/speed mantêm a chave no CSV; aqui são re-rotulados.)
+const POSTURA={ATK:'briga',DEF:'muro',BAL:'labia'};
+function cardTrait(card,key){ if(!card)return null; if(key==='vibe')return card.vibe; if(key==='postura')return POSTURA[card.type]; return null; }
+function matchReq(card,token){ const i=String(token).indexOf(':'); if(i<0)return false; return cardTrait(card,token.slice(0,i))===token.slice(i+1); }
 function parseFusions(csv){
-  const out={general:{},specific:{}};
+  const out={recipes:[],specific:{}};
   const lines=csv.split(/\r?\n/).filter(l=>l.trim()&&!l.trim().startsWith('#'));
   lines.slice(1).forEach(line=>{
     const c=parseCSVLine(line).map(x=>x.trim()); const mode=c[0];
-    if(mode==='general'||mode==='specific')out[mode][fuseKey(c[1],c[2])]=c[3];
+    if(mode==='specific')out.specific[fuseKey(c[1],c[2])]=c[3];
+    else if(mode==='recipe')out.recipes.push({reqs:[c[1],c[2]],result:c[3]});
   });
   return out;
 }
@@ -1229,7 +1239,10 @@ const FUSIONS=parseFusions(FUSIONS_CSV);
 function fusePair(a,b){
   if(!a||!b)return null;
   let rid=FUSIONS.specific[fuseKey(a.id,b.id)];            // específica tem prioridade
-  if(!rid&&a.vibe&&b.vibe)rid=FUSIONS.general[fuseKey(a.vibe,b.vibe)];
+  if(!rid){                                                // senão: 1ª receita cujos 2 requisitos batem (qualquer ordem)
+    const r=FUSIONS.recipes.find(R=>(matchReq(a,R.reqs[0])&&matchReq(b,R.reqs[1]))||(matchReq(a,R.reqs[1])&&matchReq(b,R.reqs[0])));
+    if(r)rid=r.result;
+  }
   if(!rid)return null;
   const base=BASE_CARDS.find(x=>x.id===rid); if(!base||base.atk==null)return null;
   const ea=(typeof getEffAtk==='function'?getEffAtk(a):a.atk)||0;

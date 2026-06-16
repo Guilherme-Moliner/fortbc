@@ -1,17 +1,19 @@
 mode,a,b,result,note
-general,amarelo,amarelo,fus_resenha,Festa + Festa
-general,amarelo,vermelho,fus_brigarole,Festa + Força
-general,amarelo,azul,fus_camarote,Festa + Controle
-general,amarelo,roxo,fus_apagao,Festa + Caos
-general,amarelo,verde,fus_resistencia,Festa + Sustain
-general,vermelho,vermelho,fus_marombeiro,Força + Força
-general,vermelho,azul,fus_leaochacara,Força + Controle
-general,vermelho,roxo,fus_climao,Força + Caos
-general,vermelho,verde,fus_tanque,Força + Sustain
-general,azul,azul,fus_mestrecerimonia,Controle + Controle
-general,azul,roxo,fus_mentemestra,Controle + Caos
-general,azul,verde,fus_zen,Controle + Sustain
-general,roxo,roxo,fus_surto,Caos + Caos
-general,roxo,verde,fus_mauelemento,Caos + Sustain
-general,verde,verde,fus_brotheragem,Sustain + Sustain
-specific,arthur,letti,fus_lenda,Arthur + Letti = Lenda do Rolê
+recipe,postura:muro,postura:muro,fus_tanque,Dois Muros (prioridade postura)
+recipe,postura:labia,postura:labia,fus_mestrecerimonia,Duas Labias (prioridade postura)
+recipe,vibe:amarelo,vibe:amarelo,fus_resenha,Nerdola + Nerdola
+recipe,vibe:amarelo,vibe:vermelho,fus_brigarole,Nerdola + Socialista
+recipe,vibe:amarelo,vibe:azul,fus_camarote,Nerdola + Marombeiro
+recipe,vibe:amarelo,vibe:roxo,fus_apagao,Nerdola + Rolezeiro
+recipe,vibe:amarelo,vibe:verde,fus_resistencia,Nerdola + Dinheirista
+recipe,vibe:vermelho,vibe:vermelho,fus_marombeiro,Socialista + Socialista
+recipe,vibe:vermelho,vibe:azul,fus_leaochacara,Socialista + Marombeiro
+recipe,vibe:vermelho,vibe:roxo,fus_climao,Socialista + Rolezeiro
+recipe,vibe:vermelho,vibe:verde,fus_tanque,Socialista + Dinheirista
+recipe,vibe:azul,vibe:azul,fus_mestrecerimonia,Marombeiro + Marombeiro
+recipe,vibe:azul,vibe:roxo,fus_mentemestra,Marombeiro + Rolezeiro
+recipe,vibe:azul,vibe:verde,fus_zen,Marombeiro + Dinheirista
+recipe,vibe:roxo,vibe:roxo,fus_surto,Rolezeiro + Rolezeiro
+recipe,vibe:roxo,vibe:verde,fus_mauelemento,Rolezeiro + Dinheirista
+recipe,vibe:verde,vibe:verde,fus_brotheragem,Dinheirista + Dinheirista
+specific,arthur,letti,fus_lenda,Arthur + Letti

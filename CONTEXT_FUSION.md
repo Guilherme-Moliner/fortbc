@@ -3,6 +3,14 @@
 > Mecânica de fusão estilo **Yu-Gi-Oh! Forbidden Memories**, adaptada ao jogo turn-based.
 > Implementação V0 (2026-06-16). Stats/nomes das cartas-resultado são **placeholder** — balancear.
 
+## Receita por CARACTERÍSTICA (2026-06-16, modelo novo)
+- Fusão agora é por **receita de características** (`FUSIONS_CSV`/`FUSIONS.csv`): `mode,a,b,result,note`.
+  - `recipe`: `a`/`b` = requisitos `chave:valor`. Chaves ativas: **`vibe`** e **`postura`** (= coluna `type` re-rotulada: ATK=briga, DEF=muro, BAL=labia). Cada material satisfaz 1 requisito; ordem não importa.
+  - `specific`: par de `id`s (prioridade máxima).
+  - Ordem de match = ordem no CSV (`postura` listada ANTES de vibe → tem prioridade, pra a característica nova realmente entrar; senão a vibe casaria sempre).
+- Colunas do CSV **mantêm as chaves** type/range/cost/speed (Card Lab/planilha/produção não quebram) — `postura` é derivada de `type` em runtime (`POSTURA`/`cardTrait`/`matchReq`).
+- Decisão do usuário: começar simples com **2 características (vibe + postura)**; expandir (alcance/caos/pique de range/cost/speed) depois.
+
 ## Decisões travadas (com o usuário)
 - **Fusão geral = par de VIBES** (não ATK/DEF/BAL). As 5 vibes funcionam como o "tipo" do FM.
 - **Resultados = cartas novas dedicadas** (`kind:fusion`) — só surgem via fusão, NÃO entram em deck/loja/recompensa.
