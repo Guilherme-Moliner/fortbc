@@ -23,6 +23,10 @@ npm-debug.log*
 # Tooling de preview local
 .claude/
 
+# Clones/pastas soltas e versão antiga do Card Lab (substituída por cardlab/)
+fortbc-main/
+Card Lab/
+
 # Áudio bruto (fontes a curar/renomear — NÃO versionar)
 *.7z
 *.zip

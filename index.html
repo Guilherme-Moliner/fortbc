@@ -1092,6 +1092,23 @@ trap_emboscada,Emboscada,trap,TRAP,vermelho,-,0,3,,,-,0,1,,trap_double,2,,💥,A
 trap_rede,Rede,trap,TRAP,azul,-,0,2,,,-,0,2,,trap_net,40,,🕸,Arapuca: inimigo −40 ATK + cura um aliado
 trap_praga,Praga,trap,TRAP,verde,-,0,3,,,-,0,2,,trap_drain,50,,🦟,Arapuca: drena 50 ATK do inimigo
 trap_fumaca,Bomba de Fumaça,trap,TRAP,roxo,-,0,3,,,-,0,1,,trap_smoke,30,,🌫,"Arapuca: inimigo −30 ATK (placeholder)"
+# ── Cartas de FUSÃO (kind:fusion — NÃO entram em deck/loja; só surgem via fusão. Stats/img placeholder) ──
+fus_resenha,A Resenha,fusion,ATK,amarelo,melee,5,0,380,200,medium,0,0,,,,,🎊,"Fusão Festa+Festa (placeholder)",baladinha.jpg
+fus_camarote,Rei do Camarote,fusion,BAL,amarelo,mid,5,0,420,170,medium,0,0,,,,,👑,"Fusão Festa+Controle (placeholder)",reidocamarote.jpeg
+fus_climao,O Climão,fusion,ATK,vermelho,melee,5,0,300,220,medium,0,0,,,,,😤,"Fusão Força+Caos (placeholder)",bolado.jpg
+fus_brotheragem,Brotheragem Eterna,fusion,DEF,verde,melee,5,0,600,120,slow,0,0,,,,,🤝,"Fusão Sustain+Sustain (placeholder)",apoio.jpeg
+fus_lenda,Lenda do Rolê,fusion,ATK,vermelho,melee,6,0,360,240,fast,0,0,,,,,🌟,"Fusão específica Arthur+Letti (placeholder)",nobrilho.jpg
+fus_brigarole,Brigou no Rolê,fusion,ATK,vermelho,melee,5,0,320,225,medium,0,0,,,,,🥊,"Fusão Festa+Força (placeholder)",armlock.jpg
+fus_apagao,Apagão Total,fusion,BAL,roxo,mid,5,0,300,215,medium,0,0,,,,,🥴,"Fusão Festa+Caos (placeholder)",deitei.jpg
+fus_resistencia,Resistência Etílica,fusion,DEF,verde,melee,5,0,520,190,slow,0,0,,,,,🍺,"Fusão Festa+Sustain (placeholder)",torredechopp.jpg
+fus_marombeiro,Marombeiro Supremo,fusion,ATK,vermelho,melee,6,0,380,250,medium,0,0,,,,,💪,"Fusão Força+Força (placeholder)",posefitness.jpg
+fus_leaochacara,Leão de Chácara,fusion,DEF,azul,melee,5,0,480,205,slow,0,0,,,,,🛡,"Fusão Força+Controle (placeholder)",pewpew.jpg
+fus_tanque,Tanque Humano,fusion,DEF,verde,melee,6,0,600,200,slow,0,0,,,,,🦾,"Fusão Força+Sustain (placeholder)",to no shape pai.jpeg
+fus_mestrecerimonia,Mestre de Cerimônia,fusion,BAL,azul,mid,5,0,360,195,medium,0,0,,,,,🎤,"Fusão Controle+Controle (placeholder)",newalbum.jpg
+fus_mentemestra,Mente Mestra,fusion,BAL,roxo,mid,5,0,330,210,medium,0,0,,,,,🧠,"Fusão Controle+Caos (placeholder)",mindfuck.jpeg
+fus_zen,Zen Master,fusion,DEF,azul,mid,5,0,500,185,medium,0,0,,,,,🧘,"Fusão Controle+Sustain (placeholder)",sónaboa.jpg
+fus_surto,Surto Coletivo,fusion,ATK,roxo,melee,5,0,320,220,medium,0,0,,,,,🤯,"Fusão Caos+Caos (placeholder)",oloco.jpeg
+fus_mauelemento,Mau Elemento,fusion,BAL,verde,mid,5,0,420,195,medium,0,0,,,,,🚬,"Fusão Caos+Sustain (placeholder)",cigarrinho.jpg
 `;
 
 function parseCSVLine(line){
@@ -1125,12 +1142,76 @@ function parseCardsCSV(csv){
     if(r.effectDur!=='')c.effectDur=Number(r.effectDur);
     if(c.kind==='pawn')c.pawn=true;
     if(c.kind==='hero')c.hero=true;
+    if(c.kind==='fusion')c.fusion=true;   // resultado de fusão; é monstro mas não entra em deck/loja
     if(c.kind==='item')c.type='ITEM';
     if(c.kind==='trap')c.type='TRAP';
     return c;
   });
 }
 const BASE_CARDS = parseCardsCSV(CARDS_CSV);
+
+// ══ FUSÕES (estilo YGO Forbidden Memories — ver CONTEXT_FUSION.md) ══
+// Fonte única: bloco FUSIONS_CSV abaixo (espelhado em FUSIONS.csv). Linhas # = comentário.
+//  mode=general → a,b são VIBES; mode=specific → a,b são IDs de carta (specific tem prioridade).
+const FUSIONS_CSV = `
+mode,a,b,result,note
+# Fusões gerais: par de VIBES → carta kind:fusion
+general,amarelo,amarelo,fus_resenha,Festa + Festa
+general,amarelo,vermelho,fus_brigarole,Festa + Força
+general,amarelo,azul,fus_camarote,Festa + Controle
+general,amarelo,roxo,fus_apagao,Festa + Caos
+general,amarelo,verde,fus_resistencia,Festa + Sustain
+general,vermelho,vermelho,fus_marombeiro,Força + Força
+general,vermelho,azul,fus_leaochacara,Força + Controle
+general,vermelho,roxo,fus_climao,Força + Caos
+general,vermelho,verde,fus_tanque,Força + Sustain
+general,azul,azul,fus_mestrecerimonia,Controle + Controle
+general,azul,roxo,fus_mentemestra,Controle + Caos
+general,azul,verde,fus_zen,Controle + Sustain
+general,roxo,roxo,fus_surto,Caos + Caos
+general,roxo,verde,fus_mauelemento,Caos + Sustain
+general,verde,verde,fus_brotheragem,Sustain + Sustain
+# Fusões específicas: par de IDs de carta (têm prioridade sobre a geral)
+specific,arthur,letti,fus_lenda,Arthur + Letti = Lenda do Rolê
+`;
+function fuseKey(a,b){return [a,b].sort().join('|');}
+function parseFusions(csv){
+  const out={general:{},specific:{}};
+  const lines=csv.split(/\r?\n/).filter(l=>l.trim()&&!l.trim().startsWith('#'));
+  lines.slice(1).forEach(line=>{
+    const c=parseCSVLine(line).map(x=>x.trim()); const mode=c[0];
+    if(mode==='general'||mode==='specific')out[mode][fuseKey(c[1],c[2])]=c[3];
+  });
+  return out;
+}
+const FUSIONS=parseFusions(FUSIONS_CSV);
+// Funde DUAS cartas (instâncias). Retorna instância da carta-resultado ou null se não fundem.
+function fusePair(a,b){
+  if(!a||!b)return null;
+  let rid=FUSIONS.specific[fuseKey(a.id,b.id)];            // específica tem prioridade
+  if(!rid&&a.vibe&&b.vibe)rid=FUSIONS.general[fuseKey(a.vibe,b.vibe)];
+  if(!rid)return null;
+  const base=BASE_CARDS.find(x=>x.id===rid); if(!base||base.atk==null)return null;
+  const ea=(typeof getEffAtk==='function'?getEffAtk(a):a.atk)||0;
+  const eb=(typeof getEffAtk==='function'?getEffAtk(b):b.atk)||0;
+  if(!(base.atk>ea&&base.atk>eb))return null;              // trava de ATK (regra FM)
+  return instOf(rid);
+}
+// Encadeia 2–5 materiais (esquerda→direita, como no FM), SEM punir o experimento:
+//  - par funde → ambos materiais vão pro cemitério; o resultado vira a base do próximo par.
+//  - par NÃO funde → descarta o de índice menor (cemitério) e segue com o próximo como base.
+//  - no fim, a carta-base sobrevivente é invocada. Retorna {summon, grave}.
+function runFusionChain(cards){
+  if(!cards||cards.length<2)return null;
+  const grave=[]; let acc=cards[0];
+  for(let i=1;i<cards.length;i++){
+    const r=fusePair(acc,cards[i]);
+    if(r){ grave.push(acc,cards[i]); acc=r; }   // fundiu: materiais ao cemitério, resultado vira base
+    else { grave.push(acc); acc=cards[i]; }       // não fundiu: descarta o menor, segue com o próximo
+  }
+  return {summon:acc, grave};
+}
+
 const TOWER_ATK = 30;
 
 // ══════════════════════════════════════════════════════
@@ -1699,7 +1780,7 @@ function phaseMain(){
 }
 
 // helpers de tipo de carta
-function isMonster(c){return c&&(c.kind==='pawn'||c.kind==='hero');}
+function isMonster(c){return c&&(c.kind==='pawn'||c.kind==='hero'||c.kind==='fusion');}
 function isQuickCard(c){return c&&(c.kind==='item'||c.kind==='trap');}
 
 const MAIN_HINT=`<span class="action-hint">⬇ DOWN FASE — baixe 1 monstro (clique na carta e no slot) ou passe</span><button class="play-btn pass" onclick="confirmMain(-1,-1)">Passar</button>`;
@@ -2027,7 +2108,7 @@ function generateRewards(n){
     pool.push({cat:'unit',icon:`<span style="color:${LV_COLOR[lv+1]}">★</span>`,title:`Evoluir: ${c.name}`,desc:`${LV_NAMES[lv]} → ${LV_NAMES[lv+1]} · +${pct}% nos status (todas as cópias)`,apply:()=>{cardLevels[id]=lv+1;saveLevels(cardLevels);rebuildPlayerDeck();}});
   }
   // 2) RECRUTA — nova unidade da vibe dominante do baralho (contextual)
-  const vibe=dominantVibe(); const monsters=BASE_CARDS.filter(isMonster);
+  const vibe=dominantVibe(); const monsters=BASE_CARDS.filter(c=>isMonster(c)&&c.kind!=='fusion');
   const vibed=vibe?monsters.filter(c=>c.vibe===vibe):[]; const src=vibed.length?vibed:monsters;
   const rc=src[Math.floor(Math.random()*src.length)];
   if(rc){const vl=rc.vibe&&VIBES.find(v=>v.id===rc.vibe);pool.push({cat:'unit',icon:'🃏',title:`Recrutar: ${rc.name}`,desc:`+1 unidade no baralho${vl?` · ${vl.emoji} ${vl.name}`:''}`,apply:()=>{APP.playerDeck.push({...applyCardLevel(rc,cardLevels),uid:uid(),_shown:true});}});}
@@ -2659,7 +2740,32 @@ function bfToggleFusion(i){
   bfInspect(G.playerHand[i]); bfLayoutHand();
   const fb=document.getElementById('bf-fusionbar'); if(fb)fb.style.display=BF.fusion.length>=1?'flex':'none'; setText('bf-fusion-n',BF.fusion.length);
 }
-function bfDoFusion(){ if(BF.fusion.length<2){bfToast('Selecione ao menos 2 cartas');return;} bfToast('Fusão de '+BF.fusion.length+' cartas (regras chegam no engine)'); bfClearFusion(); }
+function bfDoFusion(){
+  if(G.phase!=='main'||G.mainConfirmed){bfToast('Fusão só na DOWN FASE');return;}
+  if(BF.fusion.length<2){bfToast('Selecione ao menos 2 cartas');return;}
+  const cap=(Save.data?(licenseFor(Save.data.duels).fusion||5):5);
+  if(BF.fusion.length>cap){bfToast('Sua licença permite fundir até '+cap+' cartas');return;}
+  const idxs=[...BF.fusion];
+  const cards=idxs.map(i=>G.playerHand[i]);
+  if(!cards.every(isMonster)){bfToast('Só dá pra fundir monstros');return;}
+  const out=runFusionChain(cards);
+  if(!out){bfToast('Selecione ao menos 2 cartas');return;}
+  const result=out.summon;
+  const slot=result.commander?4:[0,1,2,3].find(n=>!G.playerField[n]);
+  if(slot==null){bfToast('Sem slot livre pra invocar a fusão');return;}
+  // consome os materiais da mão (índices em ordem decrescente p/ não bagunçar)
+  idxs.sort((a,b)=>b-a).forEach(i=>G.playerHand.splice(i,1));
+  BF.fusion=[];
+  // cemitério: materiais consumidos + fusões intermediárias descartadas
+  out.grave.forEach(c=>G.playerGrave.push(c));
+  // invoca a carta sobrevivente (substitui a ação de baixar 1 monstro nesta DOWN FASE)
+  const fc=makeFC(result,'player'); if(G.playerField[slot])G.playerGrave.push(G.playerField[slot]); G.playerField[slot]=fc;
+  playSFX('reward'); bfToast('🌀 '+result.name+' invocado'); bfLog('Fusão → '+result.name+' (cemitério: '+out.grave.length+')','green');
+  G.mainConfirmed=true; clearSlotHighlights();
+  const aiSlot=G.aiMainSlot; applyAiMain(); updateFieldUI(); renderHand(); updateDeckUI();
+  juiceLand('player',slot); if(aiSlot!=null)juiceLand('ai',aiSlot);
+  showMsg('⚔ Cartas reveladas!'); setTimeout(()=>startPhase('lastminute'),1200);
+}
 function bfClearFusion(){ BF.fusion=[]; bfLayoutHand(); const fb=document.getElementById('bf-fusionbar'); if(fb)fb.style.display='none'; setText('bf-fusion-n',0); }
 function bfToast(msg){ const t=document.getElementById('bf-toast'); if(!t)return; t.textContent=msg; t.style.display='block'; clearTimeout(BF._toastT); BF._toastT=setTimeout(()=>t.style.display='none',1700); }
 // ── Inspetor (trilho) ──

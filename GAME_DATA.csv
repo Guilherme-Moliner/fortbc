@@ -34,3 +34,19 @@ trap_emboscada,Emboscada,trap,TRAP,vermelho,-,0,3,,,-,0,1,,trap_double,2,,💥,A
 trap_rede,Rede,trap,TRAP,azul,-,0,2,,,-,0,2,,trap_net,40,,🕸,Arapuca: inimigo −40 ATK + cura um aliado
 trap_praga,Praga,trap,TRAP,verde,-,0,3,,,-,0,2,,trap_drain,50,,🦟,Arapuca: drena 50 ATK do inimigo
 trap_fumaca,Bomba de Fumaça,trap,TRAP,roxo,-,0,3,,,-,0,1,,trap_smoke,30,,🌫,"Arapuca: inimigo −30 ATK (placeholder)"
+fus_resenha,A Resenha,fusion,ATK,amarelo,melee,5,0,380,200,medium,0,0,,,,,🎊,"Fusão Festa+Festa (placeholder)",baladinha.jpg
+fus_camarote,Rei do Camarote,fusion,BAL,amarelo,mid,5,0,420,170,medium,0,0,,,,,👑,"Fusão Festa+Controle (placeholder)",reidocamarote.jpeg
+fus_climao,O Climão,fusion,ATK,vermelho,melee,5,0,300,220,medium,0,0,,,,,😤,"Fusão Força+Caos (placeholder)",bolado.jpg
+fus_brotheragem,Brotheragem Eterna,fusion,DEF,verde,melee,5,0,600,120,slow,0,0,,,,,🤝,"Fusão Sustain+Sustain (placeholder)",apoio.jpeg
+fus_lenda,Lenda do Rolê,fusion,ATK,vermelho,melee,6,0,360,240,fast,0,0,,,,,🌟,"Fusão específica Arthur+Letti (placeholder)",nobrilho.jpg
+fus_brigarole,Brigou no Rolê,fusion,ATK,vermelho,melee,5,0,320,225,medium,0,0,,,,,🥊,"Fusão Festa+Força (placeholder)",armlock.jpg
+fus_apagao,Apagão Total,fusion,BAL,roxo,mid,5,0,300,215,medium,0,0,,,,,🥴,"Fusão Festa+Caos (placeholder)",deitei.jpg
+fus_resistencia,Resistência Etílica,fusion,DEF,verde,melee,5,0,520,190,slow,0,0,,,,,🍺,"Fusão Festa+Sustain (placeholder)",torredechopp.jpg
+fus_marombeiro,Marombeiro Supremo,fusion,ATK,vermelho,melee,6,0,380,250,medium,0,0,,,,,💪,"Fusão Força+Força (placeholder)",posefitness.jpg
+fus_leaochacara,Leão de Chácara,fusion,DEF,azul,melee,5,0,480,205,slow,0,0,,,,,🛡,"Fusão Força+Controle (placeholder)",pewpew.jpg
+fus_tanque,Tanque Humano,fusion,DEF,verde,melee,6,0,600,200,slow,0,0,,,,,🦾,"Fusão Força+Sustain (placeholder)",to no shape pai.jpeg
+fus_mestrecerimonia,Mestre de Cerimônia,fusion,BAL,azul,mid,5,0,360,195,medium,0,0,,,,,🎤,"Fusão Controle+Controle (placeholder)",newalbum.jpg
+fus_mentemestra,Mente Mestra,fusion,BAL,roxo,mid,5,0,330,210,medium,0,0,,,,,🧠,"Fusão Controle+Caos (placeholder)",mindfuck.jpeg
+fus_zen,Zen Master,fusion,DEF,azul,mid,5,0,500,185,medium,0,0,,,,,🧘,"Fusão Controle+Sustain (placeholder)",sónaboa.jpg
+fus_surto,Surto Coletivo,fusion,ATK,roxo,melee,5,0,320,220,medium,0,0,,,,,🤯,"Fusão Caos+Caos (placeholder)",oloco.jpeg
+fus_mauelemento,Mau Elemento,fusion,BAL,verde,mid,5,0,420,195,medium,0,0,,,,,🚬,"Fusão Caos+Sustain (placeholder)",cigarrinho.jpg
