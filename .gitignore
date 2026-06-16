@@ -16,6 +16,9 @@ npm-debug.log*
 # Temporários
 *.tmp
 *.log
+# Lock de planilha aberta (LibreOffice/Excel) — não versionar
+.~lock.*#
+~$*
 
 # Tooling de preview local
 .claude/
