@@ -2050,12 +2050,24 @@ function vibeSynergyMult(field){
   if(max>=2)return 1+VIBE_SYN_2;
   return 1;
 }
-// ATK efetivo de um lado, já com rank + vibe + buffs/debuffs do turno.
+// ── CÍRCULO DE VANTAGEM (por vibe). Cada um vence o da direita:
+//    Nerdola(amarelo) > Dinheirista(verde) > Socialista(vermelho) > Rolezeiro(roxo) > Marombeiro(azul) > Nerdola ──
+const VIBE_BEATS={amarelo:'verde', verde:'vermelho', vermelho:'roxo', roxo:'azul', azul:'amarelo'};
+const VIBE_ADV=1.5, VIBE_DIS=0.67;
+function vibeAdvMult(att,def){
+  if(!att||!def||att===def)return 1;
+  if(VIBE_BEATS[att]===def)return VIBE_ADV;   // ataca quem perde → +50%
+  if(VIBE_BEATS[def]===att)return VIBE_DIS;    // ataca quem vence → −33%
+  return 1;
+}
+// ATK efetivo de um lado, já com rank + vibe + vantagem por slot + buffs/debuffs do turno.
 function computeFieldAtk(side){
   const field=side==='player'?G.playerField:G.aiField;
+  const oppField=side==='player'?G.aiField:G.playerField;   // choque carta vs carta no mesmo slot
   const m=(G.mods&&G.mods[side])||{atkMult:1,atkFlat:0,skip:false};
   if(m.skip)return 0;
-  let base=field.reduce((s,c)=>s+(c?getEffAtk(c):0),0);
+  let base=0;
+  field.forEach((c,i)=>{ if(!c)return; const d=oppField[i]; base+=getEffAtk(c)*vibeAdvMult(c.vibe,d&&d.vibe); });
   base*=vibeSynergyMult(field);
   base*=(m.atkMult||1);
   base+=(m.atkFlat||0);
@@ -2182,19 +2194,33 @@ const VIBES=[
 const DECK_SIZE=30;   // tamanho ALVO do baralho
 const MIN_DECK=10;    // mínimo pra poder iniciar um fight (anti-trava em coleção pequena)
 
-// STARTER: coleção inicial = mapa {id: quantidade}. Total ~31 (dá pra montar 30).
-const STARTER_BASE_QTY={ peon_atk:3, peon_def:3, peon_bal:3, peon_def2:3, rodada:3, churrasco:3, energetico:2, reforco:2 };
-const STARTER_DECKS={  // ids extras por vibe (2 heróis + 2 itens) — heróis entram ×1, itens ×2
-  amarelo:['arthur','leo','energetico','rodada'],
-  vermelho:['garopaba','letti','churrasco','turboboost'],
-  azul:['nathan','vitao','churrasco','reforco'],
-  roxo:['zaga','fanta','turboboost','rodada'],
-  verde:['bala','borba','ressurreicao','reforco'],
+// STARTER: coleção inicial = mapa {id: quantidade}. Montada pela vibe escolhida.
+// Peões por vibe em ordem de NÍVEL (1º→4º). 'verde' é irregular no CSV (peon_bal2 é azul), usa bal→bal3→bal4→bal5.
+const PEON_LEVELS={
+  vermelho:['peon_atk','peon_atk2','peon_atk3','peon_atk4'],
+  azul:    ['peon_def','peon_def2','peon_def3','peon_def4'],
+  amarelo: ['peon_nerd','peon_nerd2','peon_nerd3','peon_nerd4'],
+  roxo:    ['peon_role','peon_role2','peon_role3','peon_role4'],
+  verde:   ['peon_bal','peon_bal3','peon_bal4','peon_bal5'],
 };
+const HEROES_BY_VIBE={
+  amarelo:['fanta','nathan'], vermelho:['garopaba','borba'], azul:['arthur','vitao'],
+  roxo:['leo','zaga'], verde:['bala','letti'],
+};
+const STARTER_ITEMS={ rodada:2, churrasco:2, energetico:1, reforco:1 };  // completa o deck mínimo
 function starterCollection(vibeId){
-  const col={...STARTER_BASE_QTY};
-  const vp='vp_'+vibeId; col[vp]=(col[vp]||0)+3;                 // peão da vibe escolhida
-  (STARTER_DECKS[vibeId]||[]).forEach(id=>{ const c=BASE_CARDS.find(x=>x.id===id); col[id]=(col[id]||0)+((c&&c.hero)?1:2); });
+  const col={}; const add=(id,n)=>{ if(id)col[id]=(col[id]||0)+n; };
+  const pick=arr=>arr&&arr.length?arr[Math.floor(Math.random()*arr.length)]:null;
+  // 2 cópias do peão NÍVEL 1 de CADA vibe
+  Object.values(PEON_LEVELS).forEach(arr=>add(arr[0],2));
+  // própria vibe: nível1 +1 (→3), nível2 ×3, nível3 ×2, nível4 ×1
+  const mine=PEON_LEVELS[vibeId]||PEON_LEVELS.amarelo;
+  add(mine[0],1); add(mine[1],3); add(mine[2],2); add(mine[3],1);
+  // 2 heróis: 1 da vibe + 1 aleatório de outra vibe
+  add(pick(HEROES_BY_VIBE[vibeId]),1);
+  add(pick(Object.entries(HEROES_BY_VIBE).filter(([v])=>v!==vibeId).flatMap(([,h])=>h)),1);
+  // itens p/ completar
+  Object.entries(STARTER_ITEMS).forEach(([id,n])=>add(id,n));
   return col;
 }
 
