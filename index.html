@@ -6,6 +6,7 @@
 <title>Batalha dos Amigos · fortbc</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root{--gold:#f0b429;--gold-d:#c8860a;--red:#e63946;--blue:#2196f3;--green:#4caf50;--bg0:#070710;--bg1:#0e0e1c;--bg2:#161628;--bg3:#1e1e35;--border:#2a2a45;--text:#dde0f0;--dim:#667;--atk:#e63946;--def:#4fc3f7;--bal:#81c784;--shadow:0 4px 24px rgba(0,0,0,.9);--glow-gold:0 0 14px rgba(240,180,41,.45);}
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -407,6 +408,163 @@ body{background:#000;color:var(--text);font-family:'Cinzel',serif;overflow:hidde
 .cv-tier{font-size:.52rem;font-weight:700;padding:2px 7px;border-radius:5px;border:1px solid color-mix(in srgb,var(--tc) 50%,transparent);color:var(--tc);opacity:.55;}
 .cv-tier.on{opacity:1;background:color-mix(in srgb,var(--tc) 16%,transparent);box-shadow:0 0 8px color-mix(in srgb,var(--tc) 45%,transparent);}
 
+/* ═══════════════ CAMPO DE BATALHA (port do Claude Design — tema Nebulosa padrão) ═══════════════ */
+/* vars de tema escopadas no #screen-game; trocadas por applyTheme(). Default = nebula. */
+#screen-game{
+  --bf-bg:#0e0b1a; --bf-bg2:#171231; --bf-bg3:#06040e;
+  --bf-panel:#161232; --bf-panel2:#1f1a40; --bf-slot:#120e26; --bf-field:#161232;
+  --bf-line:rgba(200,190,255,.10); --bf-line2:rgba(200,190,255,.22);
+  --bf-ink:#ece9fb; --bf-ink2:#a89dd0; --bf-ink3:#6b6296;
+  --bf-red:#e2533f; --bf-blue:#5a8cf0; --bf-gold:#f0b429; --bf-teal:#5fc99a; --bf-purp:#b487ff;
+  --bf-scrim:rgba(8,5,18,.74);
+  background:radial-gradient(125% 120% at 50% 0%, var(--bf-bg2) 0%, var(--bf-bg) 58%, var(--bf-bg3) 100%)!important;
+  font-family:'Barlow',system-ui,sans-serif; color:var(--bf-ink); position:relative;
+}
+@keyframes cmdPulse{0%,100%{box-shadow:inset 0 0 0 2px rgba(240,180,41,.85),0 0 16px rgba(240,180,41,.30)}50%{box-shadow:inset 0 0 0 2px rgba(240,180,41,1),0 0 30px rgba(240,180,41,.6)}}
+@keyframes youGlow{0%,100%{box-shadow:0 0 0 1px var(--bf-blue),0 0 16px rgba(90,140,240,.20)}50%{box-shadow:0 0 0 1px var(--bf-blue),0 0 26px rgba(90,140,240,.38)}}
+@keyframes terrFloat{0%,100%{opacity:.9}50%{opacity:1}}
+#screen-game.no-motion *{animation:none!important;transition:none!important}
+/* TOPBAR */
+#bf-top{height:46px;flex:0 0 46px;display:flex;align-items:center;gap:14px;padding:0 14px;background:linear-gradient(180deg,#0c0918,#08060f);border-bottom:1px solid var(--bf-line);position:relative;z-index:30}
+#bf-top .bf-turn{font-size:13px;color:var(--bf-ink2);min-width:120px;letter-spacing:.3px}
+#bf-top .bf-turn b{font-family:'Oswald';font-weight:600;font-size:17px;color:var(--bf-ink)}
+#bf-phasetrack{flex:1;display:flex;justify-content:center;gap:7px}
+.bf-phase{font-family:'Oswald';font-size:12px;letter-spacing:.8px;padding:6px 15px;border-radius:7px;color:var(--bf-ink2);background:#0e0b1d;border:1px solid var(--bf-line);font-weight:500;transition:all .18s;white-space:nowrap}
+.bf-phase.active{color:#1c1405;background:var(--bf-gold);border-color:var(--bf-gold);font-weight:700;box-shadow:0 0 14px rgba(240,180,41,.4)}
+.bf-topright{min-width:120px;display:flex;justify-content:flex-end;align-items:center;gap:9px}
+.bf-topright .bf-score{font-size:13px;color:var(--bf-ink2)}
+.bf-topright .bf-score b{font-family:'JetBrains Mono';color:var(--bf-gold);font-size:15px}
+.bf-iconbtn{width:28px;height:28px;border:1px solid var(--bf-line);border-radius:8px;display:grid;place-items:center;color:var(--bf-ink2);cursor:pointer;background:#0e0b1d}
+/* ARENA */
+#bf-arena{flex:1;display:grid;grid-template-columns:200px 1fr 286px;gap:12px;padding:12px;min-height:0;position:relative;transition:grid-template-columns .25s}
+#screen-game.rail-collapsed #bf-arena{grid-template-columns:200px 1fr 0px}
+/* COLUNA ESQUERDA — identidade */
+.bf-idcol{display:flex;flex-direction:column;gap:11px;min-height:0}
+.bf-id{flex:0 0 auto;border-radius:12px;padding:10px 11px;display:flex;flex-direction:column;gap:8px}
+.bf-id.enemy{border:1px solid rgba(226,83,63,.42);background:linear-gradient(180deg,rgba(226,83,63,.14),rgba(226,83,63,.02))}
+.bf-id.you{border:1px solid var(--bf-blue);background:linear-gradient(180deg,rgba(90,140,240,.18),rgba(90,140,240,.03));animation:youGlow 3.4s ease-in-out infinite}
+.bf-id-top{display:flex;gap:10px;align-items:center}
+.bf-portrait{width:50px;height:58px;flex:0 0 50px;border-radius:8px;position:relative;overflow:hidden;padding:2px;box-shadow:0 2px 7px rgba(0,0,0,.5)}
+.bf-portrait.enemy{background:linear-gradient(150deg,#caa23a,#6e4a1e 55%,#3a2410)}
+.bf-portrait.you{background:linear-gradient(150deg,#7fb0f5,#2a5b8e 55%,#13283f)}
+.bf-portrait img{position:absolute;inset:2px;width:calc(100% - 4px);height:calc(100% - 4px);object-fit:cover;border-radius:6px}
+.bf-id-name{flex:1;min-width:0}
+.bf-id-name .nm{font-family:'Oswald';font-weight:600;font-size:18px;line-height:1;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bf-id-name .sub{font-size:9px;letter-spacing:1.2px;text-transform:uppercase;margin-top:3px;font-weight:600}
+.bf-id.enemy .sub{color:var(--bf-red)}.bf-id.you .sub{color:var(--bf-blue)}
+.bf-id-lp{text-align:right}
+.bf-id-lp .lbl{font-size:8px;letter-spacing:.6px;color:var(--bf-ink3)}
+.bf-id-lp b{font-family:'JetBrains Mono';font-size:16px;color:var(--bf-ink);line-height:1.1}
+.bf-lpbar{height:9px;border-radius:5px;background:#0a0714;border:1px solid var(--bf-line);overflow:hidden}
+.bf-lpbar>i{display:block;height:100%;border-radius:5px;transition:width .9s cubic-bezier(.2,.7,.2,1)}
+.bf-id.enemy .bf-lpbar>i{background:linear-gradient(90deg,#7a2c1f,#e2533f)}
+.bf-id.you .bf-lpbar>i{background:linear-gradient(90deg,#27508f,#5a8cf0)}
+.bf-chips{display:flex;gap:6px}
+.bf-chip{flex:1;font-size:10px;padding:4px 0;text-align:center;border-radius:6px;background:#0e0b1d;border:1px solid var(--bf-line);color:var(--bf-ink2)}
+.bf-chip b{color:var(--bf-ink);font-family:'JetBrains Mono'}
+.bf-chip.grave{background:#170f24;border-color:rgba(180,135,255,.28);color:var(--bf-purp)}
+.bf-chip.grave b{color:var(--bf-purp)}
+.bf-chip.clickable{cursor:pointer}
+/* COLUNA CENTRO — board */
+.bf-board{display:flex;flex-direction:column;gap:7px;min-height:0}
+.bf-zone{position:relative;border-radius:11px;padding:4px 0}
+.bf-terr{position:absolute;inset:0;border-radius:11px;overflow:hidden}
+.bf-terr>.tg{position:absolute;inset:0;animation:terrFloat 6s ease-in-out infinite}
+.bf-terr>.sc{position:absolute;inset:0;background:var(--bf-scrim)}
+.bf-terr>.lb{position:absolute;right:10px;font-family:'JetBrains Mono';font-size:10px;letter-spacing:2px;color:rgba(255,255,255,.42)}
+.bf-row{display:flex;justify-content:center;gap:12px;position:relative}
+.bf-fdrow{display:flex;justify-content:center;gap:12px;position:relative;padding:2px 0 4px}
+.bf-fdcell{width:110px;display:grid;place-items:center;height:30px}
+.bf-fdslot{width:62px;height:28px;border-radius:5px;border:1px dashed var(--bf-line2);display:grid;place-items:center;color:var(--bf-ink3);font-size:11px;font-weight:700;opacity:.6;transition:all .15s}
+.bf-fdslot.set{background:repeating-linear-gradient(45deg,#33312a 0 5px,#211f19 5px 10px);border-style:solid;opacity:1}
+.bf-slot{width:110px;aspect-ratio:.72;border-radius:9px;position:relative;display:grid;place-items:center;border:1px solid var(--bf-line);background:var(--bf-slot)}
+.bf-slot-drop{box-shadow:0 0 22px rgba(90,140,240,.7)!important;border-color:var(--bf-blue)!important;opacity:1!important}
+.bf-fdslot.bf-slot-drop{box-shadow:0 0 16px rgba(95,201,154,.8)!important;border-color:var(--bf-teal)!important}
+.bf-frontline{flex:0 0 1px;margin:1px 34px;border-top:1px dashed var(--bf-line2);position:relative}
+.bf-frontline>span{position:absolute;top:-7px;left:50%;transform:translateX(-50%);font-family:'Oswald';font-size:9px;letter-spacing:2px;color:var(--bf-ink3);background:var(--bf-bg);padding:0 9px}
+.bf-drophl{display:none;position:absolute;inset:-7px;border:2px dashed var(--bf-blue);border-radius:13px;box-shadow:0 0 26px rgba(90,140,240,.45);pointer-events:none;z-index:5}
+#screen-game.drop-valid .bf-drophl{display:block}
+/* CARTA (slot e mão usam .bf-cardface) */
+.bf-cardface{position:absolute;inset:0;border-radius:inherit;overflow:hidden}
+.bf-cardface .art{position:absolute;inset:0;background-size:cover;background-position:center}
+.bf-cardface .ty{position:absolute;top:5px;left:5px;font-family:'Oswald';font-size:9px;padding:2px 6px;border-radius:5px;font-weight:600;letter-spacing:.5px}
+.bf-cardface .tier{position:absolute;top:5px;right:5px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;display:grid;place-items:center;font-family:'Oswald';font-size:10px;font-weight:700;color:#1c1405}
+.bf-cardface .ov{position:absolute;left:0;right:0;bottom:0;padding:16px 7px 6px;background:linear-gradient(transparent,rgba(0,0,0,.9))}
+.bf-cardface .ov .nm{font-family:'Oswald';font-size:12px;font-weight:600;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bf-cardface .ov .st{font-family:'JetBrains Mono';font-size:10px;display:flex;gap:8px;margin-top:2px;color:#dff}
+.bf-cardface .ov .st .pv{color:#9fe0c2}
+.bf-ghosticon{display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--bf-ink3)}
+.bf-ghosticon .lb{font-family:'Oswald';font-size:8px;letter-spacing:1px}
+/* HAND BAND */
+.bf-handband{flex:1;display:flex;align-items:flex-end;gap:11px;position:relative;padding:4px 2px 2px;min-height:0}
+.bf-pile{width:74px;height:100px;flex:0 0 74px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;margin-bottom:6px;cursor:pointer;position:relative}
+.bf-pile.grave{border:1px solid rgba(180,135,255,.3);background:linear-gradient(180deg,#1c1633,#120c22)}
+.bf-pile.deck{border:1px solid var(--bf-line2);background:var(--bf-panel2);box-shadow:5px -5px 0 -1px var(--bf-panel),2px -2px 0 -1px var(--bf-panel2),5px -5px 0 0 var(--bf-line)}
+.bf-pile .pt{font-family:'Oswald';font-size:10px;letter-spacing:1px}
+.bf-pile.grave .pt,.bf-pile.grave .pn{color:var(--bf-purp)}
+.bf-pile .pn{font-family:'Oswald';font-size:23px;font-weight:600;color:var(--bf-ink)}
+.bf-pile .ph{font-size:8px;color:var(--bf-ink3);letter-spacing:.5px}
+.bf-leftrow{display:flex;gap:6px;flex:0 0 auto}
+.bf-pile2{flex:1;height:52px;border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer}
+.bf-pile2.grave{border:1px solid rgba(180,135,255,.3);background:linear-gradient(180deg,#1c1633,#120c22)}
+.bf-pile2.deck{border:1px solid var(--bf-line2);background:var(--bf-panel2)}
+.bf-pile2 .pt{font-family:'Oswald';font-size:9px;letter-spacing:1px;color:var(--bf-ink2)}
+.bf-pile2.grave .pt,.bf-pile2.grave .pn{color:var(--bf-purp)}
+.bf-pile2 .pn{font-family:'Oswald';font-size:18px;font-weight:600;color:var(--bf-ink)}
+.bf-actionbar{flex:0 0 auto;border-radius:9px;border:1px solid var(--bf-line);background:#0e0b1d;padding:8px 10px;font-size:11px;color:var(--bf-ink2);display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center;min-height:44px;justify-content:center}
+.bf-actionbar .action-info{color:var(--bf-ink)}.bf-actionbar .action-warn{color:#ffb86b}
+.bf-actionbar .play-btn{padding:6px 16px;border-radius:8px;font-family:'Oswald';font-size:12px;font-weight:600;letter-spacing:.5px;cursor:pointer;background:var(--bf-gold);color:#1c1405;border:none}
+.bf-actionbar .play-btn.pass{background:transparent;border:1px solid var(--bf-line2);color:var(--bf-ink2)}
+.bf-actionbar .play-btn.confirm{background:var(--bf-teal);color:#06291f}
+#bf-handwrap{flex:1;position:relative;height:100%;min-width:0}
+.bf-hcard{position:absolute;bottom:6px;width:110px;height:153px;border-radius:10px;overflow:hidden;border:1px solid var(--bf-line2);transform-origin:50% 100%;box-shadow:0 8px 18px rgba(0,0,0,.5);cursor:grab;transition:transform .13s ease,box-shadow .13s;touch-action:none}
+.bf-hcard .fbadge{position:absolute;top:5px;left:5px;width:22px;height:22px;border-radius:50%;display:none;align-items:center;justify-content:center;font-family:'Oswald';font-size:13px;font-weight:700;color:#06291f;background:var(--bf-teal);box-shadow:0 0 0 2px rgba(0,0,0,.4),0 2px 6px rgba(0,0,0,.5);z-index:3}
+.bf-fusionbar{display:none;position:absolute;top:-2px;left:50%;transform:translateX(-50%);z-index:90;align-items:center;gap:10px;background:#0c0918f2;border:1px solid var(--bf-teal);border-radius:22px;padding:5px 6px 5px 15px;box-shadow:0 8px 22px rgba(0,0,0,.55)}
+.bf-fusionbar .lbl{font-family:'Oswald';font-size:12px;letter-spacing:.6px;color:var(--bf-teal)}
+.bf-fusionbar .lbl b{font-family:'JetBrains Mono'}
+.bf-fbtn{font-family:'Oswald';font-size:12px;font-weight:600;letter-spacing:.5px;padding:5px 13px;border-radius:16px;cursor:pointer;border:1px solid var(--bf-teal);background:var(--bf-teal);color:#06291f}
+.bf-fbtn.ghost{padding:5px 11px;border-color:var(--bf-line2);background:transparent;color:var(--bf-ink2)}
+.bf-handhint{font-size:9px;color:var(--bf-ink3);text-align:center;letter-spacing:.5px;margin-top:-2px}
+/* COLUNA DIREITA — trilho */
+#bf-rail{background:var(--bf-panel);border:1px solid var(--bf-line);border-radius:13px;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+#screen-game.rail-collapsed #bf-rail{display:none}
+.bf-railtabs{display:flex;align-items:center;gap:6px;padding:8px}
+.bf-tab{flex:1;padding:9px 0;font-family:'Oswald';font-size:12px;font-weight:600;letter-spacing:.6px;cursor:pointer;border-radius:8px;border:1px solid var(--bf-line);background:#0e0b1d;color:var(--bf-ink2)}
+.bf-tab.on{border-color:var(--bf-blue);background:var(--bf-blue);color:#fff}
+.bf-railbody{flex:1;padding:0 13px 13px;overflow-y:auto}
+#bf-handle{display:none;position:absolute;right:0;top:50%;transform:translateY(-50%);width:24px;height:96px;border-radius:9px 0 0 9px;background:linear-gradient(180deg,var(--bf-panel2),var(--bf-panel));border:1px solid var(--bf-line);border-right:0;cursor:pointer;align-items:center;justify-content:center;flex-direction:column;gap:8px;z-index:25}
+#screen-game.rail-collapsed #bf-handle{display:flex}
+#bf-handle span{writing-mode:vertical-rl;font-family:'Oswald';font-size:9px;letter-spacing:2px;color:var(--bf-ink3)}
+.bf-insp-art{width:170px;aspect-ratio:.72;margin:2px auto 12px;border-radius:11px;overflow:hidden;border:1px solid var(--bf-line2);position:relative;box-shadow:0 8px 20px rgba(0,0,0,.5)}
+.bf-insp-name{font-family:'Oswald';font-weight:600;font-size:19px;letter-spacing:.3px}
+.bf-insp-tags{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 16px}
+.bf-insp-tags span{font-size:11px;padding:4px 9px;border-radius:7px;background:#0e0b1d;border:1px solid var(--bf-line);color:var(--bf-ink2)}
+.bf-insp-efflbl{font-family:'Oswald';font-size:11px;letter-spacing:1px;color:var(--bf-ink3);text-transform:uppercase;margin-bottom:6px}
+.bf-insp-eff{font-size:13px;line-height:1.55;color:#e0d8c6}
+.bf-log-row{display:flex;gap:9px;align-items:flex-start;padding:9px 2px;border-bottom:1px solid var(--bf-line)}
+.bf-log-row .dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex:0 0 8px}
+.bf-log-row .tx{font-size:12px;color:#e0d8c6;line-height:1.45}
+/* GHOST / TOAST */
+#bf-dragghost{position:absolute;left:-999px;top:-999px;display:none;width:110px;height:153px;border-radius:10px;overflow:hidden;transform:translate(-50%,-50%) rotate(-5deg);pointer-events:none;z-index:320;box-shadow:0 22px 44px rgba(0,0,0,.65);border:1px solid var(--bf-blue)}
+#bf-toast{display:none;position:absolute;bottom:74px;left:50%;transform:translateX(-50%);z-index:330;background:#0c0918f2;border:1px solid var(--bf-line2);border-radius:20px;padding:8px 18px;font-size:12px;letter-spacing:.3px;color:var(--bf-ink);box-shadow:0 10px 26px rgba(0,0,0,.6)}
+/* MODAIS */
+.bf-modal{position:absolute;inset:0;z-index:205;background:rgba(5,4,10,.78);display:none;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.bf-modal.open{display:flex}
+.bf-modal-box{background:var(--bf-panel);border:1px solid var(--bf-line2);border-radius:16px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.7);max-height:90%;display:flex;flex-direction:column}
+.bf-modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--bf-line);font-family:'Oswald';font-size:19px;font-weight:600;letter-spacing:.5px}
+.bf-modal-x{cursor:pointer;color:var(--bf-ink2);font-size:20px;width:30px;height:30px;display:grid;place-items:center;border-radius:7px;border:1px solid var(--bf-line)}
+.bf-swatch{border-radius:11px;cursor:pointer;padding:10px;border:2px solid var(--bf-line2);display:flex;flex-direction:column;gap:8px}
+.bf-swatch.on{border-color:var(--bf-gold);background:var(--bf-panel2)}
+.bf-swatch .dots{display:flex;gap:5px}
+.bf-swatch .dots i{width:16px;height:16px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+.bf-swatch .lb{font-family:'Oswald';font-size:12px;font-weight:600;color:var(--bf-ink2)}
+.bf-swatch.on .lb{color:var(--bf-ink)}
+.bf-toggle{flex:1;display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:11px;cursor:pointer;border:1px solid var(--bf-line2);background:var(--bf-panel2);font-size:13px;color:var(--bf-ink)}
+.bf-toggle .sw{width:38px;height:21px;border-radius:11px;position:relative;transition:background .2s}
+.bf-toggle .sw i{position:absolute;top:2px;width:17px;height:17px;border-radius:50%;background:#fff;transition:left .2s}
+.bf-danger{display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 0;border-radius:11px;cursor:pointer;border:1px solid rgba(226,83,63,.4);background:rgba(226,83,63,.08);color:#f4a597;font-family:'Oswald';font-size:13px;font-weight:600;letter-spacing:.5px;width:100%}
+.bf-gravecard{aspect-ratio:.72;border-radius:9px;overflow:hidden;border:1px solid var(--bf-line2);position:relative;cursor:pointer}
+
 </style>
 </head>
 <body>
@@ -614,132 +772,176 @@ body{background:#000;color:var(--text);font-family:'Cinzel',serif;overflow:hidde
 <!-- GAME -->
 <div id="screen-game" class="screen hidden">
 
-  <!-- TOP BAR -->
-  <div id="topbar">
-    <div class="totem-hp ai-hp">
-      <span class="totem-name" style="color:#ef9a9a">🏛 FLORIPA</span>
-      <div class="hp-track"><div class="hp-fill" id="ah-fill" style="width:100%"></div></div>
-      <span class="hp-val" id="ah-val">2000</span>
+  <!-- ===== TOPBAR ===== -->
+  <div id="bf-top">
+    <div class="bf-turn">Turno <b id="turn-num">1</b></div>
+    <div id="phase-track">
+      <span class="bf-phase" id="ps-draw">DRAW</span>
+      <span class="bf-phase" id="ps-standby">STANDBY</span>
+      <span class="bf-phase" id="ps-main">DOWN FASE</span>
+      <span class="bf-phase" id="ps-lastminute">ITENS</span>
+      <span class="bf-phase" id="ps-resolution">RESOLUÇÃO</span>
     </div>
-    <div class="center-bar">
-      <div class="turn-num" id="turn-num">TURNO 1</div>
-      <div id="phase-track">
-        <span class="phase-step" id="ps-draw">DRAW</span>
-        <span class="ps-sep">›</span>
-        <span class="phase-step" id="ps-standby">STANDBY</span>
-        <span class="ps-sep">›</span>
-        <span class="phase-step" id="ps-main">DOWN FASE</span>
-        <span class="ps-sep">›</span>
-        <span class="phase-step" id="ps-lastminute">ITENS</span>
-        <span class="ps-sep">›</span>
-        <span class="phase-step" id="ps-resolution">RESOLUÇÃO</span>
-      </div>
-    </div>
-    <div class="top-right">
-      <div class="totem-hp">
-        <span class="hp-val" id="ph-val">2000</span>
-        <div class="hp-track"><div class="hp-fill" id="ph-fill" style="width:100%"></div></div>
-        <span class="totem-name" style="color:#90caf9">🏛 BC</span>
-      </div>
-      <div class="score-box"><div class="score-lbl">SCORE</div><div id="score-display">0</div></div>
-      <button id="mute-btn" onclick="toggleMute()">🔊</button>
+    <div class="bf-topright">
+      <div class="bf-score">Placar <b id="score-display">0</b></div>
+      <div class="bf-iconbtn" id="mute-btn" onclick="toggleMute()" title="som">🔊</div>
+      <div class="bf-iconbtn" onclick="bfOpenModal('settings')" title="configurações">⚙</div>
     </div>
   </div>
 
-  <!-- MAIN BOARD -->
-  <div id="gamemid">
+  <!-- ===== ARENA ===== -->
+  <div id="bf-arena">
 
-    <!-- AI BASE -->
-    <div class="base-bar ai-base">
-      <span>🏛 FLORIPA</span>
-      <div class="base-hp-track"><div class="base-hp-fill" id="ai-base-fill" style="width:100%"></div></div>
-      <span class="base-lp" id="ai-base-lp">2000 LP</span>
-    </div>
-
-    <!-- AI FIELD ROW -->
-    <div class="field-row">
-      <div class="side-zones">
-        <div class="zone-box" id="ai-grave-zone" title="Cemitério IA">
-          <div class="zone-emoji">🪦</div><div class="zone-label" id="ai-grave-count">0</div>
+    <!-- LEFT: identidade -->
+    <div class="bf-idcol">
+      <div class="bf-id enemy">
+        <div class="bf-id-top">
+          <div class="bf-portrait enemy" id="enemy-portrait"></div>
+          <div class="bf-id-name"><div class="nm" id="enemy-name">FLORIPA</div><div class="sub">inimigo</div></div>
+          <div class="bf-id-lp"><div class="lbl">PV</div><b id="enemy-lp">2000</b></div>
         </div>
-        <div class="zone-box" id="ai-field-zone" title="Zona de Campo IA">
-          <div class="zone-emoji">🌍</div><div class="zone-label">CAMPO</div>
+        <div class="bf-lpbar"><i id="enemy-lp-bar" style="width:100%"></i></div>
+        <div class="bf-chips">
+          <div class="bf-chip">Deck <b id="enemy-deck">0</b></div>
+          <div class="bf-chip grave clickable" onclick="bfOpenGrave('ai')">Cemit. <b id="enemy-grave">0</b></div>
+          <div class="bf-chip">Mão <b id="enemy-hand">0</b></div>
         </div>
       </div>
-      <div class="monster-grid">
-        <div class="mslot ai-slot" id="ai-slot-0"><span class="slot-label">1</span></div>
-        <div class="mslot ai-slot" id="ai-slot-1"><span class="slot-label">2</span></div>
-        <div class="mslot ai-slot" id="ai-slot-2"><span class="slot-label">3</span></div>
-        <div class="mslot ai-slot" id="ai-slot-3"><span class="slot-label">4</span></div>
-        <div class="mslot ai-slot commander-slot" id="ai-slot-4"><span class="slot-cmd-label">CMD</span></div>
-      </div>
-    </div>
-
-    <!-- AI HIDDEN ROW (face-down under slots 0-3) -->
-    <div style="display:flex;gap:3px;flex-shrink:0;">
-      <div style="width:49px;flex-shrink:0;"></div>
-      <div class="hidden-row" style="flex:1;">
-        <div class="hslot" id="ai-hidden-0">▽</div>
-        <div class="hslot" id="ai-hidden-1">▽</div>
-        <div class="hslot" id="ai-hidden-2">▽</div>
-        <div class="hslot" id="ai-hidden-3">▽</div>
-      </div>
-      <div style="width:calc(20% + 3px);flex-shrink:0;"></div>
-    </div>
-
-    <div class="field-separator"></div>
-
-    <!-- PLAYER HIDDEN ROW -->
-    <div style="display:flex;gap:3px;flex-shrink:0;">
-      <div style="width:49px;flex-shrink:0;"></div>
-      <div class="hidden-row" style="flex:1;">
-        <div class="hslot" id="player-hidden-0" onclick="clickHidden(0)">△</div>
-        <div class="hslot" id="player-hidden-1" onclick="clickHidden(1)">△</div>
-        <div class="hslot" id="player-hidden-2" onclick="clickHidden(2)">△</div>
-        <div class="hslot" id="player-hidden-3" onclick="clickHidden(3)">△</div>
-      </div>
-      <div style="width:calc(20% + 3px);flex-shrink:0;"></div>
-    </div>
-
-    <!-- PLAYER FIELD ROW -->
-    <div class="field-row">
-      <div class="side-zones">
-        <div class="zone-box" id="player-grave-zone" title="Cemitério" onclick="showGrave()">
-          <div class="zone-emoji">🪦</div><div class="zone-label" id="player-grave-count">0</div>
+      <div class="bf-id you" id="you-panel">
+        <div class="bf-id-top">
+          <div class="bf-portrait you" id="you-portrait"></div>
+          <div class="bf-id-name"><div class="nm" id="player-name">BC</div><div class="sub">você · turno ativo</div></div>
+          <div class="bf-id-lp"><div class="lbl">PV</div><b id="you-lp">2000</b></div>
         </div>
-        <div class="zone-box" id="player-field-zone" title="Zona de Campo" onclick="clickFieldZone()">
-          <div class="zone-emoji">🌍</div><div class="zone-label">CAMPO</div>
+        <div class="bf-lpbar"><i id="you-lp-bar" style="width:100%"></i></div>
+        <div class="bf-chips">
+          <div class="bf-chip">Deck <b id="you-deck">0</b></div>
+          <div class="bf-chip grave clickable" onclick="bfOpenGrave('player')">Cemit. <b id="you-grave">0</b></div>
+          <div class="bf-chip" style="border-color:rgba(90,140,240,.35);color:#bcd2ff">Mão <b id="you-hand">0</b>/9</div>
         </div>
       </div>
-      <div class="monster-grid">
-        <div class="mslot player-slot" id="player-slot-0" onclick="clickSlot(0)"><span class="slot-label">1</span></div>
-        <div class="mslot player-slot" id="player-slot-1" onclick="clickSlot(1)"><span class="slot-label">2</span></div>
-        <div class="mslot player-slot" id="player-slot-2" onclick="clickSlot(2)"><span class="slot-label">3</span></div>
-        <div class="mslot player-slot" id="player-slot-3" onclick="clickSlot(3)"><span class="slot-label">4</span></div>
-        <div class="mslot player-slot commander-slot" id="player-slot-4" onclick="clickSlot(4)"><span class="slot-cmd-label">CMD</span></div>
+      <!-- pilhas Cemitério/Deck (movidas pra cá, liberando largura pro leque) -->
+      <div class="bf-leftrow">
+        <div class="bf-pile2 grave" onclick="bfOpenGrave('player')"><div class="pt">CEMITÉRIO</div><div class="pn" id="grave-count">0</div></div>
+        <div class="bf-pile2 deck" onclick="bfOpenModal('deckmenu')"><div class="pt">DECK</div><div class="pn" id="deck-count">0</div></div>
       </div>
+      <!-- barra de ação da fase (texto + botão passar) -->
+      <div id="action-bar" class="bf-actionbar"><span class="action-hint">—</span></div>
     </div>
 
-    <!-- PLAYER BASE -->
-    <div class="base-bar player-base">
-      <span>🏛 BC</span>
-      <div class="base-hp-track"><div class="base-hp-fill" id="player-base-fill" style="width:100%"></div></div>
-      <span class="base-lp" id="player-base-lp">2000 LP</span>
+    <!-- CENTER: board -->
+    <div class="bf-board">
+      <!-- zona inimiga -->
+      <div class="bf-zone">
+        <div class="bf-terr" id="terr-enemy" style="display:none"><div class="tg"></div><div class="sc"></div><div class="lb" id="terr-enemy-lb" style="top:6px"></div></div>
+        <div class="bf-fdrow" id="ai-fd-row"></div>
+        <div class="bf-row" id="ai-board-row">
+          <div class="bf-slot" id="ai-fieldzone"></div>
+          <div class="bf-slot ai-slot" id="ai-slot-0"></div>
+          <div class="bf-slot ai-slot" id="ai-slot-1"></div>
+          <div class="bf-slot ai-slot" id="ai-slot-2"></div>
+          <div class="bf-slot ai-slot" id="ai-slot-3"></div>
+          <div class="bf-slot ai-slot" id="ai-slot-4"></div>
+        </div>
+      </div>
+      <!-- linha de frente -->
+      <div class="bf-frontline"><span>LINHA DE FRENTE</span></div>
+      <!-- zona do jogador -->
+      <div class="bf-zone">
+        <div class="bf-terr" id="terr-you" style="display:none"><div class="tg"></div><div class="sc"></div><div class="lb" id="terr-you-lb" style="bottom:6px"></div></div>
+        <div class="bf-row" id="player-board-row">
+          <div class="bf-drophl"></div>
+          <div class="bf-slot" id="player-fieldzone" onclick="clickFieldZone()"></div>
+          <div class="bf-slot player-slot" id="player-slot-0" onclick="clickSlot(0)"></div>
+          <div class="bf-slot player-slot" id="player-slot-1" onclick="clickSlot(1)"></div>
+          <div class="bf-slot player-slot" id="player-slot-2" onclick="clickSlot(2)"></div>
+          <div class="bf-slot player-slot" id="player-slot-3" onclick="clickSlot(3)"></div>
+          <div class="bf-slot player-slot" id="player-slot-4" onclick="clickSlot(4)"></div>
+        </div>
+        <div class="bf-fdrow" id="player-fd-row"></div>
+      </div>
+      <!-- faixa da mão (leque em largura cheia) -->
+      <div class="bf-handband">
+        <div id="bf-handwrap">
+          <div class="bf-fusionbar" id="bf-fusionbar">
+            <span class="lbl">FUSÃO <b id="bf-fusion-n">0</b>/5</span>
+            <button class="bf-fbtn" onclick="bfDoFusion()">Fundir</button>
+            <button class="bf-fbtn ghost" onclick="bfClearFusion()">Limpar</button>
+          </div>
+        </div>
+      </div>
+      <div class="bf-handhint">passe o mouse p/ destacar · arraste pro slot p/ baixar · clique p/ marcar fusão</div>
     </div>
 
+    <!-- RIGHT: trilho -->
+    <div id="bf-rail">
+      <div class="bf-railtabs">
+        <button class="bf-tab on" id="bf-tab-insp" onclick="bfSetTab('insp')">INSPETOR</button>
+        <button class="bf-tab" id="bf-tab-log" onclick="bfSetTab('log')">LOG</button>
+        <div class="bf-iconbtn" style="width:34px;height:34px;flex:0 0 34px" onclick="bfToggleRail()" title="recolher trilho">›</div>
+      </div>
+      <div class="bf-railbody" id="bf-insp"><div style="color:var(--bf-ink3);font-size:12px;text-align:center;margin-top:30px">Passe o mouse ou clique<br>com o botão direito numa carta.</div></div>
+      <div class="bf-railbody" id="bf-log" style="display:none"></div>
+    </div>
+    <div id="bf-handle" onclick="bfToggleRail()" title="abrir trilho"><span>‹ PAINEL</span></div>
   </div>
 
-  <!-- (faixa de fases foi pro topbar, liberando espaço vertical pro tabuleiro) -->
+  <!-- ghost de arraste + toast -->
+  <div id="bf-dragghost"><div style="position:absolute;left:0;right:0;bottom:0;padding:16px 7px 7px;background:linear-gradient(transparent,rgba(0,0,0,.9));font-family:'Oswald';font-size:13px;font-weight:600" id="bf-dragghost-name"></div></div>
+  <div id="bf-toast"></div>
 
-  <!-- BOTTOM / HAND -->
-  <div id="bottom">
-    <div id="action-bar"><span class="action-hint">Aguardando...</span></div>
-    <div id="hand-area"></div>
-    <div class="deck-info">
-      <span>🃏 Deck: <span id="deck-count">—</span></span>
-      <span>🪦 Cemi: <span id="grave-count">—</span></span>
-      <span id="fight-info" style="margin-left:auto;color:var(--gold);font-size:.58rem;font-weight:700;"></span>
-      <button class="btn btn-ghost btn-sm" onclick="if(confirm('Desistir?'))endFight('ai')">🏳</button>
+  <!-- ===== MODAIS ===== -->
+  <div class="bf-modal" id="bf-modal-settings" onclick="if(event.target===this)bfCloseModal()">
+    <div class="bf-modal-box" style="width:440px">
+      <div class="bf-modal-head">CONFIGURAÇÕES <span class="bf-modal-x" onclick="bfCloseModal()">✕</span></div>
+      <div style="padding:18px 20px;display:flex;flex-direction:column;gap:16px">
+        <div>
+          <div style="font-family:'Oswald';font-size:11px;letter-spacing:1.4px;color:var(--bf-ink3);text-transform:uppercase;margin-bottom:10px">Tema do campo</div>
+          <div id="bf-theme-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"></div>
+        </div>
+        <div style="display:flex;gap:11px">
+          <div class="bf-toggle" onclick="toggleMute()"><span>Som</span><span class="sw" id="bf-snd-sw"><i></i></span></div>
+          <div class="bf-toggle" onclick="bfToggleMotion()"><span>Animações</span><span class="sw" id="bf-mot-sw"><i></i></span></div>
+        </div>
+        <button class="bf-danger" onclick="bfOpenModal('surrender')">⚐ Desistir da batalha</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="bf-modal" id="bf-modal-grave" onclick="if(event.target===this)bfCloseModal()">
+    <div class="bf-modal-box" style="width:680px;max-height:560px;border-color:rgba(180,135,255,.35)">
+      <div class="bf-modal-head" style="color:var(--bf-purp)"><span id="bf-grave-title">CEMITÉRIO</span><span class="bf-modal-x" onclick="bfCloseModal()">✕</span></div>
+      <div id="bf-grave-grid" style="padding:18px 20px;overflow-y:auto;display:grid;grid-template-columns:repeat(5,1fr);gap:13px"></div>
+    </div>
+  </div>
+
+  <div class="bf-modal" id="bf-modal-deckmenu" onclick="if(event.target===this)bfCloseModal()">
+    <div class="bf-modal-box" style="width:340px">
+      <div class="bf-modal-head">DECK</div>
+      <div style="padding:18px;display:flex;flex-direction:column;gap:11px">
+        <button class="bf-danger" style="color:var(--bf-ink);border-color:var(--bf-line2);background:var(--bf-panel2);justify-content:flex-start;padding:14px 16px" onclick="bfOpenModal('decklist')">📋 Deck List — o que já comprou e o que falta</button>
+        <button class="bf-danger" style="justify-content:flex-start;padding:14px 16px" onclick="bfOpenModal('surrender')">⚐ Desistir — abandona a luta</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="bf-modal" id="bf-modal-decklist" onclick="if(event.target===this)bfCloseModal()">
+    <div class="bf-modal-box" style="width:640px;max-height:580px">
+      <div class="bf-modal-head"><span>DECK LIST</span><span style="font-family:'JetBrains Mono';font-size:12px;color:var(--bf-ink2)" id="bf-decklist-count"></span></div>
+      <div id="bf-decklist-grid" style="padding:14px 18px;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;gap:8px 16px"></div>
+    </div>
+  </div>
+
+  <div class="bf-modal" id="bf-modal-surrender" onclick="if(event.target===this)bfCloseModal()">
+    <div class="bf-modal-box" style="width:380px;border-color:rgba(226,83,63,.45)">
+      <div style="padding:22px;text-align:center">
+        <div style="font-family:'Oswald';font-size:20px;font-weight:600">Desistir da batalha?</div>
+        <div style="font-size:13px;color:var(--bf-ink2);margin-top:8px;line-height:1.5">Você abandona o duelo agora. A luta termina e você volta ao menu.</div>
+        <div style="display:flex;gap:11px;margin-top:18px">
+          <button class="bf-fbtn ghost" style="flex:1;padding:12px 0" onclick="bfCloseModal()">Cancelar</button>
+          <button class="bf-danger" style="flex:1" onclick="bfCloseModal();endFight('ai')">Desistir</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1007,7 +1209,8 @@ function juiceShake(el){ if(!el||!JUICE.on)return; el.classList.remove('juice-sh
 function juiceFlash(el){ if(!el||!JUICE.on)return; el.classList.remove('juice-flash'); void el.offsetWidth; el.classList.add('juice-flash'); setTimeout(()=>el&&el.classList.remove('juice-flash'),320); }
 
 // Turn-based constants
-const HAND_LIMIT=5;
+const HAND_LIMIT=9;     // teto da mão (nunca passa disso)
+const INITIAL_HAND=5;   // compra inicial; a partir do turno 2 compra +1/turno, acumulando até HAND_LIMIT
 const BASE_HP=2000;
 const PHASES=['draw','standby','main','lastminute','resolution'];
 
@@ -1426,7 +1629,7 @@ function initFight(fightNum,difficulty,playerDeck,extraHandSize=0){
     playerHidden:[null,null,null,null],
     playerFieldCard:null,
     playerBase:{hp:BASE_HP,maxHp:BASE_HP},
-    playerHandLimit:HAND_LIMIT+extraHandSize+handBonus,
+    playerHandLimit:HAND_LIMIT,
     aiDeck:buildAIDeck(difficulty,fightNum),aiHand:[],aiGrave:[],
     aiField:[null,null,null,null,null],
     aiHidden:[null,null,null,null],
@@ -1438,8 +1641,9 @@ function initFight(fightNum,difficulty,playerDeck,extraHandSize=0){
     mods:newMods(), playerQuickUsed:false, aiQuickUsed:false,
     nextHpBuff:{player:0,ai:0},
   };
-  for(let i=0;i<G.playerHandLimit;i++)drawOne('player');
-  for(let i=0;i<HAND_LIMIT;i++)drawOne('ai');
+  const initPlayer=Math.min(HAND_LIMIT,INITIAL_HAND+extraHandSize+handBonus);
+  for(let i=0;i<initPlayer;i++)drawOne('player');
+  for(let i=0;i<INITIAL_HAND;i++)drawOne('ai');
 }
 // Modificadores temporários de ATK/efeito por lado (valem só na resolução do turno).
 function newMods(){return{player:{atkMult:1,atkFlat:0,skip:false},ai:{atkMult:1,atkFlat:0,skip:false}};}
@@ -1465,10 +1669,11 @@ function startPhase(phase){
 function phaseDraw(){
   // novo turno: zera buffs/debuffs temporários e o "1 carta rápida por turno"
   G.mods=newMods(); G.playerQuickUsed=false; G.aiQuickUsed=false;
-  if(G.playerHand.length<G.playerHandLimit){while(G.playerHand.length<G.playerHandLimit&&G.playerDeck.length)G.playerHand.push(G.playerDeck.shift());}
-  else if(G.turn>1&&G.playerDeck.length)G.playerHand.push(G.playerDeck.shift());
-  if(G.aiHand.length<HAND_LIMIT){while(G.aiHand.length<HAND_LIMIT&&G.aiDeck.length)G.aiHand.push(G.aiDeck.shift());}
-  else if(G.turn>1&&G.aiDeck.length)G.aiHand.push(G.aiDeck.shift());
+  // turno 1 já recebeu a mão inicial no initFight; a partir do turno 2, +1/turno (acumula até o teto)
+  if(G.turn>1){
+    if(G.playerHand.length<HAND_LIMIT&&G.playerDeck.length)G.playerHand.push(G.playerDeck.shift());
+    if(G.aiHand.length<HAND_LIMIT&&G.aiDeck.length)G.aiHand.push(G.aiDeck.shift());
+  }
   if(!G.playerDeck.length&&!G.playerHand.length){showMsg('💀 Deck Out! Derrota!','red');setTimeout(()=>endFight('ai'),1000);return;}
   playSFX('ui_card_draw');
   renderHand();updateDeckUI();startPhase('standby');
@@ -1558,13 +1763,13 @@ function lmBar(canPlay){
   setActionBar(`<span class="action-hint">🎒 FASE DE ITENS${canPlay?' — jogue 1 item ou arapuca (encerra a fase)':' — você não tem itens'}</span><button class="play-btn pass" onclick="startPhase('resolution')">${canPlay?'Pular itens ›':'Avançar ›'}</button>`);
 }
 // Player joga UMA carta rápida (item ou arapuca) por turno nesta fase.
-function selectQuickCard(idx){
+function selectQuickCard(idx,hiddenSlot){
   if(G.phase!=='lastminute')return;
   const card=G.playerHand[idx];
   if(!isQuickCard(card)){showMsg('Nesta fase só itens e arapucas','orange');playSFX('ui_error');return;}
   if(G.playerQuickUsed){showMsg('Você já jogou 1 carta rápida neste turno','orange');playSFX('ui_error');return;}
   if(card.kind==='trap'){
-    const slot=G.playerHidden.findIndex(h=>!h);
+    const slot=(hiddenSlot!=null&&hiddenSlot>=0&&!G.playerHidden[hiddenSlot])?hiddenSlot:G.playerHidden.findIndex(h=>!h);
     if(slot<0){showMsg('Sem espaço pra arapuca!','red');playSFX('ui_error');return;}
     G.playerHand.splice(idx,1);
     const fc=makeFC(card,'player');fc.faceDown=true;G.playerHidden[slot]=fc;
@@ -1682,8 +1887,8 @@ function juiceDie(side,before){
   for(let i=0;i<5;i++){ if(before[i]&&!field[i]){ const s=document.getElementById(pre+i); if(s){s.classList.add('juice-die'); setTimeout(()=>s&&s.classList.remove('juice-die'),440);} } }
 }
 function juiceImpact(pOver,aOver){
-  if(pOver>0){const b=document.querySelector('.base-bar.ai-base');juiceShake(b);juiceFlash(b);}
-  if(aOver>0){const b=document.querySelector('.base-bar.player-base');juiceShake(b);juiceFlash(b);}
+  if(pOver>0){const b=document.querySelector('.bf-id.enemy');juiceShake(b);juiceFlash(b);}
+  if(aOver>0){const b=document.querySelector('.bf-id.you');juiceShake(b);juiceFlash(b);}
 }
 function juiceLand(side,slot){ if(!JUICE.on||slot==null||slot<0||slot>4)return; const s=document.getElementById((side==='player'?'player-slot-':'ai-slot-')+slot); if(s&&s.classList.contains('has-card')){s.classList.add('juice-land');setTimeout(()=>s&&s.classList.remove('juice-land'),380);} }
 // Dano carta a carta na ordem dos slots: destaca a carta, mostra -X e dreca o HP.
@@ -1806,7 +2011,7 @@ function endFight(winner){
 function addScore(p){G.score+=p;const el=document.getElementById('score-display');if(el){animateNumber(el,G.score);el.style.transform='scale(1.2)';el.style.color=p>0?'#81c784':'#e63946';setTimeout(()=>{el.style.transform='scale(1)';el.style.color='var(--gold)';},300);}}
 
 let APP={playerName:'',difficulty:'easy',mode:'menu',fightNum:1,totalScore:0,fightScore:[0,0,0],playerDeck:[],extraHandSize:0};
-function startFight(){showScreen('game');initFight(APP.fightNum,APP.difficulty,APP.playerDeck,APP.extraHandSize);updateBaseUI();updateFieldUI();updateDeckUI();const lbl=APP.mode==='free'?'Duelo Livre':'Fight '+APP.fightNum+'/3';const fi=document.getElementById('fight-info');if(fi)fi.textContent=`${lbl} · ${AI_DECKS[APP.difficulty].label}`;startMusic();showMsg(`⚔ ${lbl} — ${AI_DECKS[APP.difficulty].label}!`,'green');startPhase('draw');}
+function startFight(){showScreen('game');initFight(APP.fightNum,APP.difficulty,APP.playerDeck,APP.extraHandSize);bfInit();updateBaseUI();updateFieldUI();updateDeckUI();const lbl=APP.mode==='free'?'Duelo Livre':'Fight '+APP.fightNum+'/3';const fi=document.getElementById('fight-info');if(fi)fi.textContent=`${lbl} · ${AI_DECKS[APP.difficulty].label}`;startMusic();showMsg(`⚔ ${lbl} — ${AI_DECKS[APP.difficulty].label}!`,'green');startPhase('draw');}
 function showRewardScreen(){showScreen('reward');playSFX('reward');const opts=generateRewards(3);const cont=document.getElementById('reward-options');cont.innerHTML='';opts.forEach(opt=>{const d=document.createElement('div');d.className='reward-card';const cat=opt.cat==='unit'?'<span class="reward-cat cat-unit">UNIDADE</span>':opt.cat==='artifact'?'<span class="reward-cat cat-artifact">ARTEFATO</span>':'';d.innerHTML=`${cat}<div class="reward-icon">${opt.icon}</div><div class="reward-title">${opt.title}</div><div class="reward-desc">${opt.desc}</div>`;d.onclick=()=>pickReward(opt);cont.appendChild(d);});document.getElementById('reward-fight-score').textContent=G.score;document.getElementById('reward-total-score').textContent=APP.totalScore;}
 // IDs únicos de unidades que o player REALMENTE tem no baralho desta run.
 function deckMonsterIds(){const s=new Set();(APP.playerDeck||[]).forEach(c=>{if(isMonster(c))s.add(c.id);});return [...s];}
@@ -2074,7 +2279,7 @@ function showCardViewer(id){
 }
 function closeCardViewer(){ document.getElementById('card-viewer').classList.remove('open'); }
 // Visão detalhada de uma carta em jogo (mão/campo) — botão direito. Reusa o card-viewer.
-function showCardDetail(card){ if(!card)return; const id=card.id||(card.data&&card.data.id); if(id){playSFX('ui_card_select');showCardViewer(id);} }
+function showCardDetail(card){ if(!card)return; playSFX('ui_card_select'); if(typeof bfInspect==='function')bfInspect(card); else{const id=card.id;if(id)showCardViewer(id);} }
 
 // ── DECK BUILDER ──
 const DB={ deck:[] };
@@ -2248,34 +2453,59 @@ function showScreen(id){
   fade.classList.add('on');
   setTimeout(()=>{ swap(); fade.classList.remove('on'); },150);
 }
-function updatePhaseBanner(phase){PHASES.forEach(p=>{const el=document.getElementById('ps-'+p);if(!el)return;const idx=PHASES.indexOf(p),cur=PHASES.indexOf(phase);el.className='phase-step'+(p===phase?' active':idx<cur?' done':'');});}
-function updatePhaseBadge(phase){const lbls={draw:'DRAW',standby:'STANDBY',main:'DOWN FASE',lastminute:'ITENS',resolution:'RESOLUÇÃO'};const el=document.getElementById('phase-badge');if(el)el.textContent=lbls[phase]||phase.toUpperCase();const tn=document.getElementById('turn-num');if(tn)tn.textContent=`TURNO ${G.turn}`;}
+function updatePhaseBanner(phase){PHASES.forEach(p=>{const el=document.getElementById('ps-'+p);if(!el)return;el.className='bf-phase'+(p===phase?' active':'');});}
+function updatePhaseBadge(phase){const tn=document.getElementById('turn-num');if(tn)tn.textContent=G.turn;}
+function setText(id,v){const el=document.getElementById(id);if(el)el.textContent=v;}
 function updateBaseUI(){
   const pb=G.playerBase,ab=G.aiBase;
-  const pf=document.getElementById('player-base-fill'),af=document.getElementById('ai-base-fill');
-  if(pf)pf.style.width=Math.max(0,pb.hp/pb.maxHp*100)+'%';
-  if(af)af.style.width=Math.max(0,ab.hp/ab.maxHp*100)+'%';
-  const plp=document.getElementById('player-base-lp'),alp=document.getElementById('ai-base-lp');
-  if(plp)animateNumber(plp,Math.max(0,pb.hp),{suffix:' LP'});if(alp)animateNumber(alp,Math.max(0,ab.hp),{suffix:' LP'});
-  const phf=document.getElementById('ph-fill'),ahf=document.getElementById('ah-fill');
-  if(phf)phf.style.width=Math.max(0,pb.hp/pb.maxHp*100)+'%';if(ahf)ahf.style.width=Math.max(0,ab.hp/ab.maxHp*100)+'%';
-  const phv=document.getElementById('ph-val'),ahv=document.getElementById('ah-val');
-  if(phv)animateNumber(phv,Math.max(0,pb.hp));if(ahv)animateNumber(ahv,Math.max(0,ab.hp));
+  const pPct=Math.max(0,pb.hp/pb.maxHp*100),aPct=Math.max(0,ab.hp/ab.maxHp*100);
+  const yb=document.getElementById('you-lp-bar'),eb=document.getElementById('enemy-lp-bar');
+  if(yb)yb.style.width=pPct+'%'; if(eb)eb.style.width=aPct+'%';
+  const yl=document.getElementById('you-lp'),el=document.getElementById('enemy-lp');
+  if(yl)animateNumber(yl,Math.max(0,pb.hp)); if(el)animateNumber(el,Math.max(0,ab.hp));
+  setText('enemy-name',(APP&&APP.opponentName)||'FLORIPA');
+  setText('player-name',(Save&&Save.data&&Save.data.name)||(APP&&APP.playerName)||'BC');
+  setText('you-deck',G.playerDeck.length); setText('enemy-deck',G.aiDeck.length);
+  setText('you-hand',G.playerHand.length); setText('enemy-hand',G.aiHand.length);
+  setText('you-grave',G.playerGrave.length); setText('enemy-grave',G.aiGrave.length);
+}
+function bfSlotGhost(kind,n){
+  if(kind==='terreno')return `<div class="bf-ghosticon" style="opacity:.5"><div style="font-size:24px;line-height:1">🌍</div><div class="lb">TERRENO</div></div>`;
+  if(kind==='cmd')return `<div class="bf-ghosticon" style="opacity:.85;color:var(--bf-gold)"><div style="font-size:22px;line-height:1">👑</div><div class="lb">COMANDANTE</div></div>`;
+  return `<div class="bf-ghosticon" style="opacity:.3"><div style="font-size:20px;line-height:1">🎴</div><div class="lb">${n||''}</div></div>`;
 }
 function updateFieldUI(){
   ['player','ai'].forEach(side=>{
     const field=side==='player'?G.playerField:G.aiField;
     for(let i=0;i<5;i++){
       const el=document.getElementById(`${side}-slot-${i}`);if(!el)continue;
-      el.innerHTML='';el.className=`mslot ${side}-slot${i===4?' commander-slot':''}`;
-      if(field[i]){el.classList.add('has-card');el.appendChild(renderFC(field[i],side));}
-      else{const lbl=document.createElement('span');lbl.className=i===4?'slot-cmd-label':'slot-label';lbl.textContent=i===4?'CMD':String(i+1);el.appendChild(lbl);}
+      el.innerHTML='';el.className=`bf-slot ${side}-slot`;el.style.animation='';el.style.border='';
+      if(field[i]){ el.classList.add('has-card'); el.appendChild(renderFC(field[i],side));
+        if(i===4){el.style.border='2px solid var(--bf-gold)';el.style.animation='cmdPulse 2.6s ease-in-out infinite';}
+      } else {
+        el.innerHTML=bfSlotGhost(i===4?'cmd':'monster', i+1);
+        if(i===4){el.style.border='2px solid rgba(240,180,41,.6)';el.style.background='linear-gradient(180deg,rgba(240,180,41,.1),var(--bf-slot))';el.style.animation='cmdPulse 2.6s ease-in-out infinite';}
+      }
     }
+    // zona de campo (terreno)
+    const fz=document.getElementById(`${side}-fieldzone`); const fc=side==='player'?G.playerFieldCard:G.aiFieldCard;
+    if(fz){ fz.innerHTML=''; if(fc){fz.classList.add('has-card');fz.appendChild(renderFC(fc,side));} else fz.innerHTML=bfSlotGhost('terreno'); }
+    // face-down row: [edge, h0..h3, edge]
     const hidden=side==='player'?G.playerHidden:G.aiHidden;
-    hidden.forEach((card,i)=>{const el=document.getElementById(`${side}-hidden-${i}`);if(!el)return;el.className='hslot'+(card?' has-hidden':'');el.textContent=card?(card.faceDown?'⁉':'✓'):(side==='player'?'△':'▽');});
+    const row=document.getElementById(`${side}-fd-row`);
+    if(row){ row.innerHTML='';
+      const cells=['edge',0,1,2,3,'edge'];
+      cells.forEach(c=>{ const d=document.createElement('div');d.className='bf-fdcell';
+        if(c==='edge'){d.innerHTML='';}
+        else{ const card=hidden[c]; const idAttr=side==='player'?`id="player-fd-${c}"`:'';
+          if(card)d.innerHTML=`<div ${idAttr} class="bf-fdslot set">?</div>`;
+          else d.innerHTML=`<div ${idAttr} class="bf-fdslot"><span>▽</span></div>`;
+        }
+        row.appendChild(d);
+      });
+    }
   });
-  const pg=document.getElementById('player-grave-count'),ag=document.getElementById('ai-grave-count'),gc=document.getElementById('grave-count');
-  if(pg)pg.textContent=G.playerGrave.length;if(ag)ag.textContent=G.aiGrave.length;if(gc)gc.textContent=G.playerGrave.length;
+  setText('grave-count',G.playerGrave.length);
 }
 function renderFC(card,side){
   const div=document.createElement('div');div.className='field-card';
@@ -2290,6 +2520,7 @@ function renderFC(card,side){
   const hb=document.createElement('div');hb.className='fc-hpbar';const hf=document.createElement('div');hf.className='fc-hpfill';const pct=Math.max(0,card.currentHp/card.maxHp*100);hf.style.width=pct+'%';hf.style.background=pct>60?'#4caf50':pct>25?'#ff9800':'#f44336';hb.appendChild(hf);info.appendChild(hb);
   const st=document.createElement('div');st.className='fc-stats';st.innerHTML=`<span class="fc-hp">❤${card.currentHp}</span><span class="fc-atk">⚔${getEffAtk(card)}</span>`;info.appendChild(st);
   div.appendChild(info);
+  div.onclick=(e)=>{e.stopPropagation();showCardDetail(card);};
   div.oncontextmenu=(e)=>{e.preventDefault();showCardDetail(card);};
   return div;
 }
@@ -2297,34 +2528,195 @@ function highlightSlots(){const card=G.selectedHandCard;if(!card)return;for(let 
 function clearSlotHighlights(){for(let i=0;i<5;i++){const el=document.getElementById(`player-slot-${i}`);if(el)el.classList.remove('selectable','selected-slot');}}
 function updateDeckUI(){const dc=document.getElementById('deck-count');if(dc)dc.textContent=G.playerDeck.length;}
 function setActionBar(html){const bar=document.getElementById('action-bar');if(bar)bar.innerHTML=html;}
-function showDmgFloat(dmg,side){const el=document.getElementById(side==='ai'?'ah-val':'ph-val');if(!el)return;const rect=el.getBoundingClientRect();const d=document.createElement('div');d.className='dmg-float';d.textContent='-'+dmg;d.style.left=(rect.left+rect.width/2)+'px';d.style.top=rect.top+'px';d.style.color=side==='ai'?'#f44336':'#ff9800';document.body.appendChild(d);setTimeout(()=>d.remove(),900);}
-function showGrave(){showMsg(`Cemitério: ${G.playerGrave.length} carta(s)`);}
+function showDmgFloat(dmg,side){const el=document.getElementById(side==='ai'?'enemy-lp':'you-lp');if(!el)return;const rect=el.getBoundingClientRect();const d=document.createElement('div');d.className='dmg-float';d.textContent='-'+dmg;d.style.left=(rect.left+rect.width/2)+'px';d.style.top=rect.top+'px';d.style.color=side==='ai'?'#f44336':'#ff9800';document.body.appendChild(d);setTimeout(()=>d.remove(),900);}
+function showGrave(){bfOpenGrave('player');}
+// ═══════════ CAMPO DE BATALHA — mão em leque + features (port do Claude Design) ═══════════
+const BF={ hover:-1, fusion:[], drag:null, wrapW:430, theme:'nebula', _toastT:null };
+const BF_LOG=[];
+function bfTypeChip(t){return {ATK:['ATK','var(--bf-red)','#fff'],DEF:['DEF','var(--bf-blue)','#fff'],BAL:['BAL','var(--bf-teal)','#06291f']}[t]||['?','var(--bf-ink3)','#fff'];}
+function bfGrad(t){return t==='ATK'?'linear-gradient(160deg,#5a2b2b,#241016)':t==='DEF'?'linear-gradient(160deg,#2b3d5a,#101a24)':t==='BAL'?'linear-gradient(160deg,#3c4a32,#161f14)':'linear-gradient(160deg,#3a3050,#1a1426)';}
+function bfCardArt(card){
+  const src=cardImgSrc(card),emo=card.emoji||TYPE_EMOJI[card.type]||'?';
+  const tc=bfTypeChip(card.type); const lv=card._lv||1; const tier=((LV_NAMES[lv]||'')[0])||'';
+  const tcol=LV_COLOR[lv]||'#caa23a'; const isMon=isMonster(card);
+  const art=src?`background-image:url('${src}');background-size:cover;background-position:center`:`background:${bfGrad(card.type)}`;
+  const fall=src?'':`<div style="position:absolute;inset:0;display:grid;place-items:center;font-size:38px">${emo}</div>`;
+  const hp=card.currentHp!=null?card.currentHp:card.hp;
+  const stats=isMon?`<span>⚔ ${typeof getEffAtk==='function'?getEffAtk(card):card.atk}</span><span class="pv">♥ ${hp}</span>`:`<span style="color:var(--bf-gold)">${card.kind==='trap'?'Arapuca':'Item'}</span>`;
+  return `<div class="bf-cardface"><div class="art" style="${art}"></div>${fall}<span class="ty" style="background:${tc[1]};color:${tc[2]}">${tc[0]}</span>${tier?`<span class="tier" style="background:${tcol}">${tier}</span>`:''}<div class="ov"><div class="nm">${card.name}</div><div class="st">${stats}</div></div></div>`;
+}
+function bfMeasure(){ const el=document.getElementById('bf-handwrap'); if(!el)return; const w=el.clientWidth; if(w&&Math.abs(w-BF.wrapW)>1)BF.wrapW=w; }
 function renderHand(){
-  const area=document.getElementById('hand-area');if(!area)return;area.innerHTML='';
-  // carta jogável na fase atual? (main = monstro · lastminute = item/arapuca)
-  const playableNow=card=>(G.phase==='main'&&isMonster(card))||(G.phase==='lastminute'&&isQuickCard(card)&&!G.playerQuickUsed);
-  let newCount=0;
-  G.playerHand.forEach((card,idx)=>{
-    const lv=card._lv||1;const div=document.createElement('div');
-    const isNew=JUICE.on&&!card._shown;card._shown=true;
-    div.className=`card lv-${lv}${idx===G.selectedHandIdx?' selected':''}${isNew?' juice-draw':''}`;
-    if(isNew){div.style.setProperty('--draw-ms',JUICE.drawMs+'ms');div.style.animationDelay=(newCount++*70)+'ms';}
-    const actPhase=(G.phase==='main'||G.phase==='lastminute');
-    if(actPhase){ if(playableNow(card))div.classList.add('playable'); else div.classList.add('dimmed'); }
-    const vibe=card.vibe&&VIBES.find(v=>v.id===card.vibe);
-    if(vibe)div.innerHTML+=`<div class="card-vibe" title="${vibe.name}" style="position:absolute;top:3px;left:3px;font-size:.7rem;z-index:3">${vibe.emoji}</div>`;
-    if(card.star)div.innerHTML+=`<div class="card-star">${'★'.repeat(Math.min(card.star||0,6))}</div>`;
-    {const src=cardImgSrc(card),emo=card.emoji||TYPE_EMOJI[card.type]||'?';
-     if(src)div.innerHTML+=`<img class="card-img" src="${src}" onerror="imgFallback(this,'${emo}','card-img-ph')">`;
-     else{const bg=card.type==='ATK'?'rgba(230,57,70,.18)':card.type==='DEF'?'rgba(79,195,247,.18)':card.type==='BAL'?'rgba(129,199,132,.18)':'rgba(240,180,41,.18)';div.innerHTML+=`<div class="card-img-ph" style="background:${bg}">${emo}</div>`;}}
-    const kindLbl=card.kind==='trap'?'Arapuca':'Item';
-    div.innerHTML+=`<div class="card-body"><div class="card-name">${card.name}</div><div class="card-type-lbl lbl-${card.type}">${TYPE_EMOJI[card.type]||''} ${card.type}</div>${isMonster(card)?`<div class="card-stats"><span class="stat-hp">❤${card.hp}</span><span class="stat-atk">⚔${card.atk}</span></div>`:`<div class="card-effect-lbl">${card.emoji||''} ${kindLbl}</div>`}${card.tribute>0?`<div class="tribute-badge">🔸 Tributo ${card.tribute}x</div>`:''}</div><div class="lv-badge lv-badge-${lv}">${LV_NAMES[lv]}</div>`;
-    div.onclick=()=>selectHandCard(idx);
-    div.oncontextmenu=(e)=>{e.preventDefault();showCardDetail(card);};
-    area.appendChild(div);
+  const wrap=document.getElementById('bf-handwrap'); if(!wrap)return;
+  BF.fusion=[]; BF.hover=-1;                         // mão mudou → limpa seleção/hover
+  [...wrap.querySelectorAll('.bf-hcard')].forEach(e=>e.remove());
+  bfMeasure();
+  G.playerHand.forEach((card,i)=>{
+    card._shown=true;
+    const el=document.createElement('div'); el.className='bf-hcard'; el.dataset.i=i;
+    el.innerHTML=bfCardArt(card)+`<div class="fbadge"></div>`;
+    el.onpointerdown=(e)=>bfCardDown(i,e);
+    el.onmouseenter=()=>{ if(!BF.drag||!BF.drag.moved){BF.hover=i;bfLayoutHand();} bfInspect(card); };
+    el.onmouseleave=()=>{ if(BF.hover===i){BF.hover=-1;bfLayoutHand();} };
+    el.oncontextmenu=(e)=>{e.preventDefault();showCardDetail(card);};
+    wrap.appendChild(el);
+  });
+  const fb=document.getElementById('bf-fusionbar'); if(fb)fb.style.display='none'; setText('bf-fusion-n',0);
+  bfLayoutHand();
+}
+function bfLayoutHand(){
+  const wrap=document.getElementById('bf-handwrap'); if(!wrap)return;
+  const cards=[...wrap.querySelectorAll('.bf-hcard')]; const n=cards.length; if(!n)return;
+  const W=BF.wrapW,CW=110; const usable=Math.max(120,W-CW-6);
+  const stride=n>1?Math.min(usable/(n-1),CW):0; const span=stride*(n-1); const x0=(W-CW)/2-span/2; const mid=(n-1)/2;
+  const dragging=!!(BF.drag&&BF.drag.moved);
+  const playable=card=>(G.phase==='main'&&isMonster(card))||(G.phase==='lastminute'&&isQuickCard(card)&&!G.playerQuickUsed);
+  const actPhase=(G.phase==='main'||G.phase==='lastminute');
+  cards.forEach((el,i)=>{
+    const card=G.playerHand[i]; if(!card)return;
+    const d=i-mid,ang=d*2.8,arc=d*d*1.3;
+    const selAt=BF.fusion.indexOf(i),selected=selAt>=0,hovered=BF.hover===i&&!dragging,being=dragging&&BF.drag.i===i;
+    let transform,z,outline;
+    if(hovered){transform='translateY(-28px) scale(1.07)';z=130;outline='2px solid var(--bf-gold)';}
+    else if(selected){transform='translateY(-20px) scale(1.03)';z=100+selAt;outline='2px solid var(--bf-teal)';}
+    else{transform=`translateY(${arc.toFixed(1)}px) rotate(${ang.toFixed(1)}deg)`;z=i;outline='none';}
+    el.style.left=Math.round(x0+stride*i)+'px'; el.style.zIndex=z; el.style.transform=transform; el.style.outline=outline; el.style.outlineOffset='-1px';
+    el.style.opacity=being?'.32':(!actPhase||playable(card)?'1':'.5');
+    const b=el.querySelector('.fbadge'); if(b){b.style.display=selected?'flex':'none';b.textContent=selected?(selAt+1):'';}
   });
 }
-function showMsg(txt,cls=''){const area=document.getElementById('msg-area');if(!area)return;const d=document.createElement('div');d.className='msg '+(cls||'');d.textContent=txt;area.appendChild(d);setTimeout(()=>{d.style.opacity='0';setTimeout(()=>d.remove(),400);},2400);}
+function bfCardDown(i,e){ if(e.button!==undefined&&e.button!==0)return; BF.drag={i,x0:e.clientX,y0:e.clientY,moved:false}; window.addEventListener('pointermove',bfMove); window.addEventListener('pointerup',bfUp); }
+function bfMove(e){ const d=BF.drag; if(!d)return;
+  if(!d.moved&&Math.hypot(e.clientX-d.x0,e.clientY-d.y0)>8){ d.moved=true; const c=G.playerHand[d.i]; if(c)bfShowGhost(c); bfLayoutHand(); }
+  if(d.moved){ const g=document.getElementById('bf-dragghost'),st=document.getElementById('stage');
+    if(g&&st){const r=st.getBoundingClientRect();const s=(r.width/1280)||1;g.style.left=((e.clientX-r.left)/s)+'px';g.style.top=((e.clientY-r.top)/s)+'px';}
+    const card=G.playerHand[d.i]; const at=bfSlotAt(e); const valid=bfDropValid(card,at);
+    document.querySelectorAll('.bf-slot-drop').forEach(el=>el.classList.remove('bf-slot-drop'));
+    if(valid&&at){ const el=bfSlotEl(at); if(el)el.classList.add('bf-slot-drop'); }
+    const sg=document.getElementById('screen-game'); if(sg)sg.classList.toggle('drop-valid',valid&&!at); // realce geral só se sobre o board mas fora de um slot específico
+  }
+}
+function bfUp(e){ window.removeEventListener('pointermove',bfMove); window.removeEventListener('pointerup',bfUp);
+  const d=BF.drag; BF.drag=null; const g=document.getElementById('bf-dragghost'); if(g)g.style.display='none';
+  const sg=document.getElementById('screen-game'); if(sg)sg.classList.remove('drop-valid');
+  document.querySelectorAll('.bf-slot-drop').forEach(el=>el.classList.remove('bf-slot-drop'));
+  if(!d)return;
+  if(d.moved){ bfPlay(d.i,bfSlotAt(e)); bfLayoutHand(); }
+  else bfToggleFusion(d.i);
+}
+function bfShowGhost(card){ const g=document.getElementById('bf-dragghost'); if(!g)return; g.style.background=bfGrad(card.type); g.style.display='block'; setText('bf-dragghost-name',card.name); }
+// hit-test: qual slot do jogador está sob o ponteiro
+function bfSlotAt(e){
+  const hit=(id)=>{const el=document.getElementById(id);if(!el)return false;const r=el.getBoundingClientRect();return e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top-12&&e.clientY<=r.bottom+12;};
+  for(let i=0;i<5;i++)if(hit('player-slot-'+i))return {kind:'slot',idx:i};
+  for(let i=0;i<4;i++)if(hit('player-fd-'+i))return {kind:'hidden',idx:i};
+  if(hit('player-fieldzone'))return {kind:'fieldzone'};
+  return null;
+}
+function bfSlotEl(at){ if(!at)return null; if(at.kind==='slot')return document.getElementById('player-slot-'+at.idx); if(at.kind==='hidden')return document.getElementById('player-fd-'+at.idx); if(at.kind==='fieldzone')return document.getElementById('player-fieldzone'); return null; }
+function bfDropValid(card,at){
+  if(!card||!at)return false;
+  if(G.phase==='main'){
+    if(G.mainConfirmed||!isMonster(card))return false;
+    if(at.kind!=='slot')return false;
+    if(G.playerField[at.idx])return false;
+    if(at.idx===4)return !!card.commander; if(card.commander)return false;
+    return true;
+  }
+  if(G.phase==='lastminute'){
+    if(G.playerQuickUsed)return false;
+    if(card.kind==='trap')return at.kind==='hidden'&&!G.playerHidden[at.idx];
+    if(card.kind==='item')return at.kind==='slot'||at.kind==='fieldzone'||at.kind==='hidden'; // item: qualquer lugar do board
+    return false;
+  }
+  return false;
+}
+function bfPlay(i,at){
+  const card=G.playerHand[i]; if(!card)return;
+  if(G.phase==='main'){
+    if(G.mainConfirmed){bfToast('Você já agiu nesta fase');return;}
+    if(!isMonster(card)){bfToast('Monstros só na DOWN FASE — itens na fase ITENS');return;}
+    let slot=at&&at.kind==='slot'?at.idx:(card.commander?4:[0,1,2,3].find(n=>!G.playerField[n]));
+    if(slot==null){bfToast('Sem slot livre — solte numa casa vazia');return;}
+    if(slot===4&&!card.commander){bfToast('Só o Comandante ocupa o slot CMD');return;}
+    if(slot<4&&card.commander){bfToast('O Comandante vai no slot CMD');return;}
+    if(G.playerField[slot]){bfToast('Esse slot já está ocupado');return;}
+    confirmMain(i,slot);
+  } else if(G.phase==='lastminute'){
+    if(G.playerQuickUsed){bfToast('Você já usou 1 carta nesta fase');return;}
+    if(card.kind==='trap'){
+      let hs=at&&at.kind==='hidden'?at.idx:G.playerHidden.findIndex(h=>!h);
+      if(hs==null||hs<0||G.playerHidden[hs]){bfToast('Sem slot de armadilha livre');return;}
+      selectQuickCard(i,hs);
+    } else if(card.kind==='item'){ selectQuickCard(i); }
+    else bfToast('Aqui só itens e arapucas');
+  } else bfToast('Não dá pra baixar carta nesta fase');
+}
+function bfToggleFusion(i){
+  const at=BF.fusion.indexOf(i);
+  if(at>=0)BF.fusion.splice(at,1);
+  else{ if(BF.fusion.length>=5){bfToast('Máximo de 5 cartas na fusão');return;} BF.fusion.push(i); }
+  bfInspect(G.playerHand[i]); bfLayoutHand();
+  const fb=document.getElementById('bf-fusionbar'); if(fb)fb.style.display=BF.fusion.length>=1?'flex':'none'; setText('bf-fusion-n',BF.fusion.length);
+}
+function bfDoFusion(){ if(BF.fusion.length<2){bfToast('Selecione ao menos 2 cartas');return;} bfToast('Fusão de '+BF.fusion.length+' cartas (regras chegam no engine)'); bfClearFusion(); }
+function bfClearFusion(){ BF.fusion=[]; bfLayoutHand(); const fb=document.getElementById('bf-fusionbar'); if(fb)fb.style.display='none'; setText('bf-fusion-n',0); }
+function bfToast(msg){ const t=document.getElementById('bf-toast'); if(!t)return; t.textContent=msg; t.style.display='block'; clearTimeout(BF._toastT); BF._toastT=setTimeout(()=>t.style.display='none',1700); }
+// ── Inspetor (trilho) ──
+function bfInspect(card){ if(!card)return; const box=document.getElementById('bf-insp'); if(!box)return;
+  const tc=bfTypeChip(card.type); const lv=card._lv||1; const isMon=isMonster(card); const vibe=card.vibe&&VIBES.find(v=>v.id===card.vibe);
+  const hp=card.currentHp!=null?card.currentHp:card.hp;
+  const artBg=cardImgSrc(card)?`background:url('${cardImgSrc(card)}') center/cover`:`background:${bfGrad(card.type)}`;
+  box.innerHTML=`<div class="bf-insp-art"><div style="position:absolute;inset:0;${artBg}"></div><span style="position:absolute;top:7px;left:7px;font-family:'Oswald';font-size:10px;padding:2px 8px;border-radius:6px;font-weight:600;background:${tc[1]};color:${tc[2]}">${tc[0]}</span><div style="position:absolute;left:0;right:0;bottom:0;padding:22px 9px 9px;background:linear-gradient(transparent,rgba(0,0,0,.85))"><div style="font-family:'Oswald';font-weight:600;font-size:16px">${card.name}</div></div></div>
+  <div class="bf-insp-name">${card.name}</div>
+  <div class="bf-insp-tags">${isMon?`<span style="background:rgba(226,83,63,.14);border-color:rgba(226,83,63,.3);color:#f4a597">⚔ ${typeof getEffAtk==='function'?getEffAtk(card):card.atk}</span><span style="background:rgba(95,201,154,.12);border-color:rgba(95,201,154,.3);color:#9fe0c2">♥ ${hp}</span>`:''}<span style="color:var(--bf-gold)">${'★'.repeat(card.star||0)||'—'}</span>${card.cost!=null?`<span>Custo ${card.cost}</span>`:''}${card.tribute?`<span>Tributo ${card.tribute}</span>`:''}${vibe?`<span>${vibe.emoji} ${vibe.name}</span>`:''}<span style="color:var(--bf-gold)">${LV_NAMES[lv]||''}</span></div>
+  <div class="bf-insp-efflbl">Efeito</div><div class="bf-insp-eff">${card.ability||card.desc||(card.special?('Habilidade especial: '+card.special):(card.kind==='trap'?'Arapuca — dispara na resolução.':card.kind==='item'?'Item — jogado na fase ITENS.':'—'))}</div>`;
+  bfSetTab('insp');
+}
+function bfSetTab(t){ const i=document.getElementById('bf-insp'),l=document.getElementById('bf-log'),ib=document.getElementById('bf-tab-insp'),lb=document.getElementById('bf-tab-log'); if(!i||!l)return;
+  if(t==='log'){i.style.display='none';l.style.display='block';lb.classList.add('on');ib.classList.remove('on');}
+  else{i.style.display='block';l.style.display='none';ib.classList.add('on');lb.classList.remove('on');} }
+function bfToggleRail(){ const sg=document.getElementById('screen-game'); if(!sg)return; sg.classList.toggle('rail-collapsed');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{bfMeasure();bfLayoutHand();})); [0,60,140,280].forEach(t=>setTimeout(()=>{bfMeasure();bfLayoutHand();},t)); }
+// ── Log (alimentado pelo showMsg) ──
+function bfLog(txt,cls){ if(!txt)return; BF_LOG.unshift({txt,cls}); if(BF_LOG.length>40)BF_LOG.pop();
+  const box=document.getElementById('bf-log'); if(!box)return;
+  box.innerHTML=BF_LOG.map(l=>`<div class="bf-log-row"><span class="dot" style="background:${l.cls==='red'?'var(--bf-red)':l.cls==='green'?'var(--bf-teal)':'var(--bf-gold)'}"></span><div class="tx">${l.txt}</div></div>`).join(''); }
+// ── Modais ──
+function bfOpenModal(id){ bfCloseModal(); const m=document.getElementById('bf-modal-'+id); if(m)m.classList.add('open'); if(id==='decklist')bfRenderDeckList(); if(id==='settings'){bfRenderThemeGrid();bfRenderToggles();} }
+function bfCloseModal(){ [...document.querySelectorAll('.bf-modal.open')].forEach(m=>m.classList.remove('open')); }
+function bfOpenGrave(side){ const grave=side==='player'?G.playerGrave:G.aiGrave; window.__bfGrave=grave;
+  const nm=side==='player'?((Save&&Save.data&&Save.data.name)||'BC'):((APP&&APP.opponentName)||'FLORIPA'); setText('bf-grave-title','CEMITÉRIO · '+nm);
+  const grid=document.getElementById('bf-grave-grid');
+  grid.innerHTML=grave.length?grave.map((c,idx)=>`<div class="bf-gravecard" onclick="bfInspect(window.__bfGrave[${idx}])">${bfCardArt(c)}</div>`).join(''):`<div style="grid-column:1/-1;text-align:center;color:var(--bf-ink3);padding:30px">Cemitério vazio</div>`;
+  bfCloseModal(); const m=document.getElementById('bf-modal-grave'); if(m)m.classList.add('open'); }
+function bfRenderDeckList(){
+  const drawn=[]; G.playerHand.forEach(c=>drawn.push(c)); G.playerField.forEach(c=>{if(c)drawn.push(c);}); (G.playerHidden||[]).forEach(c=>{if(c)drawn.push(c);}); G.playerGrave.forEach(c=>drawn.push(c));
+  const inDeck=G.playerDeck.slice(); const total=drawn.length+inDeck.length;
+  setText('bf-decklist-count',`comprados ${drawn.length} / ${total} · embaralhado`);
+  const row=(c,dr)=>{const tc=bfTypeChip(c.type);return `<div style="display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:9px;border:1px solid var(--bf-line);background:${dr?'rgba(240,180,41,.06)':'transparent'};opacity:${dr?1:.62}"><span style="width:18px;height:18px;flex:0 0 18px;border-radius:5px;display:grid;place-items:center;background:${dr?'var(--bf-gold)':'#0e0b1d'};color:${dr?'#1c1405':'var(--bf-ink3)'};font-size:11px">${dr?'✓':''}</span><span style="font-family:'Oswald';font-size:9px;padding:2px 6px;border-radius:5px;font-weight:600;background:${tc[1]};color:${tc[2]}">${tc[0]}</span><span style="font-size:13px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:${dr?'var(--bf-ink)':'var(--bf-ink2)'}">${c.name}</span><span style="font-family:'JetBrains Mono';font-size:10px;color:var(--bf-ink3)">${dr?'comprada':'no deck'}</span></div>`;};
+  const grid=document.getElementById('bf-decklist-grid'); if(grid)grid.innerHTML=drawn.map(c=>row(c,true)).join('')+inDeck.map(c=>row(c,false)).join('');
+}
+// ── Temas ──
+const BF_THEMES={
+  nebula:{'--bf-bg':'#0e0b1a','--bf-bg2':'#171231','--bf-bg3':'#06040e','--bf-panel':'#161232','--bf-panel2':'#1f1a40','--bf-slot':'#120e26','--bf-field':'#161232','--bf-line':'rgba(200,190,255,.10)','--bf-line2':'rgba(200,190,255,.22)','--bf-ink':'#ece9fb','--bf-ink2':'#a89dd0','--bf-ink3':'#6b6296','--bf-red':'#e2533f','--bf-blue':'#5a8cf0','--bf-gold':'#f0b429','--bf-teal':'#5fc99a','--bf-purp':'#b487ff','--bf-scrim':'rgba(8,5,18,.74)'},
+  amber:{'--bf-bg':'#13100a','--bf-bg2':'#1d1810','--bf-bg3':'#080603','--bf-panel':'#1b150d','--bf-panel2':'#241d12','--bf-slot':'#16110a','--bf-field':'#1b150d','--bf-line':'rgba(255,238,205,.10)','--bf-line2':'rgba(255,238,205,.22)','--bf-ink':'#f3ead6','--bf-ink2':'#b6a585','--bf-ink3':'#7a6e54','--bf-red':'#e2533f','--bf-blue':'#4a93e0','--bf-gold':'#f0b429','--bf-teal':'#5fc99a','--bf-purp':'#b487ff','--bf-scrim':'rgba(10,7,3,.74)'},
+  smoke:{'--bf-bg':'#0d0f13','--bf-bg2':'#171b22','--bf-bg3':'#050608','--bf-panel':'#161a20','--bf-panel2':'#1e232b','--bf-slot':'#0f1217','--bf-field':'#161a20','--bf-line':'rgba(220,230,245,.10)','--bf-line2':'rgba(220,230,245,.22)','--bf-ink':'#e9edf3','--bf-ink2':'#9aa4b2','--bf-ink3':'#5b6575','--bf-red':'#e54d4d','--bf-blue':'#4f97e6','--bf-gold':'#efc04a','--bf-teal':'#54c79a','--bf-purp':'#b18cf0','--bf-scrim':'rgba(4,6,10,.76)'},
+  crimson:{'--bf-bg':'#160a0a','--bf-bg2':'#241010','--bf-bg3':'#0a0404','--bf-panel':'#1f0e0e','--bf-panel2':'#2a1414','--bf-slot':'#180a0a','--bf-field':'#1f0e0e','--bf-line':'rgba(255,210,205,.10)','--bf-line2':'rgba(255,210,205,.22)','--bf-ink':'#f5e6e2','--bf-ink2':'#cba097','--bf-ink3':'#8a625c','--bf-red':'#ef5a44','--bf-blue':'#5a8cf0','--bf-gold':'#f0b429','--bf-teal':'#5fc99a','--bf-purp':'#c08af0','--bf-scrim':'rgba(14,4,4,.74)'},
+  emerald:{'--bf-bg':'#0a140e','--bf-bg2':'#0f2018','--bf-bg3':'#040a06','--bf-panel':'#0e1c14','--bf-panel2':'#15281c','--bf-slot':'#0a1610','--bf-field':'#0e1c14','--bf-line':'rgba(210,255,225,.10)','--bf-line2':'rgba(210,255,225,.20)','--bf-ink':'#e6f3ea','--bf-ink2':'#9bc3a8','--bf-ink3':'#5f8570','--bf-red':'#e2533f','--bf-blue':'#4f97e6','--bf-gold':'#f0c64a','--bf-teal':'#5fd0a0','--bf-purp':'#b487ff','--bf-scrim':'rgba(4,12,8,.74)'},
+};
+const BF_THEME_META=[{key:'nebula',label:'Nebulosa',dots:['#5a8cf0','#b487ff','#171231']},{key:'amber',label:'Boteco',dots:['#f0b429','#e2533f','#1d1810']},{key:'smoke',label:'Fumaça',dots:['#9aa4b2','#4f97e6','#171b22']},{key:'crimson',label:'Brasa',dots:['#ef5a44','#f0b429','#241010']},{key:'emerald',label:'Feltro',dots:['#5fd0a0','#f0c64a','#0f2018']}];
+function bfApplyTheme(name){ const sg=document.getElementById('screen-game'); if(!sg)return; const t=BF_THEMES[name]||BF_THEMES.nebula; Object.keys(t).forEach(k=>sg.style.setProperty(k,t[k])); BF.theme=name; try{localStorage.setItem('fortbc_theme',name);}catch(e){} bfRenderThemeGrid(); }
+function bfRenderThemeGrid(){ const g=document.getElementById('bf-theme-grid'); if(!g)return; g.innerHTML=BF_THEME_META.map(m=>`<div class="bf-swatch${BF.theme===m.key?' on':''}" onclick="bfApplyTheme('${m.key}')"><div class="dots">${m.dots.map(c=>`<i style="background:${c}"></i>`).join('')}</div><div class="lb">${m.label}</div></div>`).join(''); }
+function bfToggleMotion(){ const sg=document.getElementById('screen-game'); if(!sg)return; sg.classList.toggle('no-motion'); bfRenderToggles(); }
+function bfRenderToggles(){ const snd=document.getElementById('bf-snd-sw'),mot=document.getElementById('bf-mot-sw');
+  const muted=(typeof audioMuted!=='undefined')&&audioMuted;
+  if(snd){snd.style.background=muted?'var(--bf-line2)':'var(--bf-teal)';const k=snd.querySelector('i');if(k)k.style.left=muted?'2px':'19px';}
+  if(mot){const on=!document.getElementById('screen-game').classList.contains('no-motion');mot.style.background=on?'var(--bf-teal)':'var(--bf-line2)';const k=mot.querySelector('i');if(k)k.style.left=on?'19px':'2px';}
+}
+function bfInit(){ bfApplyTheme((()=>{try{return localStorage.getItem('fortbc_theme')||'nebula';}catch(e){return 'nebula';}})()); bfSetTab('insp'); bfMeasure(); bfLayoutHand(); }
+window.addEventListener('resize',()=>{bfMeasure();bfLayoutHand();});
+function showMsg(txt,cls=''){if(typeof bfLog==='function')bfLog(txt,cls);const area=document.getElementById('msg-area');if(!area)return;const d=document.createElement('div');d.className='msg '+(cls||'');d.textContent=txt;area.appendChild(d);setTimeout(()=>{d.style.opacity='0';setTimeout(()=>d.remove(),400);},2400);}
 
 // ══════════════════════════════════════════════════════
 //  AUDIO — gerenciador de OST (crossfade) + SFX pool

@@ -48,6 +48,24 @@ Corrigida a disparidade "carta de campo enorme × texto minúsculo". Com o palco
 ### 7. 🎁 Recompensa contextual ao baralho — ✅ V1 (2026-06-15 leva 2)
 `generateRewards()` agora lê o **baralho real** do player antes de sortear (`deckMonsterIds`/`dominantVibe`): **Evoluir** só sugere unidade que ele tem; **Recrutar** oferece unidade da vibe dominante; **Artefato** filtra `BUFF_POOL` por `buffAffects()` (só buffs que afetam o deck) — fim das sugestões de carta que o player não possui. Buffs ficaram mais fortes (+10/15/18%) e por tipo (ATAQUE/DEFESA/EQUILÍBRIO). Cada opção tem chip **UNIDADE** × **ARTEFATO**; fallback de +50 ouro se faltar buff aplicável.
 
+### 10. 🎨 Port do Campo de Batalha (Claude Design) — ✅ V1 (2026-06-16)
+Tela de jogo **reescrita** a partir do mockup `Campo de Batalha.dc.html` (handoff do Claude Design), mantendo o engine 100% intacto. Tudo escopado em `#screen-game` (vars `--bf-*`), dentro do `#stage` (palco fixo já cuida do scale/letterbox — a lógica de fit do mockup não foi portada).
+- **Layout 3 colunas:** topbar (Turno · trilha de fases · Placar+som+⚙) · esquerda = painéis de identidade (inimigo/você com retrato, PV+barra, chips Deck/Cemit./Mão) · centro = board (terreno + 4 slots + CMD + face-down + linha de frente + leque da mão entre pilhas Cemitério/Deck) · direita = trilho Inspetor/Log recolhível.
+- **5 temas** (`BF_THEMES`/`BF_THEME_META`: Nebulosa/Boteco/Fumaça/Brasa/Feltro) via Configurações (⚙) → `bfApplyTheme()` troca as `--bf-*`; persiste em `localStorage fortbc_theme`.
+- **Leque da mão:** `renderHand` reescrito → cartas em arco (`bfLayoutHand`, fan math do mockup). **Hover** destaca; **arrastar pro campo** baixa (`bfPlay`→`confirmMain`/`selectQuickCard` conforme a fase, threshold 8px, ghost + highlight de drop); **clicar** marca **fusão** (até 5, badge numerado, barra FUSÃO — `bfDoFusion` é STUB). Re-centra ao recolher o trilho (delta 0, medido por `clientWidth` + re-medição em rAF/timeouts/resize).
+- **Trilho:** Inspetor (hover/botão-direito/clique no cemitério → `bfInspect`) + Log ao vivo (`bfLog`, alimentado pelo `showMsg`). Recolhe via chevron → aba "PAINEL".
+- **Modais:** Configurações (temas+som+animações+desistir), Cemitério (grid clicável→inspetor), Menu do Deck, **Deck List** (comprados vs no deck, sem ordem), Desistir.
+- **Comandante:** slot CMD com borda dourada + glow `cmdPulse`. (Estado "quebrado" = quando o engine sinalizar; sem gatilho ainda.)
+- **HAND_LIMIT 5 → 9.** Painel DEMO do mockup **não** foi portado (era scaffolding).
+- **Hooks do engine preservados:** ids `player-slot-0..4`/`ai-slot-0..4`/`player-hidden-N`/`turn-num`/`ps-*`/`score-display`/`deck-count`/`grave-count`/`action-bar`; `renderFC` mantém `.field-card`/`.fc-hp`/`.fc-hpfill` → a camada de juice (resolução Balatro, dano carta a carta) continua funcionando. `showDmgFloat`/`juiceImpact` repontados pros painéis novos.
+- **Ajustes (2026-06-16, leva 4b):**
+  - **Pilhas Cemitério/Deck + barra de ação** movidas pra **coluna esquerda** (sob o painel do jogador) → leque ocupa a **largura toda**. Classes `.bf-leftrow`/`.bf-pile2`/`.bf-actionbar`.
+  - **Arrastar pro slot específico:** `bfPlay(i,at)` + `bfSlotAt(e)`/`bfDropValid()`/`bfSlotEl()` — solta no slot exato (monstro→slot 0-3/CMD; arapuca→slot de armadilha; item→qualquer lugar do board). Realce do slot-alvo (`.bf-slot-drop`) durante o arraste.
+  - **Slots de armadilha (face-down) reimplementados** como slots visíveis (`.bf-fdslot`, ids `player-fd-0..3`), dropáveis na fase ITENS; `selectQuickCard(idx,hiddenSlot)` aceita slot específico. (Arapucas auto-disparam na resolução — lógica do engine já existente.)
+  - **Inspetor inspeciona cartas visíveis do adversário** (`renderFC` ganhou `onclick`→`showCardDetail` nos dois lados; face-down não tem handler → não inspecionável).
+  - **Compra de cartas corrigida:** `INITIAL_HAND=5` (inicial), `HAND_LIMIT=9` é **teto** (não base). Turno 1 = 5; turno 2+ = **+1/turno** acumulando até 9. `initFight`/`phaseDraw` ajustados.
+- **Falta:** terreno real (sem imagem; picker do mockup não ligado); fusão de verdade (engine); retratos dos jogadores; estado "comandante quebrado" precisa de sinal do engine; afinar no playthrough.
+
 ### 8. 🃏 Clareza de baralho durante o jogo — 🔜
 Ainda pendente: deixar óbvio quais cartas restam no deck/cemitério (lista/contador maior já ajudou), o que cada fase espera (onboarding leve / dicas na 1ª vez).
 
