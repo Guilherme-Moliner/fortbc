@@ -310,8 +310,12 @@ body{background:radial-gradient(ellipse at 30% 0%,#181830 0%,var(--bg0) 60%);col
     <!-- ═══ EXPORTAR ═══ -->
     <div class="group">
       <div class="group-title">Exportar</div>
-      <button class="btn-action save" id="btn-save" onclick="saveCard()">💾 Salvar carta (900×1350 px)</button>
-      <div style="height:8px"></div>
+      <button class="btn-action save" id="btn-save" onclick="saveArt()">💾 Salvar ARTE da carta (PNG)</button>
+      <div class="export-note" style="margin:6px 0 0;text-align:left">Salva só a foto, no formato da carta, com o nome da coluna <b>img</b> → vai pra <code>assets/cards/</code>. O jogo desenha stats, nível e moldura por cima.</div>
+      <div style="height:10px"></div>
+      <button class="btn-action" id="btn-savefull" onclick="saveCard()">🖼️ Salvar carta COMPLETA (full art)</button>
+      <div class="export-note" style="margin:6px 0 0;text-align:left">Só p/ cartas especiais (full art / arte alternativa) — grava a moldura e os stats atuais na imagem.</div>
+      <div style="height:10px"></div>
       <button class="btn-action primary" onclick="copyCSVRow()">📋 Copiar linha CSV (p/ planilha)</button>
       <div style="height:8px"></div>
       <button class="btn-action" onclick="copyData()">📄 Copiar JSON da carta</button>
@@ -455,7 +459,7 @@ function render(){
 
   const front = document.getElementById('card-front');
   front.style.setProperty('--frame',LV_COLOR[card.level]);
-  front.className = 'card-front lvl-'+card.level;
+  front.className = 'card-face card-front lvl-'+card.level;  // mantém card-face (position:absolute) senão a foto colapsa
   document.getElementById('ui-tier').textContent = LV_NAMES[card.level];
   document.getElementById('ui-tier').style.background = LV_COLOR[card.level];
   document.getElementById('ui-tier').style.color = card.level>=4?'#111':'#000';
@@ -599,9 +603,40 @@ function toggleCustomFrame(){
   overlay.classList.toggle('active', on);
 }
 
-// ── SAVE CARD AS PNG (alta resolução) ──
+function downloadBlob(blob,filename){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── SAVE ART ONLY (padrão): só a foto, formato da carta. O jogo desenha stats/nível/moldura. ──
+async function saveArt(){
+  const img = document.getElementById('ui-photo');
+  if(!img || !img.getAttribute('src') || !img.naturalWidth){ alert('Suba a foto da carta primeiro (📤 Foto do herói).'); return; }
+  const btn = document.getElementById('btn-save'); const lbl = btn.textContent;
+  btn.disabled = true; btn.textContent = '⏳ Gerando…';
+  try{
+    const W=900, H=1350;                              // proporção da carta (2:3), alta resolução
+    const cv = document.createElement('canvas'); cv.width=W; cv.height=H;
+    const ctx = cv.getContext('2d'); ctx.imageSmoothingQuality='high';
+    const ar = img.naturalWidth/img.naturalHeight, AR = W/H;  // cover-fit (igual ao jogo)
+    let dw,dh,dx,dy;
+    if(ar>AR){ dh=H; dw=H*ar; dx=(W-dw)/2; dy=0; } else { dw=W; dh=W/ar; dx=0; dy=(H-dh)/2; }
+    ctx.drawImage(img, dx, dy, dw, dh);
+    const safe = (card.id || card.name || 'carta').toString().toLowerCase().replace(/\s+/g,'_');
+    const fname = (card.img && card.img.trim()) ? card.img.trim() : `${safe}.png`;
+    const jpg = /\.jpe?g$/i.test(fname);
+    const overlay = document.getElementById('save-overlay'); overlay.classList.add('visible');
+    const fill = document.getElementById('save-bar-fill'); fill.style.width='0%'; setTimeout(()=>fill.style.width='100%',50);
+    cv.toBlob(b=>downloadBlob(b,fname), jpg?'image/jpeg':'image/png', .92);
+    setTimeout(()=>overlay.classList.remove('visible'),1600);
+  }catch(e){ alert('Erro ao salvar arte: '+e.message); }
+  btn.disabled=false; btn.textContent=lbl;
+}
+
+// ── SAVE CARD COMPLETA (full art / especial): grava moldura + stats atuais ──
 async function saveCard(){
-  const btn = document.getElementById('btn-save');
+  const btn = document.getElementById('btn-savefull');
   btn.disabled = true;
   btn.textContent = '⏳ Gerando…';
 
@@ -654,7 +689,7 @@ async function saveCard(){
 
   if(wasFlipped) flip.classList.add('flipped');
   btn.disabled = false;
-  btn.textContent = '💾 Salvar carta (900×1350 px)';
+  btn.textContent = '🖼️ Salvar carta COMPLETA (full art)';
 }
 
 // ── CONTROLS ──
@@ -809,7 +844,7 @@ function copyCSVRow(){
 // ── KEYBOARD ──
 document.addEventListener('keydown',e=>{
   if(e.key==='f'||e.key==='F') document.getElementById('card-flip').classList.toggle('flipped');
-  if(e.key==='s'||e.key==='S') saveCard();
+  if(e.key==='s'||e.key==='S') saveArt();
 });
 
 // ── INIT ──
