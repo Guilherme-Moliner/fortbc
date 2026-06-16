@@ -518,6 +518,7 @@ body{background:#000;color:var(--text);font-family:'Cinzel',serif;overflow:hidde
 .bf-actionbar .play-btn.confirm{background:var(--bf-teal);color:#06291f}
 #bf-handwrap{flex:1;position:relative;height:100%;min-width:0}
 .bf-hcard{position:absolute;bottom:6px;width:110px;height:153px;border-radius:10px;overflow:hidden;border:1px solid var(--bf-line2);transform-origin:50% 100%;box-shadow:0 8px 18px rgba(0,0,0,.5);cursor:grab;transition:transform .13s ease,box-shadow .13s;touch-action:none}
+.bf-fusemini{position:absolute;width:124px;height:172px;border-radius:12px;overflow:hidden;border:1px solid var(--bf-line2);box-shadow:0 12px 34px rgba(0,0,0,.6);transition:transform .5s cubic-bezier(.4,.9,.3,1),filter .5s ease,opacity .5s ease;will-change:transform,filter,opacity}
 .bf-hcard .fbadge{position:absolute;top:5px;left:5px;width:22px;height:22px;border-radius:50%;display:none;align-items:center;justify-content:center;font-family:'Oswald';font-size:13px;font-weight:700;color:#06291f;background:var(--bf-teal);box-shadow:0 0 0 2px rgba(0,0,0,.4),0 2px 6px rgba(0,0,0,.5);z-index:3}
 .bf-fusionbar{display:none;position:absolute;top:-2px;left:50%;transform:translateX(-50%);z-index:90;align-items:center;gap:10px;background:#0c0918f2;border:1px solid var(--bf-teal);border-radius:22px;padding:5px 6px 5px 15px;box-shadow:0 8px 22px rgba(0,0,0,.55)}
 .bf-fusionbar .lbl{font-family:'Oswald';font-size:12px;letter-spacing:.6px;color:var(--bf-teal)}
@@ -1358,8 +1359,9 @@ let HERO_IMAGES={};   // resolved at preload (gh url or b64)
 const CARD_IMG_BASE='assets/cards/';
 // Resolve a melhor imagem da carta: img própria > imagem de herói > null (cai no emoji).
 function cardImgSrc(card){
-  if(card.img)return CARD_IMG_BASE+card.img;
-  if(card.hero&&HERO_IMAGES[card.id])return HERO_IMAGES[card.id];
+  if(card.img)return CARD_IMG_BASE+card.img;                 // 1) img explícito na coluna
+  if(card.hero&&HERO_IMAGES[card.id])return HERO_IMAGES[card.id]; // 2) arte de herói (base64/raw)
+  if(card.id)return CARD_IMG_BASE+card.id+'.png';            // 3) convenção: assets/cards/<id>.png (qualquer carta; cai no emoji se faltar)
   return null;
 }
 // onerror das <img>: troca por um box com emoji, sem quebrar o layout.
@@ -2672,11 +2674,11 @@ function updateFieldUI(){
 function renderFC(card,side){
   const div=document.createElement('div');div.className='field-card';
   if(card.faceDown){const fd=document.createElement('div');fd.className='card-face-down';fd.textContent='⁉';div.appendChild(fd);return div;}
-  const tb=document.createElement('div');tb.className=`type-badge badge-${card.type}`;tb.textContent=TYPE_EMOJI[card.type]||'';div.appendChild(tb);
+  const tb=document.createElement('div');tb.className=`type-badge badge-${card.type}`;tb.textContent=TYPE_EMOJI[card.type]||'';tb.style.background=bfVibeColor(card);tb.style.color='#fff';div.appendChild(tb);
   const rb=document.createElement('div');rb.className=`rank-badge rank-${card.fieldRank}`;rb.textContent=['🥉','🥈','🥇'][card.fieldRank];div.appendChild(rb);
   const fcSrc=cardImgSrc(card),fcEmo=card.emoji||TYPE_EMOJI[card.type]||'?';
   if(fcSrc){const img=document.createElement('img');img.className='fc-img';img.src=fcSrc;if(side==='ai')img.style.transform='scaleY(-1)';img.onerror=()=>imgFallback(img,fcEmo,'fc-ph');div.appendChild(img);}
-  else{const ph=document.createElement('div');ph.className='fc-ph';ph.style.background=card.type==='ATK'?'rgba(230,57,70,.2)':card.type==='DEF'?'rgba(79,195,247,.2)':'rgba(129,199,132,.2)';ph.textContent=fcEmo;div.appendChild(ph);}
+  else{const ph=document.createElement('div');ph.className='fc-ph';ph.style.background=bfGrad(card);ph.textContent=fcEmo;div.appendChild(ph);}
   const info=document.createElement('div');info.className='fc-info';
   const nm=document.createElement('div');nm.className='fc-name';nm.textContent=card.name;info.appendChild(nm);
   const hb=document.createElement('div');hb.className='fc-hpbar';const hf=document.createElement('div');hf.className='fc-hpfill';const pct=Math.max(0,card.currentHp/card.maxHp*100);hf.style.width=pct+'%';hf.style.background=pct>60?'#4caf50':pct>25?'#ff9800':'#f44336';hb.appendChild(hf);info.appendChild(hb);
@@ -2696,16 +2698,19 @@ function showGrave(){bfOpenGrave('player');}
 const BF={ hover:-1, fusion:[], drag:null, wrapW:430, theme:'nebula', _toastT:null };
 const BF_LOG=[];
 function bfTypeChip(t){return {ATK:['ATK','var(--bf-red)','#fff'],DEF:['DEF','var(--bf-blue)','#fff'],BAL:['BAL','var(--bf-teal)','#06291f']}[t]||['?','var(--bf-ink3)','#fff'];}
-function bfGrad(t){return t==='ATK'?'linear-gradient(160deg,#5a2b2b,#241016)':t==='DEF'?'linear-gradient(160deg,#2b3d5a,#101a24)':t==='BAL'?'linear-gradient(160deg,#3c4a32,#161f14)':'linear-gradient(160deg,#3a3050,#1a1426)';}
+// Cor da carta = VIBE (não mais o type). Cai num cinza se a carta não tiver vibe.
+function vibeOf(card){ return card&&card.vibe?VIBES.find(v=>v.id===card.vibe):null; }
+function bfVibeColor(card){ const v=vibeOf(card); return v?v.color:'#7a7a92'; }
+function bfGrad(card){ const c=(typeof card==='string')?(VIBES.find(v=>v.id===card)||{}).color:bfVibeColor(card); return `linear-gradient(160deg, ${(c||'#5a4a6a')}cc, #15111e)`; }
 function bfCardArt(card){
   const src=cardImgSrc(card),emo=card.emoji||TYPE_EMOJI[card.type]||'?';
   const tc=bfTypeChip(card.type); const lv=card._lv||1; const tier=((LV_NAMES[lv]||'')[0])||'';
-  const tcol=LV_COLOR[lv]||'#caa23a'; const isMon=isMonster(card);
-  const art=src?`background-image:url('${src}');background-size:cover;background-position:center`:`background:${bfGrad(card.type)}`;
-  const fall=src?'':`<div style="position:absolute;inset:0;display:grid;place-items:center;font-size:38px">${emo}</div>`;
+  const tcol=LV_COLOR[lv]||'#caa23a'; const isMon=isMonster(card); const vcol=bfVibeColor(card);
+  const fall=`<div style="position:absolute;inset:0;display:grid;place-items:center;font-size:38px;opacity:.9">${emo}</div>`;
+  const imgTag=src?`<img src="${src}" onerror="this.remove()" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">`:'';
   const hp=card.currentHp!=null?card.currentHp:card.hp;
   const stats=isMon?`<span>⚔ ${typeof getEffAtk==='function'?getEffAtk(card):card.atk}</span><span class="pv">♥ ${hp}</span>`:`<span style="color:var(--bf-gold)">${card.kind==='trap'?'Arapuca':'Item'}</span>`;
-  return `<div class="bf-cardface"><div class="art" style="${art}"></div>${fall}<span class="ty" style="background:${tc[1]};color:${tc[2]}">${tc[0]}</span>${tier?`<span class="tier" style="background:${tcol}">${tier}</span>`:''}<div class="ov"><div class="nm">${card.name}</div><div class="st">${stats}</div></div></div>`;
+  return `<div class="bf-cardface"><div class="art" style="background:${bfGrad(card)}"></div>${fall}${imgTag}<span class="ty" style="background:${vcol};color:#fff">${tc[0]}</span>${tier?`<span class="tier" style="background:${tcol}">${tier}</span>`:''}<div class="ov"><div class="nm">${card.name}</div><div class="st">${stats}</div></div></div>`;
 }
 function bfMeasure(){ const el=document.getElementById('bf-handwrap'); if(!el)return; const w=el.clientWidth; if(w&&Math.abs(w-BF.wrapW)>1)BF.wrapW=w; }
 function renderHand(){
@@ -2821,7 +2826,58 @@ function bfToggleFusion(i){
   bfInspect(G.playerHand[i]); bfLayoutHand();
   const fb=document.getElementById('bf-fusionbar'); if(fb)fb.style.display=BF.fusion.length>=1?'flex':'none'; setText('bf-fusion-n',BF.fusion.length);
 }
-function bfDoFusion(){
+// Passos da cadeia (p/ animar cada fusão individual). Retorna {steps, grave, summon}.
+function fusionSteps(cards){
+  const steps=[]; const grave=[]; let acc=cards[0];
+  for(let i=1;i<cards.length;i++){
+    const r=fusePair(acc,cards[i]);
+    if(r){ steps.push({a:acc,b:cards[i],result:r}); grave.push(acc,cards[i]); acc=r; }
+    else { steps.push({a:acc,b:cards[i],result:null}); grave.push(acc); acc=cards[i]; }
+  }
+  return {steps,grave,summon:acc};
+}
+// Mini-carta p/ a animação de fusão.
+function bfFuseMini(card,extra){const d=document.createElement('div');d.className='bf-fusemini';if(extra)d.style.cssText+=extra;d.innerHTML=bfCardArt(card);return d;}
+// Anima a cadeia: 2 cartas convergem e clareiam → resultado emerge do branco. Falha = a menor é descartada.
+async function bfFuseAnim(steps){
+  const stage=document.getElementById('stage')||document.body;
+  const ov=document.createElement('div'); ov.id='bf-fuse';
+  ov.style.cssText='position:absolute;inset:0;z-index:200;background:rgba(4,3,12,.6);display:grid;place-items:center;backdrop-filter:blur(2px)';
+  stage.appendChild(ov);
+  const wait=ms=>new Promise(r=>setTimeout(r,ms));
+  let incoming=steps[0].a;
+  for(const s of steps){
+    ov.innerHTML='';
+    const A=bfFuseMini(incoming,'transform:translateX(-100px)');
+    const B=bfFuseMini(s.b,'transform:translateX(100px)');
+    ov.appendChild(A); ov.appendChild(B);
+    await wait(70);
+    if(s.result){
+      playSFX('special_recycler');
+      A.style.transform='translateX(0) scale(.96)'; B.style.transform='translateX(0) scale(.96)';
+      A.style.filter=B.style.filter='brightness(5) saturate(0)'; A.style.opacity=B.style.opacity='.05';
+      await wait(500);
+      ov.innerHTML='';
+      const R=bfFuseMini(s.result,'filter:brightness(6) saturate(0);opacity:0;transform:scale(1.12)');
+      ov.appendChild(R); await wait(50);
+      R.style.filter='brightness(1)'; R.style.opacity='1'; R.style.transform='scale(1.06)';
+      await wait(520); R.style.transform='scale(1)'; await wait(220);
+      incoming=s.result;
+    }else{
+      playSFX('unit_die');
+      A.style.transform='translateX(-100px) translateY(70px) rotate(-14deg)'; A.style.opacity='0';
+      B.style.transform='translateX(0)';
+      await wait(520);
+      incoming=s.b;
+    }
+  }
+  // desliza pra mão (descendo até a faixa da mão), sem pop
+  let last=ov.querySelector('.bf-fusemini'); if(!last){last=bfFuseMini(incoming);ov.appendChild(last);}
+  last.style.transform='translateY(330px) scale(.62)'; last.style.opacity='.15';
+  await wait(480);
+  ov.remove();
+}
+async function bfDoFusion(){
   if(G.phase!=='main'||G.mainConfirmed){bfToast('Fusão só na DOWN FASE');return;}
   if(BF.fusion.length<2){bfToast('Selecione ao menos 2 cartas');return;}
   const cap=(Save.data?(licenseFor(Save.data.duels).fusion||5):5);
@@ -2829,23 +2885,19 @@ function bfDoFusion(){
   const idxs=[...BF.fusion];
   const cards=idxs.map(i=>G.playerHand[i]);
   if(!cards.every(isMonster)){bfToast('Só dá pra fundir monstros');return;}
-  const out=runFusionChain(cards);
-  if(!out){bfToast('Selecione ao menos 2 cartas');return;}
-  const result=out.summon;
-  const slot=result.commander?4:[0,1,2,3].find(n=>!G.playerField[n]);
-  if(slot==null){bfToast('Sem slot livre pra invocar a fusão');return;}
-  // consome os materiais da mão (índices em ordem decrescente p/ não bagunçar)
+  const out=fusionSteps(cards);
+  // tira os materiais da mão e esconde a barra antes de animar
   idxs.sort((a,b)=>b-a).forEach(i=>G.playerHand.splice(i,1));
-  BF.fusion=[];
-  // cemitério: materiais consumidos + fusões intermediárias descartadas
+  BF.fusion=[]; const fb=document.getElementById('bf-fusionbar'); if(fb)fb.style.display='none';
+  renderHand();
+  playSFX('reward');
+  await bfFuseAnim(out.steps);
+  // materiais (e fusões intermediárias descartadas) vão pro cemitério
   out.grave.forEach(c=>G.playerGrave.push(c));
-  // invoca a carta sobrevivente (substitui a ação de baixar 1 monstro nesta DOWN FASE)
-  const fc=makeFC(result,'player'); if(G.playerField[slot])G.playerGrave.push(G.playerField[slot]); G.playerField[slot]=fc;
-  playSFX('reward'); bfToast('🌀 '+result.name+' invocado'); bfLog('Fusão → '+result.name+' (cemitério: '+out.grave.length+')','green');
-  G.mainConfirmed=true; clearSlotHighlights();
-  const aiSlot=G.aiMainSlot; applyAiMain(); updateFieldUI(); renderHand(); updateDeckUI();
-  juiceLand('player',slot); if(aiSlot!=null)juiceLand('ai',aiSlot);
-  showMsg('⚔ Cartas reveladas!'); setTimeout(()=>startPhase('lastminute'),1200);
+  // a carta resultante vai pra MÃO (jogador escolhe onde baixar depois) — NÃO consome a DOWN FASE
+  G.playerHand.push(out.summon);
+  bfToast('🌀 '+out.summon.name+' foi pra sua mão'); bfLog('Fusão → '+out.summon.name+' (foi pra mão)','green');
+  updateDeckUI(); renderHand();
 }
 function bfClearFusion(){ BF.fusion=[]; bfLayoutHand(); const fb=document.getElementById('bf-fusionbar'); if(fb)fb.style.display='none'; setText('bf-fusion-n',0); }
 function bfToast(msg){ const t=document.getElementById('bf-toast'); if(!t)return; t.textContent=msg; t.style.display='block'; clearTimeout(BF._toastT); BF._toastT=setTimeout(()=>t.style.display='none',1700); }
