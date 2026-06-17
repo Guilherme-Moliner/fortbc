@@ -52,22 +52,31 @@ def main():
     with open(CSV_PATH, "w", encoding="utf-8", newline="") as f:
         f.write(csv_text + "\n")
 
-    # 4. injeta no index.html
+    # 4. injeta no index.html (CARDS_CSV e, se existir, FUSIONS_CSV)
     with open(HTML_PATH, "r", encoding="utf-8", newline="") as f:
         html = f.read()
     nl = "\r\n" if "\r\n" in html else "\n"
-    body = csv_text.replace("\n", nl)
-    pat = re.compile(r"(const CARDS_CSV = `\r?\n)(.*?)(\r?\n`;)", re.DOTALL)
-    if not pat.search(html):
-        print("ERRO: bloco CARDS_CSV não encontrado no index.html"); sys.exit(1)
-    html2 = pat.sub(lambda m: m.group(1) + body + m.group(3), html, count=1)
+    def inject(html, var, text):
+        pat = re.compile(r"(const " + var + r" = `\r?\n)(.*?)(\r?\n`;)", re.DOTALL)
+        if not pat.search(html):
+            print("ERRO: bloco " + var + " não encontrado no index.html"); sys.exit(1)
+        body = text.replace("\n", nl)
+        return pat.sub(lambda m: m.group(1) + body + m.group(3), html, count=1)
+    html = inject(html, "CARDS_CSV", csv_text)
+    fus_path = os.path.join(ROOT, "FUSIONS.csv")
+    fus_n = 0
+    if os.path.isfile(fus_path):
+        with open(fus_path, "r", encoding="utf-8", newline="") as f:
+            fus_text = f.read().rstrip("\n")
+        html = inject(html, "FUSIONS_CSV", fus_text)
+        fus_n = len([l for l in fus_text.split("\n")[1:] if l.strip() and not l.strip().startswith("#")])
     with open(HTML_PATH, "w", encoding="utf-8", newline="") as f:
-        f.write(html2)
+        f.write(html)
 
     # 5. resumo
     files_no_card = sorted(fn for fn in files if fn.endswith(".png")
                            and fn[:-4] not in {r[i_id].strip() for r in data})
-    print(f"OK · {len(data)} cartas sincronizadas (GAME_DATA.csv -> index.html)")
+    print(f"OK · {len(data)} cartas + {fus_n} receitas de fusão sincronizadas (-> index.html)")
     print(f"img preenchido em {len(wired)} carta(s): {', '.join(wired) if wired else '(nenhuma nova)'}")
     if missing:
         print("AVISO · img aponta p/ arquivo inexistente em assets/cards/:")

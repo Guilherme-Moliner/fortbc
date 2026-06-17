@@ -277,6 +277,21 @@ O engine real-time (lanes, ATB, gameLoop, etc.) ainda existe nas linhas 514-825 
 - [ ] Recompensa "Recrutar" entra só no baralho DA RUN (`APP.playerDeck`), não na coleção permanente — confirmar expectativa / repro.
 - [ ] Boss final no roguelite + item bônus ao vencer.
 
+### Sessão 2026-06-16 — Rogue (Etapa A) + Modos + Comandante
+**Feito:**
+- [x] **Modos do roguelite rebatizados** (`ROGUE_MODES`): **Rápido** (4 batalhas), **Longo** (10), **Boss Mode** (5, chefe na última). Tela de dificuldade atualizada.
+- [x] **Dificuldade incremental** por run: `fightCurve()` (substitui `FIGHT_CURVE`) escala ATK/nível do 1º ao último fight (`RUN_CURVE` editável); boss final ganha bônus extra.
+- [x] **Baralho da IA curado + capado** (`AI_DECK_SIZE=30`, `AI_STAR_CAP` por dificuldade, sem fusões) — antes usava todas as ~72 cartas (centenas no deck).
+- [x] **HP da base persiste entre fights** do roguelite (`APP.playerBaseHp`); só itens curam, não recupera sozinho.
+- [x] **Dinheiro: +100 fixo por vitória** (era +50/+30).
+- [x] **Boss Mode:** vencer a batalha final dá **item bônus permanente** (carta aleatória na coleção, `grantBossBonus`).
+- [x] **Comandante funcional:** heróis (`kind:hero`) vão no slot **CMD** (slot 4) e dão **+20% ATK por carta da mesma vibe no seu campo** (`COMMANDER_BONUS`, em `computeFieldAtk`; `isCommander()`). IA também posiciona herói no CMD.
+- [x] Selo de rank (🥉🥈🥇) **maior** na carta de campo; **inspetor** mostra rank ATUAL + clique na carta de campo alimenta o inspetor com o objeto vivo (valores atualizados).
+- [x] `cardlab/sync.py` estendido: sincroniza **CARDS_CSV e FUSIONS_CSV**. Procedimento de fusão em `cardlab/COMO_CRIAR_FUSOES.md`.
+- Confirmado por design: recompensa "Recrutar" é **só da run** (não vai pra coleção permanente).
+
+**A tratar depois:** procedimento self-serve de **habilidades** (special/`vibe_*` ainda STUB — o comandante é o 1º efeito real); habilidades dos heróis no turn-based; IA não funde; tematizar nome dos modos/oponentes.
+
 ### Concluído
 - [x] Testar o fluxo completo do jogo turn-based — OK (2026-06-12)
 - [x] Sistema de Menu completo (title, name/load, menu, campanha-esqueleto, roguelite, duelo livre, biblioteca, password) + abstração `Save` com stub cloud — OK (2026-06-13)

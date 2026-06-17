@@ -111,7 +111,7 @@ body{background:#000;color:var(--text);font-family:'Cinzel',serif;overflow:hidde
 .fc-hp{color:#81c784;}.fc-atk{color:var(--atk);}
 .fc-hpbar{width:90%;height:6px;background:rgba(0,0,0,.7);border-radius:3px;overflow:hidden;border:1px solid rgba(0,0,0,.6);}
 .fc-hpfill{height:100%;border-radius:2px;transition:width .3s;}
-.rank-badge{position:absolute;top:3px;right:3px;font-size:.42rem;font-weight:700;padding:1px 4px;border-radius:3px;z-index:3;text-shadow:none;}
+.rank-badge{position:absolute;top:3px;right:3px;font-size:.95rem;font-weight:700;padding:2px 5px;border-radius:5px;z-index:3;text-shadow:0 1px 3px #000,0 0 4px #000;line-height:1;}
 .rank-0{background:#3a2a10;color:#cd7f32;}.rank-1{background:#2a2e33;color:#b0b8c1;}.rank-2{background:#3a3000;color:#ffd700;}
 .type-badge{position:absolute;top:3px;left:3px;font-size:.46rem;font-weight:900;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:3;text-shadow:none;}
 .badge-ATK{background:var(--atk);color:#fff;}.badge-DEF{background:var(--def);color:#000;}.badge-BAL{background:var(--bal);color:#000;}
@@ -691,11 +691,11 @@ body{background:#000;color:var(--text);font-family:'Cinzel',serif;overflow:hidde
 <div id="screen-runsetup" class="screen hidden">
   <div class="menu-panel">
     <h1>🎲 ROGUELITE</h1>
-    <div class="who">3 fights · escolha a dificuldade</div>
+    <div class="who">escolha o modo · dificuldade incremental</div>
     <div class="diff-row">
-      <div class="diff-opt"><input type="radio" name="rsdiff" id="rs-easy" value="easy" checked><label for="rs-easy">🌱<br>Iniciante</label></div>
-      <div class="diff-opt"><input type="radio" name="rsdiff" id="rs-med" value="medium"><label for="rs-med">⚔<br>Veterano</label></div>
-      <div class="diff-opt"><input type="radio" name="rsdiff" id="rs-hard" value="hard"><label for="rs-hard">💀<br>Mestre</label></div>
+      <div class="diff-opt"><input type="radio" name="rsdiff" id="rs-easy" value="rapido" checked><label for="rs-easy">⚡<br>Rápido<br><small>4 batalhas</small></label></div>
+      <div class="diff-opt"><input type="radio" name="rsdiff" id="rs-med" value="longo"><label for="rs-med">🏃<br>Longo<br><small>10 batalhas</small></label></div>
+      <div class="diff-opt"><input type="radio" name="rsdiff" id="rs-hard" value="boss"><label for="rs-hard">👑<br>Boss Mode<br><small>chefe no fim</small></label></div>
     </div>
     <button class="btn btn-primary" style="width:100%" onclick="startRoguelite()">⚔ INICIAR RUN</button>
     <button class="btn btn-ghost back-btn" onclick="showScreen('menu')">‹ VOLTAR</button>
@@ -1195,30 +1195,25 @@ const BASE_CARDS = parseCardsCSV(CARDS_CSV);
 // Fonte única: bloco FUSIONS_CSV abaixo (espelhado em FUSIONS.csv). Linhas # = comentário.
 //  mode=general → a,b são VIBES; mode=specific → a,b são IDs de carta (specific tem prioridade).
 const FUSIONS_CSV = `
-mode,a,b,result,note
-# Receitas por CARACTERÍSTICA (chave:valor). Chaves: vibe · postura (type: ATK=briga / DEF=muro / BAL=labia).
-# Cada receita = 2 requisitos (1 por material). Ordem dos materiais não importa.
-# Por POSTURA (tem prioridade sobre vibe — exercita a característica nova):
-recipe,postura:muro,postura:muro,fus_tanque,Dois Muros → Tanque
-recipe,postura:labia,postura:labia,fus_mestrecerimonia,Duas Lábias → Mestre de Cerimônia
-# Par de vibes (fallback):
-recipe,vibe:amarelo,vibe:amarelo,fus_resenha,Nerdola + Nerdola
-recipe,vibe:amarelo,vibe:vermelho,fus_brigarole,Nerdola + Socialista
-recipe,vibe:amarelo,vibe:azul,fus_camarote,Nerdola + Marombeiro
-recipe,vibe:amarelo,vibe:roxo,fus_apagao,Nerdola + Rolezeiro
-recipe,vibe:amarelo,vibe:verde,fus_resistencia,Nerdola + Dinheirista
-recipe,vibe:vermelho,vibe:vermelho,fus_marombeiro,Socialista + Socialista
-recipe,vibe:vermelho,vibe:azul,fus_leaochacara,Socialista + Marombeiro
-recipe,vibe:vermelho,vibe:roxo,fus_climao,Socialista + Rolezeiro
-recipe,vibe:vermelho,vibe:verde,fus_tanque,Socialista + Dinheirista
-recipe,vibe:azul,vibe:azul,fus_mestrecerimonia,Marombeiro + Marombeiro
-recipe,vibe:azul,vibe:roxo,fus_mentemestra,Marombeiro + Rolezeiro
-recipe,vibe:azul,vibe:verde,fus_zen,Marombeiro + Dinheirista
-recipe,vibe:roxo,vibe:roxo,fus_surto,Rolezeiro + Rolezeiro
-recipe,vibe:roxo,vibe:verde,fus_mauelemento,Rolezeiro + Dinheirista
-recipe,vibe:verde,vibe:verde,fus_brotheragem,Dinheirista + Dinheirista
-# Específicas (par de IDs, prioridade máxima):
-specific,arthur,letti,fus_lenda,Arthur + Letti = Lenda do Rolê
+mode,a,b,result,note
+recipe,postura:muro,postura:muro,fus_tanque,Dois Muros (prioridade postura)
+recipe,postura:labia,postura:labia,fus_mestrecerimonia,Duas Labias (prioridade postura)
+recipe,vibe:amarelo,vibe:amarelo,fus_resenha,Nerdola + Nerdola
+recipe,vibe:amarelo,vibe:vermelho,fus_brigarole,Nerdola + Socialista
+recipe,vibe:amarelo,vibe:azul,fus_camarote,Nerdola + Marombeiro
+recipe,vibe:amarelo,vibe:roxo,fus_apagao,Nerdola + Rolezeiro
+recipe,vibe:amarelo,vibe:verde,fus_resistencia,Nerdola + Dinheirista
+recipe,vibe:vermelho,vibe:vermelho,fus_marombeiro,Socialista + Socialista
+recipe,vibe:vermelho,vibe:azul,fus_leaochacara,Socialista + Marombeiro
+recipe,vibe:vermelho,vibe:roxo,fus_climao,Socialista + Rolezeiro
+recipe,vibe:vermelho,vibe:verde,fus_tanque,Socialista + Dinheirista
+recipe,vibe:azul,vibe:azul,fus_mestrecerimonia,Marombeiro + Marombeiro
+recipe,vibe:azul,vibe:roxo,fus_mentemestra,Marombeiro + Rolezeiro
+recipe,vibe:azul,vibe:verde,fus_zen,Marombeiro + Dinheirista
+recipe,vibe:roxo,vibe:roxo,fus_surto,Rolezeiro + Rolezeiro
+recipe,vibe:roxo,vibe:verde,fus_mauelemento,Rolezeiro + Dinheirista
+recipe,vibe:verde,vibe:verde,fus_brotheragem,Dinheirista + Dinheirista
+specific,arthur,letti,fus_lenda,Arthur + Letti
 `;
 function fuseKey(a,b){return [a,b].sort().join('|');}
 // Características da carta usadas nas receitas de fusão. (type/range/cost/speed mantêm a chave no CSV; aqui são re-rotulados.)
@@ -1377,15 +1372,30 @@ const AI_DECKS={
   medium:{label:'Veterano', lvOverride:2,atkMult:1.0, aiInterval:4,  usesItems:true },
   hard:  {label:'Mestre',   lvOverride:4,atkMult:1.25,aiInterval:2.5,usesItems:true },
 };
-// Curva por fight (roguelite 1→3). Multiplica o atkMult da IA e ajusta o lv.
-// Fight 1 propositalmente fraco pra destravar a progressão.
-const FIGHT_CURVE={
-  1:{atkMult:0.65, lvDelta:-1},
-  2:{atkMult:0.85, lvDelta:0 },
-  3:{atkMult:1.0,  lvDelta:0 },
+// MODOS do Roguelite (rebatizados). fights = nº de batalhas; aiBase = base de dificuldade da IA.
+const ROGUE_MODES={
+  rapido:{label:'Rápido',    fights:4,  boss:false, aiBase:'easy'  },
+  longo: {label:'Longo',     fights:10, boss:false, aiBase:'medium'},
+  boss:  {label:'Boss Mode', fights:5,  boss:true,  aiBase:'hard'  },
 };
+// Dificuldade INCREMENTAL ao longo da run (editável). t = progresso 0→1 entre o 1º e o último fight.
+const RUN_CURVE={ atkStart:0.65, atkEnd:1.10, lvStart:-1, lvEnd:1, bossAtk:0.30, bossLv:1 };
+function fightCurve(fightNum){
+  const total=(typeof APP!=='undefined'&&APP.totalFights)||3;
+  const t = total>1 ? (fightNum-1)/(total-1) : 1;
+  let atkMult = RUN_CURVE.atkStart + (RUN_CURVE.atkEnd-RUN_CURVE.atkStart)*t;
+  let lvDelta = Math.round(RUN_CURVE.lvStart + (RUN_CURVE.lvEnd-RUN_CURVE.lvStart)*t);
+  if(typeof APP!=='undefined'&&APP.isBossRun&&fightNum===total){ atkMult+=RUN_CURVE.bossAtk; lvDelta+=RUN_CURVE.bossLv; } // batalha final = chefe
+  return {atkMult, lvDelta};
+}
+// Baralho da IA: tamanho-teto + teto de estrelas por dificuldade (curadoria — evita IA com tudo).
+const AI_DECK_SIZE=30;
+const AI_STAR_CAP={ easy:4, medium:8, hard:99 };
+// Comandante (herói no slot CMD): +20% ATK por carta da MESMA cor (vibe) no seu campo.
+const COMMANDER_BONUS=0.20;
+function isCommander(c){ return !!c && c.kind==='hero'; }
 // Carta(s) extra(s) na mão inicial do PLAYER por fight (ajuda no começo).
-const PLAYER_HAND_BONUS={1:1, 2:0, 3:0};
+const PLAYER_HAND_BONUS={1:1};
 // Sinergia de Vibe (passiva): nº de cartas da MESMA vibe em campo → +ATK no campo todo.
 const VIBE_SYNERGY_ON=true;
 const VIBE_SYN_2=0.10;   // 2 cartas mesma vibe → +10%
@@ -1431,12 +1441,16 @@ function currentDeckIds(){ const saved=Save.getDeck&&Save.getDeck(); if(saved&&s
 function autoDeckIds(){ const ids=[]; if(Save.data){ Save.collectionIds().forEach(id=>{ const q=Save.ownedQty(id); for(let i=0;i<q;i++)ids.push(id); }); } else { BASE_CARDS.forEach(c=>{ for(let i=0;i<c.copies;i++)ids.push(c.id); }); } shuffle(ids); return ids.slice(0,DECK_SIZE); }
 function buildAIDeck(diff,fightNum=1){
   const cfg=AI_DECKS[diff];
-  const fc=FIGHT_CURVE[fightNum]||{atkMult:1,lvDelta:0};
+  const fc=fightCurve(fightNum);
   const lv=Math.max(1,Math.min(6,cfg.lvOverride+(fc.lvDelta||0)));
   const atkMult=cfg.atkMult*(fc.atkMult||1);
-  const fl={};BASE_CARDS.forEach(c=>fl[c.id]=lv);
-  let deck=[];BASE_CARDS.forEach(c=>{const card=applyCardLevel(c,fl);card.atk=card.atk?Math.round(card.atk*atkMult):card.atk;for(let i=0;i<c.copies;i++)deck.push({...card,uid:uid()});});
-  return shuffle(deck);
+  const starCap=AI_STAR_CAP[diff]||99;
+  // curadoria: sem fusões, e respeita o teto de estrelas da dificuldade
+  const pool=BASE_CARDS.filter(c=>c.kind!=='fusion' && (c.star||0)<=starCap);
+  const fl={};pool.forEach(c=>fl[c.id]=lv);
+  let deck=[];pool.forEach(c=>{const card=applyCardLevel(c,fl);card.atk=card.atk?Math.round(card.atk*atkMult):card.atk;for(let i=0;i<c.copies;i++)deck.push({...card,uid:uid()});});
+  shuffle(deck);
+  return deck.slice(0,AI_DECK_SIZE);   // teto de cartas (antes a IA usava tudo → centenas)
 }
 
 function initFight(fightNum,difficulty,playerDeck,extraHandSize=0,extraAtbRegen=0){
@@ -1764,7 +1778,7 @@ function initFight(fightNum,difficulty,playerDeck,extraHandSize=0){
     playerField:[null,null,null,null,null],
     playerHidden:[null,null,null,null],
     playerFieldCard:null,
-    playerBase:{hp:BASE_HP,maxHp:BASE_HP},
+    playerBase:{hp:(APP.mode==='roguelite'&&APP.playerBaseHp!=null)?APP.playerBaseHp:BASE_HP, maxHp:BASE_HP},
     playerHandLimit:HAND_LIMIT,
     aiDeck:buildAIDeck(difficulty,fightNum),aiHand:[],aiGrave:[],
     aiField:[null,null,null,null,null],
@@ -1876,10 +1890,14 @@ function confirmMain(cardIdx,slotTarget){
 }
 
 function aiDecideMain(){
+  G.aiMainCard=null;G.aiMainSlot=null;
   const cands=G.aiHand.filter(isMonster);if(!cands.length)return;
-  cands.sort((a,b)=>(b.atk||0)-(a.atk||0));G.aiMainCard=cands[0];
-  for(let i=0;i<5;i++){if(!G.aiField[i]){if(i===4&&!G.aiMainCard.commander)continue;if(i<4&&G.aiMainCard.commander)continue;G.aiMainSlot=i;break;}}
-  if(G.aiMainSlot===null||G.aiMainSlot===undefined)G.aiMainCard=null;
+  cands.sort((a,b)=>(b.atk||0)-(a.atk||0));
+  // herói → slot CMD (4) se vazio; peão → primeiro slot 0..3 livre
+  for(const c of cands){
+    if(isCommander(c)){ if(!G.aiField[4]){G.aiMainCard=c;G.aiMainSlot=4;return;} }
+    else { const s=[0,1,2,3].find(i=>!G.aiField[i]); if(s!=null){G.aiMainCard=c;G.aiMainSlot=s;return;} }
+  }
 }
 function applyAiMain(){
   if(!G.aiMainCard||G.aiMainSlot===null||G.aiMainSlot===undefined)return;
@@ -2084,6 +2102,9 @@ function computeFieldAtk(side){
   let base=0;
   field.forEach((c,i)=>{ if(!c)return; const d=oppField[i]; base+=getEffAtk(c)*vibeAdvMult(c.vibe,d&&d.vibe); });
   base*=vibeSynergyMult(field);
+  // COMANDANTE (herói no slot CMD): +20% ATK por carta da mesma cor no seu campo
+  const cmd=field[4];
+  if(isCommander(cmd)){ const same=field.filter(c=>c&&c.vibe===cmd.vibe).length; base*=(1+COMMANDER_BONUS*same); }
   base*=(m.atkMult||1);
   base+=(m.atkFlat||0);
   return Math.max(0,Math.round(base));
@@ -2153,14 +2174,24 @@ function endFight(winner){
   if(G.gameOver)return;G.gameOver=true;G.winner=winner;
   if(winner==='player'){addScore(500+G.turn*10);showMsg('🏆 VITÓRIA!','green');}else{showMsg('💀 Derrota...','red');}
   APP.fightScore[G.fightNum-1]=G.score;APP.totalScore+=G.score;
-  if(Save.data){ Save.recordDuel(); if(winner==='player')Save.addMoney(APP.mode==='free'?30:50); }
-  setTimeout(()=>{if(APP.mode!=='free'&&winner==='player'&&G.fightNum<3)showRewardScreen();else showEndScreen(winner);},1800);
+  if(G.playerBase)APP.playerBaseHp=G.playerBase.hp;   // HP da base persiste entre fights do roguelite
+  if(Save.data){ Save.recordDuel(); if(winner==='player')Save.addMoney(100); }   // ganho fixo +100 por vitória
+  const total=APP.totalFights||3;
+  if(winner==='player'&&APP.mode==='roguelite'&&APP.isBossRun&&G.fightNum>=total) grantBossBonus();
+  setTimeout(()=>{if(APP.mode!=='free'&&winner==='player'&&G.fightNum<total)showRewardScreen();else showEndScreen(winner);},1800);
+}
+function grantBossBonus(){
+  if(!Save.data)return;
+  const pool=BASE_CARDS.filter(c=>c.kind!=='fusion');
+  const c=pool[Math.floor(Math.random()*pool.length)];
+  Save.addCard(c.id,1); Save.persist();
+  showMsg(`👑 CHEFE DERROTADO! Item bônus: ${c.name} foi pra sua coleção!`,'green'); playSFX('reward');
 }
 function addScore(p){G.score+=p;const el=document.getElementById('score-display');if(el){animateNumber(el,G.score);el.style.transform='scale(1.2)';el.style.color=p>0?'#81c784':'#e63946';setTimeout(()=>{el.style.transform='scale(1)';el.style.color='var(--gold)';},300);}}
 
 let APP={playerName:'',difficulty:'easy',mode:'menu',fightNum:1,totalScore:0,fightScore:[0,0,0],playerDeck:[],extraHandSize:0};
 function foeName(){ return (APP&&APP.opponentName)||'Oponente'; }   // nome do adversário (puxado no Duelo Livre)
-function startFight(){showScreen('game');initFight(APP.fightNum,APP.difficulty,APP.playerDeck,APP.extraHandSize);bfInit();updateBaseUI();updateFieldUI();updateDeckUI();{const _sd=document.getElementById('score-display');if(_sd)_sd.textContent=G.score;}const lbl=APP.mode==='free'?'Duelo Livre':'Fight '+APP.fightNum+'/3';const fi=document.getElementById('fight-info');if(fi)fi.textContent=`${lbl} · ${AI_DECKS[APP.difficulty].label}`;startMusic();showMsg(`⚔ ${lbl} — ${AI_DECKS[APP.difficulty].label}!`,'green');startPhase('draw');}
+function startFight(){showScreen('game');initFight(APP.fightNum,APP.difficulty,APP.playerDeck,APP.extraHandSize);bfInit();updateBaseUI();updateFieldUI();updateDeckUI();{const _sd=document.getElementById('score-display');if(_sd)_sd.textContent=G.score;}const lbl=APP.mode==='free'?'Duelo Livre':((APP.isBossRun&&APP.fightNum>=(APP.totalFights||3))?'👑 CHEFE':'Batalha '+APP.fightNum+'/'+(APP.totalFights||3));const fi=document.getElementById('fight-info');if(fi)fi.textContent=`${lbl} · ${AI_DECKS[APP.difficulty].label}`;startMusic();showMsg(`⚔ ${lbl} — ${AI_DECKS[APP.difficulty].label}!`,'green');startPhase('draw');}
 function showRewardScreen(){showScreen('reward');playSFX('reward');const opts=generateRewards(3);const cont=document.getElementById('reward-options');cont.innerHTML='';opts.forEach(opt=>{const d=document.createElement('div');d.className='reward-card';const cat=opt.cat==='unit'?'<span class="reward-cat cat-unit">UNIDADE</span>':opt.cat==='artifact'?'<span class="reward-cat cat-artifact">ARTEFATO</span>':'';d.innerHTML=`${cat}<div class="reward-icon">${opt.icon}</div><div class="reward-title">${opt.title}</div><div class="reward-desc">${opt.desc}</div>`;d.onclick=()=>pickReward(opt);cont.appendChild(d);});document.getElementById('reward-fight-score').textContent=G.score;document.getElementById('reward-total-score').textContent=APP.totalScore;}
 // IDs únicos de unidades que o player REALMENTE tem no baralho desta run.
 function deckMonsterIds(){const s=new Set();(APP.playerDeck||[]).forEach(c=>{if(isMonster(c))s.add(c.id);});return [...s];}
@@ -2366,9 +2397,11 @@ function updateHud(){
 
 // ── ROGUELITE (fluxo de 3 fights existente, reconectado ao menu) ──
 function startRoguelite(){
-  const diff=document.querySelector('input[name="rsdiff"]:checked')?.value||'easy';
-  APP.mode='roguelite'; APP.opponentName='Oponente'; APP.playerName=APP.playerName||(Save.data&&Save.data.name)||'BC'; APP.difficulty=diff;
-  APP.fightNum=1; APP.totalScore=0; APP.fightScore=[0,0,0]; APP.playerDeck=buildPlayerDeck(); APP.extraHandSize=0;
+  const modeId=document.querySelector('input[name="rsdiff"]:checked')?.value||'rapido';
+  const M=ROGUE_MODES[modeId]||ROGUE_MODES.rapido;
+  APP.mode='roguelite'; APP.rogueMode=modeId; APP.totalFights=M.fights; APP.isBossRun=!!M.boss;
+  APP.opponentName='Oponente'; APP.playerName=APP.playerName||(Save.data&&Save.data.name)||'BC'; APP.difficulty=M.aiBase;
+  APP.fightNum=1; APP.totalScore=0; APP.fightScore=new Array(M.fights).fill(0); APP.playerBaseHp=BASE_HP; APP.playerDeck=buildPlayerDeck(); APP.extraHandSize=0;
   if(Save.data){ Save.data.runs=(Save.data.runs||0)+1; Save.touch(); }
   startFight();
 }
@@ -2695,11 +2728,11 @@ function renderFC(card,side){
   const hb=document.createElement('div');hb.className='fc-hpbar';const hf=document.createElement('div');hf.className='fc-hpfill';const pct=Math.max(0,card.currentHp/card.maxHp*100);hf.style.width=pct+'%';hf.style.background=pct>60?'#4caf50':pct>25?'#ff9800':'#f44336';hb.appendChild(hf);info.appendChild(hb);
   const st=document.createElement('div');st.className='fc-stats';st.innerHTML=`<span class="fc-hp">❤${card.currentHp}</span><span class="fc-atk">⚔${getEffAtk(card)}</span>`;info.appendChild(st);
   div.appendChild(info);
-  div.onclick=(e)=>{e.stopPropagation();showCardDetail(card);};
-  div.oncontextmenu=(e)=>{e.preventDefault();showCardDetail(card);};
+  div.onclick=(e)=>{e.stopPropagation();bfInspect(card);};            // inspetor (rail) com valores ATUAIS
+  div.oncontextmenu=(e)=>{e.preventDefault();showCardDetail(card);};   // modal completo
   return div;
 }
-function highlightSlots(){const card=G.selectedHandCard;if(!card)return;for(let i=0;i<5;i++){const el=document.getElementById(`player-slot-${i}`);if(!el)continue;if(i===4&&card.commander)el.classList.add('selectable');else if(i<4&&!card.commander&&isMonster(card))el.classList.add('selectable');}}
+function highlightSlots(){const card=G.selectedHandCard;if(!card)return;for(let i=0;i<5;i++){const el=document.getElementById(`player-slot-${i}`);if(!el)continue;if(i===4&&isCommander(card))el.classList.add('selectable');else if(i<4&&!isCommander(card)&&isMonster(card))el.classList.add('selectable');}}
 function clearSlotHighlights(){for(let i=0;i<5;i++){const el=document.getElementById(`player-slot-${i}`);if(el)el.classList.remove('selectable','selected-slot');}}
 function updateDeckUI(){const dc=document.getElementById('deck-count');if(dc)dc.textContent=G.playerDeck.length;}
 function setActionBar(html){const bar=document.getElementById('action-bar');if(bar)bar.innerHTML=html;}
@@ -2814,10 +2847,10 @@ function bfPlay(i,at){
   if(G.phase==='main'){
     if(G.mainConfirmed){bfToast('Você já agiu nesta fase');return;}
     if(!isMonster(card)){bfToast('Monstros só na DOWN FASE — itens na fase ITENS');return;}
-    let slot=at&&at.kind==='slot'?at.idx:(card.commander?4:[0,1,2,3].find(n=>!G.playerField[n]));
+    let slot=at&&at.kind==='slot'?at.idx:(isCommander(card)?4:[0,1,2,3].find(n=>!G.playerField[n]));
     if(slot==null){bfToast('Sem slot livre — solte numa casa vazia');return;}
-    if(slot===4&&!card.commander){bfToast('Só o Comandante ocupa o slot CMD');return;}
-    if(slot<4&&card.commander){bfToast('O Comandante vai no slot CMD');return;}
+    if(slot===4&&!isCommander(card)){bfToast('Só HERÓIS ocupam o slot de Comandante');return;}
+    if(slot<4&&isCommander(card)){bfToast('Herói vai no slot CMD (vira Comandante)');return;}
     if(G.playerField[slot]){bfToast('Esse slot já está ocupado');return;}
     confirmMain(i,slot);
   } else if(G.phase==='lastminute'){
@@ -2915,11 +2948,12 @@ function bfToast(msg){ const t=document.getElementById('bf-toast'); if(!t)return
 // ── Inspetor (trilho) ──
 function bfInspect(card){ if(!card)return; const box=document.getElementById('bf-insp'); if(!box)return;
   const tc=bfTypeChip(card.type); const lv=card._lv||1; const isMon=isMonster(card); const vibe=card.vibe&&VIBES.find(v=>v.id===card.vibe);
+  const fr=(isMon&&typeof card.fieldRank==='number')?['🥉 Bronze','🥈 Prata','🥇 Ouro'][card.fieldRank]:null;   // rank ATUAL em campo
   const hp=card.currentHp!=null?card.currentHp:card.hp;
   const artBg=cardImgSrc(card)?`background:url('${cardImgSrc(card)}') center/cover`:`background:${bfGrad(card.type)}`;
   box.innerHTML=`<div class="bf-insp-art"><div style="position:absolute;inset:0;${artBg}"></div><span style="position:absolute;top:7px;left:7px;font-family:'Oswald';font-size:10px;padding:2px 8px;border-radius:6px;font-weight:600;background:${tc[1]};color:${tc[2]}">${tc[0]}</span><div style="position:absolute;left:0;right:0;bottom:0;padding:22px 9px 9px;background:linear-gradient(transparent,rgba(0,0,0,.85))"><div style="font-family:'Oswald';font-weight:600;font-size:16px">${card.name}</div></div></div>
   <div class="bf-insp-name">${card.name}</div>
-  <div class="bf-insp-tags">${isMon?`<span style="background:rgba(226,83,63,.14);border-color:rgba(226,83,63,.3);color:#f4a597">⚔ ${typeof getEffAtk==='function'?getEffAtk(card):card.atk}</span><span style="background:rgba(95,201,154,.12);border-color:rgba(95,201,154,.3);color:#9fe0c2">♥ ${hp}</span>`:''}<span style="color:var(--bf-gold)">${'★'.repeat(card.star||0)||'—'}</span>${card.cost!=null?`<span>Custo ${card.cost}</span>`:''}${card.tribute?`<span>Tributo ${card.tribute}</span>`:''}${vibe?`<span>${vibe.emoji} ${vibe.name}</span>`:''}<span style="color:var(--bf-gold)">${LV_NAMES[lv]||''}</span></div>
+  <div class="bf-insp-tags">${isMon?`<span style="background:rgba(226,83,63,.14);border-color:rgba(226,83,63,.3);color:#f4a597">⚔ ${typeof getEffAtk==='function'?getEffAtk(card):card.atk}</span><span style="background:rgba(95,201,154,.12);border-color:rgba(95,201,154,.3);color:#9fe0c2">♥ ${hp}</span>`:''}<span style="color:var(--bf-gold)">${'★'.repeat(card.star||0)||'—'}</span>${card.cost!=null?`<span>Custo ${card.cost}</span>`:''}${card.tribute?`<span>Tributo ${card.tribute}</span>`:''}${vibe?`<span>${vibe.emoji} ${vibe.name}</span>`:''}${fr?`<span style="color:var(--bf-gold)">⬆ ${fr}</span>`:''}<span style="color:var(--bf-gold)">${LV_NAMES[lv]||''}</span></div>
   <div class="bf-insp-efflbl">Efeito</div><div class="bf-insp-eff">${card.ability||card.desc||(card.special?('Habilidade especial: '+card.special):(card.kind==='trap'?'Arapuca — dispara na resolução.':card.kind==='item'?'Item — jogado na fase ITENS.':'—'))}</div>`;
   bfSetTab('insp');
 }
