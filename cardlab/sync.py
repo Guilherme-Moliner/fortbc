@@ -22,7 +22,7 @@ HTML_PATH = os.path.join(ROOT, "index.html")
 def main():
     files = set(os.listdir(CARDS_DIR)) if os.path.isdir(CARDS_DIR) else set()
 
-    with open(CSV_PATH, "r", encoding="utf-8", newline="") as f:
+    with open(CSV_PATH, "r", encoding="utf-8-sig", newline="") as f:
         rows = list(csv.reader(f))
     header, data = rows[0], [r for r in rows[1:] if r and any(c.strip() for c in r)]
     idx = {name: i for i, name in enumerate(header)}
