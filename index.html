@@ -824,7 +824,7 @@ body{background:#000;color:var(--text);font-family:'Cinzel',serif;overflow:hidde
       <div class="bf-id enemy">
         <div class="bf-id-top">
           <div class="bf-portrait enemy" id="enemy-portrait"></div>
-          <div class="bf-id-name"><div class="nm" id="enemy-name">FLORIPA</div><div class="sub">inimigo</div></div>
+          <div class="bf-id-name"><div class="nm" id="enemy-name">Oponente</div><div class="sub">inimigo</div></div>
           <div class="bf-id-lp"><div class="lbl">PV</div><b id="enemy-lp">2000</b></div>
         </div>
         <div class="bf-lpbar"><i id="enemy-lp-bar" style="width:100%"></i></div>
@@ -1078,46 +1078,46 @@ const HERO_IMAGES_B64 = {
 // ══════════════════════════════════════════════════════════════════
 const CARDS_CSV = `
 id,name,kind,type,vibe,range,star,cost,hp,atk,speed,tribute,copies,special,effect,effectVal,effectDur,emoji,ability,img
-peon_atk,Sem Terra,pawn,ATK,vermelho,melee,1,1,100,60,fast,0,3,,,,,,,
-peon_def,Malhadinho,pawn,DEF,azul,melee,1,1,200,30,slow,0,3,,,,,,,
-peon_bal,Economista,pawn,BAL,verde,mid,2,1,150,50,medium,0,3,,,,,,,
-peon_def2,Bombado,pawn,DEF,azul,melee,2,1,280,40,slow,0,3,,,,,,,
-peon_atk2,Camarada,pawn,ATK,vermelho,melee,2,1,150,80,slow,0,3,,,,,,,
-peon_atk3,Comunista,pawn,ATK,vermelho,melee,4,1,200,100,slow,0,3,,,,,,,
-peon_atk4,PTista,pawn,ATK,vermelho,melee,6,1,240,120,slow,0,3,,,,,,,
-peon_atk5,Presidente,pawn,ATK,vermelho,melee,13,1,1313,130,slow,0,3,,,,,,,
-peon_def3,Amante do Suco,pawn,DEF,azul,melee,5,1,360,60,slow,0,3,,,,,,,
-peon_def4,Trembolono,pawn,DEF,azul,melee,6,1,500,80,slow,0,3,,,,,,,
-peon_def5,Mr Olympia,pawn,DEF,azul,melee,9,1,1500,140,slow,0,3,,,,,,,
-peon_bal2,Investidor,pawn,DEF,azul,melee,4,1,200,75,slow,0,3,,,,,,,
-peon_bal3,Rico Top 1%,pawn,BAL,verde,mid,5,1,250,100,slow,0,3,,,,,,,
-peon_bal4,Banqueiro,pawn,BAL,verde,mid,8,1,400,120,slow,0,3,,,,,,,
-peon_bal5,Schead Musk,pawn,BAL,verde,mid,10,1,900,200,slow,0,3,,,,,,,
-peon_nerd,Streamer,pawn,DEF,amarelo,melee,1,1,200,30,slow,0,3,,,,,,,
-peon_nerd2,Minezeiro,pawn,DEF,amarelo,melee,2,1,280,40,slow,0,3,,,,,,,
-peon_nerd3,BoardGaymer,pawn,DEF,amarelo,melee,3,1,360,60,slow,0,3,,,,,,,
-peon_nerd4,Suequeiro,pawn,DEF,amarelo,melee,5,1,500,80,slow,0,3,,,,,,,
-peon_nerd5,Elden Lord,pawn,DEF,amarelo,melee,6,1,1500,140,slow,0,3,,,,,,,
-peon_role,Muleque Piranha,pawn,ATK,roxo,melee,1,1,100,60,slow,0,3,,,,,,,
-peon_role2,Pegador,pawn,ATK,roxo,melee,2,1,150,80,slow,0,3,,,,,,,
-peon_role3,Boleiro,pawn,ATK,roxo,melee,4,1,200,100,slow,0,3,,,,,,,
-peon_role4,PIMP,pawn,ATK,roxo,melee,5,1,240,120,slow,0,3,,,,,,,
-peon_role5,Rei do Camarote,pawn,ATK,roxo,melee,8,1,1313,130,slow,0,3,,,,,,,
+peon_atk,Sem Terra,pawn,ATK,vermelho,melee,1,1,100,60,fast,0,3,,,,,,,peon_atk.png
+peon_def,Malhadinho,pawn,DEF,azul,melee,1,1,200,30,slow,0,3,,,,,,,peon_def.png
+peon_bal,Economista,pawn,BAL,verde,mid,2,1,150,50,medium,0,3,,,,,,,peon_bal.png
+peon_def2,Bombado,pawn,DEF,azul,melee,2,1,280,40,slow,0,3,,,,,,,peon_def2.png
+peon_atk2,Camarada,pawn,ATK,vermelho,melee,2,1,150,80,slow,0,3,,,,,,,peon_atk2.png
+peon_atk3,Comunista,pawn,ATK,vermelho,melee,4,1,200,100,slow,0,3,,,,,,,peon_atk3.png
+peon_atk4,PTista,pawn,ATK,vermelho,melee,6,1,240,120,slow,0,3,,,,,,,peon_atk4.png
+peon_atk5,Presidente,pawn,ATK,vermelho,melee,13,1,1313,130,slow,0,3,,,,,,,peon_atk5.png
+peon_def3,Amante do Suco,pawn,DEF,azul,melee,5,1,360,60,slow,0,3,,,,,,,peon_def3.png
+peon_def4,Trembolono,pawn,DEF,azul,melee,6,1,500,80,slow,0,3,,,,,,,peon_def4.png
+peon_def5,Mr Olympia,pawn,DEF,azul,melee,9,1,1500,140,slow,0,3,,,,,,,peon_def5.png
+peon_bal2,Investidor,pawn,DEF,azul,melee,4,1,200,75,slow,0,3,,,,,,,peon_bal2.png
+peon_bal3,Rico Top 1%,pawn,BAL,verde,mid,5,1,250,100,slow,0,3,,,,,,,peon_bal3.png
+peon_bal4,Banqueiro,pawn,BAL,verde,mid,8,1,400,120,slow,0,3,,,,,,,peon_bal4.png
+peon_bal5,Schead Musk,pawn,BAL,verde,mid,10,1,900,200,slow,0,3,,,,,,,peon_bal5.png
+peon_nerd,Streamer,pawn,DEF,amarelo,melee,1,1,200,30,slow,0,3,,,,,,,peon_nerd.png
+peon_nerd2,Minezeiro,pawn,DEF,amarelo,melee,2,1,280,40,slow,0,3,,,,,,,peon_nerd2.png
+peon_nerd3,BoardGaymer,pawn,DEF,amarelo,melee,3,1,360,60,slow,0,3,,,,,,,peon_nerd3.png
+peon_nerd4,Suequeiro,pawn,DEF,amarelo,melee,5,1,500,80,slow,0,3,,,,,,,peon_nerd4.png
+peon_nerd5,Elden Lord,pawn,DEF,amarelo,melee,6,1,1500,140,slow,0,3,,,,,,,peon_nerd5.png
+peon_role,Muleque Piranha,pawn,ATK,roxo,melee,1,1,100,60,slow,0,3,,,,,,,peon_role.png
+peon_role2,Pegador,pawn,ATK,roxo,melee,2,1,150,80,slow,0,3,,,,,,,peon_role2.png
+peon_role3,Boleiro,pawn,ATK,roxo,melee,4,1,200,100,slow,0,3,,,,,,,peon_role3.png
+peon_role4,PIMP,pawn,ATK,roxo,melee,5,1,240,120,slow,0,3,,,,,,,peon_role4.png
+peon_role5,Rei do Camarote,pawn,ATK,roxo,melee,8,1,1313,130,slow,0,3,,,,,,,peon_role5.png
 arthur,Arthur,hero,ATK,azul,long,3,3,220,110,fast,0,1,,,,,,Long range (legado — redesenhar),
-fanta,Fanta,hero,BAL,amarelo,mid,3,3,200,70,medium,0,1,recycler,,,,,Recycler (legado),
-nathan,Nathan,hero,DEF,amarelo,melee,3,3,320,45,slow,0,1,,,,,,,
-garopaba,Garopaba,hero,ATK,vermelho,melee,4,4,250,130,medium,0,1,deathbuff,,,,,Morte heroica (legado),
-bala,Bala,hero,DEF,verde,melee,4,4,420,50,slow,0,1,provoker,,,,,Provoker (legado),
-leo,Léo,hero,ATK,roxo,melee,4,4,260,130,medium,0,1,,,,,,,
-zaga,Zaga,hero,BAL,roxo,mid,4,4,320,95,medium,0,1,,,,,,,
-vitao,Vitão,hero,BAL,azul,mid,5,5,350,80,medium,1,1,healer,,,,,Healer (legado),
-borba,Borba,hero,DEF,vermelho,melee,5,5,600,70,slow,1,1,,,,,,,
-letti,Letti,hero,ATK,verde,melee,6,6,280,160,veryfast,1,1,rusher,,,,,Rusher (legado — ignora unidades),
-churrasco,Churrasco,item,ITEM,azul,-,0,2,,,-,0,3,,heal_all,80,,🥩,Cura suas unidades +80 HP,
-energetico,Energético,item,ITEM,amarelo,-,0,2,,,-,0,3,,atk_buff,0.3,,⚡,+30% ATK no seu campo nesta resolução,
-rodada,Rodada,item,ITEM,amarelo,-,0,1,,,-,0,3,,draw2,2,,🍺,Compra 2 cartas,
-turboboost,Turbo Boost,item,ITEM,amarelo,-,0,2,,,-,0,3,,atk_buff,0.2,,💨,Turbo: +20% ATK neste turno (TODO redesenhar),
-ressurreicao,Tadalinha,item,ITEM,verde,-,0,4,,,-,0,3,,resurrect,0.5,,🔄,Revive última unidade do cemitério (50% HP),
+fanta,Fanta,hero,BAL,amarelo,mid,3,3,200,70,medium,0,1,recycler,,,,,Recycler (legado),fanta.png
+nathan,Nathan,hero,DEF,amarelo,melee,3,3,320,45,slow,0,1,,,,,,,nathan.png
+garopaba,Garopaba,hero,ATK,vermelho,melee,4,4,250,130,medium,0,1,deathbuff,,,,,Morte heroica (legado),garopaba.png
+bala,Bala,hero,DEF,verde,melee,4,4,420,50,slow,0,1,provoker,,,,,Provoker (legado),bala.png
+leo,Léo,hero,ATK,roxo,melee,4,4,260,130,medium,0,1,,,,,,,leo.png
+zaga,Zaga,hero,BAL,roxo,mid,4,4,320,95,medium,0,1,,,,,,,zaga.png
+vitao,Vitão,hero,BAL,azul,mid,5,5,350,80,medium,1,1,healer,,,,,Healer (legado),vitao.png
+borba,Borba,hero,DEF,vermelho,melee,5,5,600,70,slow,1,1,,,,,,,borba.png
+letti,Letti,hero,ATK,verde,melee,6,6,280,160,veryfast,1,1,rusher,,,,,Rusher (legado — ignora unidades),letti.png
+churrasco,Churrasco,item,ITEM,azul,-,0,2,,,-,0,3,,heal_all,80,,🥩,Cura suas unidades +80 HP,churrasco.png
+energetico,Energético,item,ITEM,amarelo,-,0,2,,,-,0,3,,atk_buff,0.3,,⚡,+30% ATK no seu campo nesta resolução,energetico.png
+rodada,Rodada,item,ITEM,amarelo,-,0,1,,,-,0,3,,draw2,2,,🍺,Compra 2 cartas,rodada.png
+turboboost,Turbo Boost,item,ITEM,amarelo,-,0,2,,,-,0,3,,atk_buff,0.2,,💨,Turbo: +20% ATK neste turno (TODO redesenhar),turboboost.png
+ressurreicao,Tadalinha,item,ITEM,verde,-,0,4,,,-,0,3,,resurrect,0.5,,🔄,Revive última unidade do cemitério (50% HP),ressurreicao.png
 reforco,Reforço,item,ITEM,verde,-,0,3,,,-,0,3,,next_hp_buff,0.5,,🛡,Próxima unidade que baixar +50% HP,
 ressaca,Ressaca,item,ITEM,amarelo,-,0,2,,,-,0,2,,debuff_all_atk,40,,🥴,Todos inimigos −40 ATK nesta resolução,
 dedinho,Dedinho Mindinho,item,ITEM,roxo,-,0,2,,,-,0,2,,debuff_strongest,0.3,,🤏,Inimigo mais forte −30% ATK,
@@ -1934,7 +1934,7 @@ function aiDecideLastMinute(){
   if(!pick)pick=items.find(c=>c.effect==='draw2')||items[0];
   const i=G.aiHand.indexOf(pick);if(i>=0)G.aiHand.splice(i,1);
   applyTurnItem(pick,'ai');G.aiGrave.push(pick);G.aiQuickUsed=true;
-  showMsg(`🤖 Floripa usou ${pick.name}!`,'orange');
+  showMsg(`🤖 ${foeName()} usou ${pick.name}!`,'orange');
 }
 
 function phaseResolution(){
@@ -1954,13 +1954,13 @@ async function resolveSequence(pAtk,aAtk){
   ov.innerHTML=`<div class="ro-row">
     <div class="ro-side"><div class="ro-lbl">VOCÊ</div><div class="ro-val you" id="ro-you">0</div></div>
     <div class="ro-vs">⚔ VS ⚔</div>
-    <div class="ro-side"><div class="ro-lbl">FLORIPA</div><div class="ro-val foe" id="ro-foe">0</div></div>
+    <div class="ro-side"><div class="ro-lbl">${foeName()}</div><div class="ro-val foe" id="ro-foe">0</div></div>
   </div><div class="ro-note" id="ro-note"></div>`;
   host.appendChild(ov);
   await tallySide('player',pAtk,document.getElementById('ro-you'));
   await tallySide('ai',aAtk,document.getElementById('ro-foe'));
   const note=document.getElementById('ro-note');
-  if(note)note.textContent = pAtk>aAtk?'💥 Você bate mais forte!' : aAtk>pAtk?'🛡️ Floripa bate mais forte!' : '⚖️ Choque equilibrado!';
+  if(note)note.textContent = pAtk>aAtk?'💥 Você bate mais forte!' : aAtk>pAtk?'🛡️ '+foeName()+' bate mais forte!' : '⚖️ Choque equilibrado!';
   await sleep(JUICE.comparePauseMs);
   ov.style.transition='opacity .25s'; ov.style.opacity='0'; await sleep(250); ov.remove();
 }
@@ -2159,7 +2159,8 @@ function endFight(winner){
 function addScore(p){G.score+=p;const el=document.getElementById('score-display');if(el){animateNumber(el,G.score);el.style.transform='scale(1.2)';el.style.color=p>0?'#81c784':'#e63946';setTimeout(()=>{el.style.transform='scale(1)';el.style.color='var(--gold)';},300);}}
 
 let APP={playerName:'',difficulty:'easy',mode:'menu',fightNum:1,totalScore:0,fightScore:[0,0,0],playerDeck:[],extraHandSize:0};
-function startFight(){showScreen('game');initFight(APP.fightNum,APP.difficulty,APP.playerDeck,APP.extraHandSize);bfInit();updateBaseUI();updateFieldUI();updateDeckUI();const lbl=APP.mode==='free'?'Duelo Livre':'Fight '+APP.fightNum+'/3';const fi=document.getElementById('fight-info');if(fi)fi.textContent=`${lbl} · ${AI_DECKS[APP.difficulty].label}`;startMusic();showMsg(`⚔ ${lbl} — ${AI_DECKS[APP.difficulty].label}!`,'green');startPhase('draw');}
+function foeName(){ return (APP&&APP.opponentName)||'Oponente'; }   // nome do adversário (puxado no Duelo Livre)
+function startFight(){showScreen('game');initFight(APP.fightNum,APP.difficulty,APP.playerDeck,APP.extraHandSize);bfInit();updateBaseUI();updateFieldUI();updateDeckUI();{const _sd=document.getElementById('score-display');if(_sd)_sd.textContent=G.score;}const lbl=APP.mode==='free'?'Duelo Livre':'Fight '+APP.fightNum+'/3';const fi=document.getElementById('fight-info');if(fi)fi.textContent=`${lbl} · ${AI_DECKS[APP.difficulty].label}`;startMusic();showMsg(`⚔ ${lbl} — ${AI_DECKS[APP.difficulty].label}!`,'green');startPhase('draw');}
 function showRewardScreen(){showScreen('reward');playSFX('reward');const opts=generateRewards(3);const cont=document.getElementById('reward-options');cont.innerHTML='';opts.forEach(opt=>{const d=document.createElement('div');d.className='reward-card';const cat=opt.cat==='unit'?'<span class="reward-cat cat-unit">UNIDADE</span>':opt.cat==='artifact'?'<span class="reward-cat cat-artifact">ARTEFATO</span>':'';d.innerHTML=`${cat}<div class="reward-icon">${opt.icon}</div><div class="reward-title">${opt.title}</div><div class="reward-desc">${opt.desc}</div>`;d.onclick=()=>pickReward(opt);cont.appendChild(d);});document.getElementById('reward-fight-score').textContent=G.score;document.getElementById('reward-total-score').textContent=APP.totalScore;}
 // IDs únicos de unidades que o player REALMENTE tem no baralho desta run.
 function deckMonsterIds(){const s=new Set();(APP.playerDeck||[]).forEach(c=>{if(isMonster(c))s.add(c.id);});return [...s];}
@@ -2189,7 +2190,7 @@ function generateRewards(n){
 }
 function rebuildPlayerDeck(){APP.playerDeck=APP.playerDeck.map(c=>{const b=BASE_CARDS.find(x=>x.id===c.id);if(!b)return c;return{...applyCardLevel(b,cardLevels),uid:c.uid};});}
 function pickReward(opt){opt.apply();APP.fightNum++;startFight();}
-function showEndScreen(winner){showScreen('end');const won=winner==='player';const t=document.getElementById('end-title');t.textContent=won?'🏆 VITÓRIA!':'💀 DERROTA';t.style.color=won?'#81c784':'#e63946';document.getElementById('end-score').textContent=APP.totalScore;document.getElementById('end-name').textContent=APP.playerName;document.getElementById('end-fights').textContent=APP.fightScore.map((s,i)=>`F${i+1}: ${s}`).join(' | ');if(won)saveScore({name:APP.playerName,score:APP.totalScore,diff:APP.difficulty,date:new Date().toLocaleDateString()});renderHighscores();}
+function showEndScreen(winner){showScreen('end');const won=winner==='player';const t=document.getElementById('end-title');t.textContent=won?'🏆 VITÓRIA!':'💀 DERROTA';t.style.color=won?'#81c784':'#e63946';document.getElementById('end-score').textContent=APP.totalScore;document.getElementById('end-name').textContent=APP.playerName;document.getElementById('end-fights').textContent=APP.fightScore.map((s,i)=>`F${i+1}: ${s}`).join(' | ');if(APP.totalScore>0)saveScore({name:APP.playerName,score:APP.totalScore,diff:APP.difficulty,date:new Date().toLocaleDateString()});renderHighscores();}
 function renderHighscores(){const sc=loadScores();const tb=document.getElementById('hs-tbody');if(!tb)return;tb.innerHTML='';sc.forEach((s,i)=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${i+1}</td><td>${s.name}</td><td style="color:var(--gold)">${s.score}</td><td>${s.diff}</td><td>${s.date||''}</td>`;tb.appendChild(tr);});}
 
 // ══════════════════════════════════════════════════════
@@ -2366,7 +2367,7 @@ function updateHud(){
 // ── ROGUELITE (fluxo de 3 fights existente, reconectado ao menu) ──
 function startRoguelite(){
   const diff=document.querySelector('input[name="rsdiff"]:checked')?.value||'easy';
-  APP.mode='roguelite'; APP.playerName=APP.playerName||(Save.data&&Save.data.name)||'BC'; APP.difficulty=diff;
+  APP.mode='roguelite'; APP.opponentName='Oponente'; APP.playerName=APP.playerName||(Save.data&&Save.data.name)||'BC'; APP.difficulty=diff;
   APP.fightNum=1; APP.totalScore=0; APP.fightScore=[0,0,0]; APP.playerDeck=buildPlayerDeck(); APP.extraHandSize=0;
   if(Save.data){ Save.data.runs=(Save.data.runs||0)+1; Save.touch(); }
   startFight();
@@ -2386,7 +2387,7 @@ function renderOpponents(){
 }
 function startFreeDuel(oppId){
   const o=OPPONENTS.find(x=>x.id===oppId)||OPPONENTS[0];
-  APP.mode='free'; APP.opponent=o.name; APP.playerName=APP.playerName||(Save.data&&Save.data.name)||'BC'; APP.difficulty=o.diff;
+  APP.mode='free'; APP.opponent=o.name; APP.opponentName=o.name; APP.playerName=APP.playerName||(Save.data&&Save.data.name)||'BC'; APP.difficulty=o.diff;
   APP.fightNum=1; APP.totalScore=0; APP.fightScore=[0,0,0]; APP.playerDeck=buildPlayerDeck(); APP.extraHandSize=0;
   startFight();
 }
@@ -2398,10 +2399,20 @@ const PASSWORD_DECKS={
 };
 function submitPassword(){
   const code=(document.getElementById('inp-pass').value||'').trim().toUpperCase();
-  const entry=PASSWORD_DECKS[code]; const msg=document.getElementById('pass-msg');
+  const msg=document.getElementById('pass-msg');
+  // 🔓 código de TESTE: libera TODAS as cartas na coleção do save
+  if(code==='TUDO'||code==='LIBERAGERAL'){
+    if(!Save.data){ msg.textContent='❌ crie uma conta primeiro'; msg.style.color='var(--red)'; return; }
+    if(!Save.data.collection)Save.data.collection={};
+    BASE_CARDS.forEach(c=>{ Save.data.collection[c.id]=Math.max(Save.ownedQty(c.id), c.copies||1); });
+    Save.persist();
+    msg.textContent='✔ TODAS as cartas liberadas! Monte em 🃏 Meu Baralho.'; msg.style.color='#81c784';
+    playSFX('reward'); setTimeout(goMenu,900); return;
+  }
+  const entry=PASSWORD_DECKS[code];
   if(!entry){ msg.textContent='❌ código inválido'; msg.style.color='var(--red)'; return; }
   msg.textContent='✔ '+entry.label+' carregado'; msg.style.color='#81c784';
-  APP.mode='free'; APP.playerName=APP.playerName||'BC'; APP.difficulty='medium';
+  APP.mode='free'; APP.opponentName='Oponente'; APP.playerName=APP.playerName||'BC'; APP.difficulty='medium';
   APP.fightNum=1; APP.totalScore=0; APP.fightScore=[0,0,0]; APP.playerDeck=entry.build(); APP.extraHandSize=0;
   setTimeout(startFight,500);
 }
@@ -2627,7 +2638,7 @@ function updateBaseUI(){
   if(yb)yb.style.width=pPct+'%'; if(eb)eb.style.width=aPct+'%';
   const yl=document.getElementById('you-lp'),el=document.getElementById('enemy-lp');
   if(yl)animateNumber(yl,Math.max(0,pb.hp)); if(el)animateNumber(el,Math.max(0,ab.hp));
-  setText('enemy-name',(APP&&APP.opponentName)||'FLORIPA');
+  setText('enemy-name',foeName());
   setText('player-name',(Save&&Save.data&&Save.data.name)||(APP&&APP.playerName)||'BC');
   setText('you-deck',G.playerDeck.length); setText('enemy-deck',G.aiDeck.length);
   setText('you-hand',G.playerHand.length); setText('enemy-hand',G.aiHand.length);
@@ -2925,7 +2936,7 @@ function bfLog(txt,cls){ if(!txt)return; BF_LOG.unshift({txt,cls}); if(BF_LOG.le
 function bfOpenModal(id){ bfCloseModal(); const m=document.getElementById('bf-modal-'+id); if(m)m.classList.add('open'); if(id==='decklist')bfRenderDeckList(); if(id==='settings'){bfRenderThemeGrid();bfRenderToggles();} }
 function bfCloseModal(){ [...document.querySelectorAll('.bf-modal.open')].forEach(m=>m.classList.remove('open')); }
 function bfOpenGrave(side){ const grave=side==='player'?G.playerGrave:G.aiGrave; window.__bfGrave=grave;
-  const nm=side==='player'?((Save&&Save.data&&Save.data.name)||'BC'):((APP&&APP.opponentName)||'FLORIPA'); setText('bf-grave-title','CEMITÉRIO · '+nm);
+  const nm=side==='player'?((Save&&Save.data&&Save.data.name)||'BC'):(foeName()); setText('bf-grave-title','CEMITÉRIO · '+nm);
   const grid=document.getElementById('bf-grave-grid');
   grid.innerHTML=grave.length?grave.map((c,idx)=>`<div class="bf-gravecard" onclick="bfInspect(window.__bfGrave[${idx}])">${bfCardArt(c)}</div>`).join(''):`<div style="grid-column:1/-1;text-align:center;color:var(--bf-ink3);padding:30px">Cemitério vazio</div>`;
   bfCloseModal(); const m=document.getElementById('bf-modal-grave'); if(m)m.classList.add('open'); }

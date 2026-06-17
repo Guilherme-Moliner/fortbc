@@ -29,7 +29,16 @@ Cada carta tem a coluna **`img`** na base (`GAME_DATA.csv` / `CARDS_CSV`). O jog
    - Carta nova: clique **📋 Copiar linha CSV (p/ planilha)** e cole na planilha de apoio (ou me mande a linha que eu sincronizo no `CARDS_CSV`/`GAME_DATA.csv`).
 10. **Commit + push** (ou me peça). O GitHub Pages atualiza e a carta aparece no jogo. ✅
 
+## Sincronização (o passo "sincroniza")
+O jogo lê o bloco **`CARDS_CSV` embutido no `index.html`** — não a `GAME_DATA.csv` direto. Pra refletir a planilha no jogo existe o script:
+
+```
+python cardlab/sync.py
+```
+
+Ele: (1) lê `assets/cards/`, (2) preenche a coluna `img` de toda carta cujo `<id>.png` existe na pasta, (3) reescreve a `GAME_DATA.csv`, (4) copia tudo pro `CARDS_CSV` do `index.html`, e (5) avisa sobre `img` apontando p/ arquivo inexistente. **Basta me dizer "sincroniza" que eu rodo.**
+
 ## Fluxo combinado com o Claude (aqui)
 - Você planeja/edita na **planilha de apoio** e produz as artes no **Card Lab** (com os amigos / outra IA).
-- Me manda as linhas novas/alteradas (ou o link da planilha) → eu atualizo `CARDS_CSV` + `GAME_DATA.csv`, valido e deixo o GitHub atualizado.
+- Me manda as linhas novas/alteradas (ou o link da planilha) → eu rodo o `sync.py` (atualiza `CARDS_CSV` + `GAME_DATA.csv`), valido e deixo o GitHub atualizado.
 - Meta: chegar a ~100 cartas. A base já tem o esqueleto (vibes, fusão, itens, arapucas) — falta encher de conteúdo.

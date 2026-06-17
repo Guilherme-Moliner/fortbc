@@ -260,6 +260,23 @@ O engine real-time (lanes, ATB, gameLoop, etc.) ainda existe nas linhas 514-825 
 
 > **Fase de POLISH (v5.1):** o gameplay V1 turn-based foi testado e funciona mecanicamente. O backlog de polish está detalhado em **`POLISH.md`**, separando o que precisa de decisão criativa do usuário (🗣️ CHAT) do que é implementação direta (🔧). Consultar antes de iniciar polish.
 
+### Sessão 2026-06-16 — Cartas (leva 2) + correções de playtest
+**Feito:**
+- [x] `cardlab/sync.py` — sincroniza `GAME_DATA.csv` → `CARDS_CSV` embutido no index.html (e preenche `img` pelas artes em `assets/cards/`). **É o mecanismo do "sincroniza":** rodar `python cardlab/sync.py`.
+- [x] 39 cartas passaram a exibir a arte (coluna `img` preenchida). Fusões ainda usam emoji até mover as artes de `Imagens/` → `assets/cards/` com nome web-safe.
+- [x] Adversário: helper `foeName()` — padrão **"Oponente"**; Duelo Livre puxa o nome do oponente. (Bug corrigido: a tela lia `APP.opponentName`, mas o free duel setava `APP.opponent`.)
+- [x] Password de **TESTE** `TUDO`/`LIBERAGERAL` — libera todas as cartas na coleção (`submitPassword`).
+- [x] Placar (`#score-display`) reseta no início de cada fight (antes "grudava" da partida anterior).
+- [x] Score salvo ao terminar com `totalScore>0` (antes só na vitória → perdia run abandonada após já ter vencido fights).
+
+**Achados do playtest (backlog a tratar — Game Mechanics):**
+- [ ] Baralho da IA usa **TODAS** as cartas (sem limite/curadoria) → ~150-200 cartas, inclui peões de vibe (Brotinho/Caótico). Limitar tamanho + curar por dificuldade.
+- [ ] IA no Mestre já começa com cartas nível Ouro (`lvOverride 4` − curva). Revisar curva de nível por fight.
+- [ ] Dinheiro é fixo (+50 roguelite / +30 free por vitória), **não** proporcional ao score. Decidir se vira proporcional.
+- [ ] HP da base reseta a cada fight; usuário quer que **não** recupere por meios normais (só itens) — persistir HP entre os 3 fights do roguelite.
+- [ ] Recompensa "Recrutar" entra só no baralho DA RUN (`APP.playerDeck`), não na coleção permanente — confirmar expectativa / repro.
+- [ ] Boss final no roguelite + item bônus ao vencer.
+
 ### Concluído
 - [x] Testar o fluxo completo do jogo turn-based — OK (2026-06-12)
 - [x] Sistema de Menu completo (title, name/load, menu, campanha-esqueleto, roguelite, duelo livre, biblioteca, password) + abstração `Save` com stub cloud — OK (2026-06-13)
