@@ -129,7 +129,10 @@ body{background:#000;color:var(--text);font-family:'Cinzel',serif;overflow:hidde
 
 /* BOTTOM */
 #bottom{flex-shrink:0;background:var(--bg2);border-top:1px solid var(--border);}
-#action-bar{height:30px;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 10px;font-size:.64rem;border-bottom:1px solid var(--border);}
+#action-bar{min-height:50px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px;padding:7px 10px;font-size:.64rem;line-height:1.25;text-align:center;border-bottom:1px solid var(--border);}
+.bf-runbuffs{margin-top:6px;display:flex;flex-direction:column;gap:3px;max-height:130px;overflow:auto;font-size:.56rem;padding:5px 7px;background:rgba(0,0,0,.22);border-radius:8px;}
+.bf-runbuffs .rb-title{font-family:'Oswald';letter-spacing:.5px;color:var(--bf-gold,#f0b429);opacity:.85;margin-bottom:2px;}
+.bf-runbuffs .rb-item{display:flex;gap:5px;align-items:center;line-height:1.3;}
 .action-hint{color:var(--dim);letter-spacing:1px;}.action-info{color:var(--text);}.action-warn{color:#ff9800;}
 .play-btn{padding:3px 12px;border-radius:10px;cursor:pointer;font-family:'Cinzel',serif;font-size:.5rem;font-weight:700;letter-spacing:1px;transition:all .15s;}
 .play-btn.confirm{border:1px solid #4caf50;background:rgba(76,175,80,.15);color:#81c784;}
@@ -802,10 +805,11 @@ body{background:#000;color:var(--text);font-family:'Cinzel',serif;overflow:hidde
   <!-- ===== TOPBAR ===== -->
   <div id="bf-top">
     <div class="bf-turn">Turno <b id="turn-num">1</b></div>
+    <div class="bf-turn" id="bf-battle" style="display:none"></div>
     <div id="phase-track">
       <span class="bf-phase" id="ps-draw">DRAW</span>
       <span class="bf-phase" id="ps-standby">STANDBY</span>
-      <span class="bf-phase" id="ps-main">DOWN FASE</span>
+      <span class="bf-phase" id="ps-main">GUERREIROS</span>
       <span class="bf-phase" id="ps-lastminute">ITENS</span>
       <span class="bf-phase" id="ps-resolution">RESOLUÇÃO</span>
     </div>
@@ -854,6 +858,7 @@ body{background:#000;color:var(--text);font-family:'Cinzel',serif;overflow:hidde
       </div>
       <!-- barra de ação da fase (texto + botão passar) -->
       <div id="action-bar" class="bf-actionbar"><span class="action-hint">—</span></div>
+      <div id="run-buffs" class="bf-runbuffs" style="display:none"></div>
     </div>
 
     <!-- CENTER: board -->
@@ -1195,25 +1200,25 @@ const BASE_CARDS = parseCardsCSV(CARDS_CSV);
 // Fonte única: bloco FUSIONS_CSV abaixo (espelhado em FUSIONS.csv). Linhas # = comentário.
 //  mode=general → a,b são VIBES; mode=specific → a,b são IDs de carta (specific tem prioridade).
 const FUSIONS_CSV = `
-mode,a,b,result,note
-recipe,postura:muro,postura:muro,fus_tanque,Dois Muros (prioridade postura)
-recipe,postura:labia,postura:labia,fus_mestrecerimonia,Duas Labias (prioridade postura)
-recipe,vibe:amarelo,vibe:amarelo,fus_resenha,Nerdola + Nerdola
-recipe,vibe:amarelo,vibe:vermelho,fus_brigarole,Nerdola + Socialista
-recipe,vibe:amarelo,vibe:azul,fus_camarote,Nerdola + Marombeiro
-recipe,vibe:amarelo,vibe:roxo,fus_apagao,Nerdola + Rolezeiro
-recipe,vibe:amarelo,vibe:verde,fus_resistencia,Nerdola + Dinheirista
-recipe,vibe:vermelho,vibe:vermelho,fus_marombeiro,Socialista + Socialista
-recipe,vibe:vermelho,vibe:azul,fus_leaochacara,Socialista + Marombeiro
-recipe,vibe:vermelho,vibe:roxo,fus_climao,Socialista + Rolezeiro
-recipe,vibe:vermelho,vibe:verde,fus_tanque,Socialista + Dinheirista
-recipe,vibe:azul,vibe:azul,fus_mestrecerimonia,Marombeiro + Marombeiro
-recipe,vibe:azul,vibe:roxo,fus_mentemestra,Marombeiro + Rolezeiro
-recipe,vibe:azul,vibe:verde,fus_zen,Marombeiro + Dinheirista
-recipe,vibe:roxo,vibe:roxo,fus_surto,Rolezeiro + Rolezeiro
-recipe,vibe:roxo,vibe:verde,fus_mauelemento,Rolezeiro + Dinheirista
-recipe,vibe:verde,vibe:verde,fus_brotheragem,Dinheirista + Dinheirista
-specific,arthur,letti,fus_lenda,Arthur + Letti
+mode,a,b,result,note
+recipe,postura:muro,postura:muro,fus_tanque,Dois Muros (prioridade postura)
+recipe,postura:labia,postura:labia,fus_mestrecerimonia,Duas Labias (prioridade postura)
+recipe,vibe:amarelo,vibe:amarelo,fus_resenha,Nerdola + Nerdola
+recipe,vibe:amarelo,vibe:vermelho,fus_brigarole,Nerdola + Socialista
+recipe,vibe:amarelo,vibe:azul,fus_camarote,Nerdola + Marombeiro
+recipe,vibe:amarelo,vibe:roxo,fus_apagao,Nerdola + Rolezeiro
+recipe,vibe:amarelo,vibe:verde,fus_resistencia,Nerdola + Dinheirista
+recipe,vibe:vermelho,vibe:vermelho,fus_marombeiro,Socialista + Socialista
+recipe,vibe:vermelho,vibe:azul,fus_leaochacara,Socialista + Marombeiro
+recipe,vibe:vermelho,vibe:roxo,fus_climao,Socialista + Rolezeiro
+recipe,vibe:vermelho,vibe:verde,fus_tanque,Socialista + Dinheirista
+recipe,vibe:azul,vibe:azul,fus_mestrecerimonia,Marombeiro + Marombeiro
+recipe,vibe:azul,vibe:roxo,fus_mentemestra,Marombeiro + Rolezeiro
+recipe,vibe:azul,vibe:verde,fus_zen,Marombeiro + Dinheirista
+recipe,vibe:roxo,vibe:roxo,fus_surto,Rolezeiro + Rolezeiro
+recipe,vibe:roxo,vibe:verde,fus_mauelemento,Rolezeiro + Dinheirista
+recipe,vibe:verde,vibe:verde,fus_brotheragem,Dinheirista + Dinheirista
+specific,arthur,letti,fus_lenda,Arthur + Letti
 `;
 function fuseKey(a,b){return [a,b].sort().join('|');}
 // Características da carta usadas nas receitas de fusão. (type/range/cost/speed mantêm a chave no CSV; aqui são re-rotulados.)
@@ -1410,7 +1415,9 @@ const BUFF_POOL=[
   {id:'def18', label:'+18% HP nas unidades 🛡 DEFESA',   icon:'🛡️', apply:d=>d.forEach(c=>{if(c.type==='DEF'&&c.hp)c.hp=Math.round(c.hp*1.18);})},
   {id:'atkbal',label:'+15% ATK nas unidades ⚖ EQUILÍBRIO',icon:'⚖️',apply:d=>d.forEach(c=>{if(c.type==='BAL'&&c.atk)c.atk=Math.round(c.atk*1.15);})},
   {id:'draw1', label:'+1 carta na mão inicial', icon:'🃏', apply:(d,A)=>{A.extraHandSize=(A.extraHandSize||0)+1;}},
+  {id:'fusion1',label:'+1 fusão por turno', icon:'🌀', apply:(d,A)=>{A.fusionsPerTurn=(A.fusionsPerTurn||1)+1;}},
 ];
+function fusionLimit(){ return (typeof APP!=='undefined'&&APP.fusionsPerTurn)||1; }  // fusões por turno (rogue pode subir via artefato)
 function buffAffects(b,deck){
   switch(b.id){
     case 'def18':  return deck.some(c=>c.type==='DEF'&&c.hp);
@@ -1818,7 +1825,7 @@ function startPhase(phase){
 
 function phaseDraw(){
   // novo turno: zera buffs/debuffs temporários e o "1 carta rápida por turno"
-  G.mods=newMods(); G.playerQuickUsed=false; G.aiQuickUsed=false;
+  G.mods=newMods(); G.playerQuickUsed=false; G.aiQuickUsed=false; G.fusionsUsed=0;
   // turno 1 já recebeu a mão inicial no initFight; a partir do turno 2, +1/turno (acumula até o teto)
   if(G.turn>1){
     if(G.playerHand.length<HAND_LIMIT&&G.playerDeck.length)G.playerHand.push(G.playerDeck.shift());
@@ -1844,7 +1851,14 @@ function phaseStandby(){
 function phaseMain(){
   G.selectedHandCard=null;G.selectedHandIdx=null;G.mainConfirmed=false;G.aiMainCard=null;G.aiMainSlot=null;
   aiDecideMain();
-  setActionBar(MAIN_HINT);
+  // sem monstros na mão → passa sozinho (igual à fase de itens)
+  if(!G.playerHand.some(isMonster)){
+    setActionBar(`<span class="action-hint">⬇ GUERREIROS — sem monstros na mão, passando…</span>`);
+    renderHand();clearSlotHighlights();
+    setTimeout(()=>{ if(G.phase==='main'&&!G.mainConfirmed)confirmMain(-1,-1); },1300);
+    return;
+  }
+  setActionBar(phaseMainHint());
   renderHand();clearSlotHighlights();
 }
 
@@ -1852,7 +1866,7 @@ function phaseMain(){
 function isMonster(c){return c&&(c.kind==='pawn'||c.kind==='hero'||c.kind==='fusion');}
 function isQuickCard(c){return c&&(c.kind==='item'||c.kind==='trap');}
 
-const MAIN_HINT=`<span class="action-hint">⬇ DOWN FASE — baixe 1 monstro (clique na carta e no slot) ou passe</span><button class="play-btn pass" onclick="confirmMain(-1,-1)">Passar</button>`;
+function phaseMainHint(){ return `<span class="action-hint">⬇ GUERREIROS — baixe 1 monstro ou passe · 🌀 ${G.fusionsUsed||0}/${fusionLimit()} fusões</span><button class="play-btn pass" onclick="confirmMain(-1,-1)">Passar</button>`; }
 
 function selectHandCard(idx){
   if(G.phase==='lastminute'){selectQuickCard(idx);return;}
@@ -1860,7 +1874,7 @@ function selectHandCard(idx){
   const card=G.playerHand[idx];
   if(isQuickCard(card)){showMsg('Itens e arapucas se jogam na fase 🎒 ITENS','orange');playSFX('ui_error');return;}
   playSFX('ui_card_select');
-  if(G.selectedHandIdx===idx){G.selectedHandIdx=null;G.selectedHandCard=null;clearSlotHighlights();setActionBar(MAIN_HINT);}
+  if(G.selectedHandIdx===idx){G.selectedHandIdx=null;G.selectedHandCard=null;clearSlotHighlights();setActionBar(phaseMainHint());}
   else{G.selectedHandIdx=idx;G.selectedHandCard=card;highlightSlots();setActionBar(`<span class="action-info">${card.name} selecionada — escolha o slot</span><button class="play-btn pass" onclick="confirmMain(-1,-1)">Passar</button>`);}
   renderHand();
 }
@@ -2191,7 +2205,14 @@ function addScore(p){G.score+=p;const el=document.getElementById('score-display'
 
 let APP={playerName:'',difficulty:'easy',mode:'menu',fightNum:1,totalScore:0,fightScore:[0,0,0],playerDeck:[],extraHandSize:0};
 function foeName(){ return (APP&&APP.opponentName)||'Oponente'; }   // nome do adversário (puxado no Duelo Livre)
-function startFight(){showScreen('game');initFight(APP.fightNum,APP.difficulty,APP.playerDeck,APP.extraHandSize);bfInit();updateBaseUI();updateFieldUI();updateDeckUI();{const _sd=document.getElementById('score-display');if(_sd)_sd.textContent=G.score;}const lbl=APP.mode==='free'?'Duelo Livre':((APP.isBossRun&&APP.fightNum>=(APP.totalFights||3))?'👑 CHEFE':'Batalha '+APP.fightNum+'/'+(APP.totalFights||3));const fi=document.getElementById('fight-info');if(fi)fi.textContent=`${lbl} · ${AI_DECKS[APP.difficulty].label}`;startMusic();showMsg(`⚔ ${lbl} — ${AI_DECKS[APP.difficulty].label}!`,'green');startPhase('draw');}
+function startFight(){showScreen('game');initFight(APP.fightNum,APP.difficulty,APP.playerDeck,APP.extraHandSize);bfInit();updateBaseUI();updateFieldUI();updateDeckUI();{const _sd=document.getElementById('score-display');if(_sd)_sd.textContent=G.score;}const lbl=APP.mode==='free'?'Duelo Livre':((APP.isBossRun&&APP.fightNum>=(APP.totalFights||3))?'👑 CHEFE':'Batalha '+APP.fightNum+'/'+(APP.totalFights||3));const fi=document.getElementById('fight-info');if(fi)fi.textContent=`${lbl} · ${AI_DECKS[APP.difficulty].label}`;const bb=document.getElementById('bf-battle');if(bb){bb.textContent=lbl;bb.style.display=APP.mode==='free'?'none':'';}renderRunBuffs();startMusic();showMsg(`⚔ ${lbl} — ${AI_DECKS[APP.difficulty].label}!`,'green');startPhase('draw');}
+function renderRunBuffs(){
+  const el=document.getElementById('run-buffs'); if(!el)return;
+  const list=(APP.mode!=='free'&&APP.runBuffs)||[];
+  if(!list.length){el.style.display='none';el.innerHTML='';return;}
+  el.style.display='';
+  el.innerHTML='<div class="rb-title">🎁 Coletado na run</div>'+list.map(b=>`<div class="rb-item"><span>${b.icon||'•'}</span><span>${b.title||''}</span></div>`).join('');
+}
 function showRewardScreen(){showScreen('reward');playSFX('reward');const opts=generateRewards(3);const cont=document.getElementById('reward-options');cont.innerHTML='';opts.forEach(opt=>{const d=document.createElement('div');d.className='reward-card';const cat=opt.cat==='unit'?'<span class="reward-cat cat-unit">UNIDADE</span>':opt.cat==='artifact'?'<span class="reward-cat cat-artifact">ARTEFATO</span>':'';d.innerHTML=`${cat}<div class="reward-icon">${opt.icon}</div><div class="reward-title">${opt.title}</div><div class="reward-desc">${opt.desc}</div>`;d.onclick=()=>pickReward(opt);cont.appendChild(d);});document.getElementById('reward-fight-score').textContent=G.score;document.getElementById('reward-total-score').textContent=APP.totalScore;}
 // IDs únicos de unidades que o player REALMENTE tem no baralho desta run.
 function deckMonsterIds(){const s=new Set();(APP.playerDeck||[]).forEach(c=>{if(isMonster(c))s.add(c.id);});return [...s];}
@@ -2220,7 +2241,7 @@ function generateRewards(n){
   return shuffle(pool).slice(0,n);
 }
 function rebuildPlayerDeck(){APP.playerDeck=APP.playerDeck.map(c=>{const b=BASE_CARDS.find(x=>x.id===c.id);if(!b)return c;return{...applyCardLevel(b,cardLevels),uid:c.uid};});}
-function pickReward(opt){opt.apply();APP.fightNum++;startFight();}
+function pickReward(opt){opt.apply(); if(APP.runBuffs)APP.runBuffs.push({icon:opt.icon,title:opt.title,cat:opt.cat}); APP.fightNum++;startFight();}
 function showEndScreen(winner){showScreen('end');const won=winner==='player';const t=document.getElementById('end-title');t.textContent=won?'🏆 VITÓRIA!':'💀 DERROTA';t.style.color=won?'#81c784':'#e63946';document.getElementById('end-score').textContent=APP.totalScore;document.getElementById('end-name').textContent=APP.playerName;document.getElementById('end-fights').textContent=APP.fightScore.map((s,i)=>`F${i+1}: ${s}`).join(' | ');if(APP.totalScore>0)saveScore({name:APP.playerName,score:APP.totalScore,diff:APP.difficulty,date:new Date().toLocaleDateString()});renderHighscores();}
 function renderHighscores(){const sc=loadScores();const tb=document.getElementById('hs-tbody');if(!tb)return;tb.innerHTML='';sc.forEach((s,i)=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${i+1}</td><td>${s.name}</td><td style="color:var(--gold)">${s.score}</td><td>${s.diff}</td><td>${s.date||''}</td>`;tb.appendChild(tr);});}
 
@@ -2401,7 +2422,7 @@ function startRoguelite(){
   const M=ROGUE_MODES[modeId]||ROGUE_MODES.rapido;
   APP.mode='roguelite'; APP.rogueMode=modeId; APP.totalFights=M.fights; APP.isBossRun=!!M.boss;
   APP.opponentName='Oponente'; APP.playerName=APP.playerName||(Save.data&&Save.data.name)||'BC'; APP.difficulty=M.aiBase;
-  APP.fightNum=1; APP.totalScore=0; APP.fightScore=new Array(M.fights).fill(0); APP.playerBaseHp=BASE_HP; APP.playerDeck=buildPlayerDeck(); APP.extraHandSize=0;
+  APP.fightNum=1; APP.totalScore=0; APP.fightScore=new Array(M.fights).fill(0); APP.playerBaseHp=BASE_HP; APP.playerDeck=buildPlayerDeck(); APP.extraHandSize=0; APP.fusionsPerTurn=1; APP.runBuffs=[];
   if(Save.data){ Save.data.runs=(Save.data.runs||0)+1; Save.touch(); }
   startFight();
 }
@@ -2599,18 +2620,20 @@ function closeLogin(){ document.getElementById('login-modal').classList.remove('
 // ── FUNDO ANIMADO (cartas flutuando — dica do que vem) ──
 let cardBgMounted=false;
 function mountCardBg(){
-  if(cardBgMounted)return; cardBgMounted=true;
   const bg=document.getElementById('menu-bg'); if(!bg)return;
-  const N=8;
+  bg.innerHTML='';                                       // re-sorteia a cada chamada
+  const pool=BASE_CARDS.filter(c=>cardImgSrc(c)&&c.kind!=='fusion');  // pool com arte (sem fusões, cujos arquivos ainda não estão na pasta)
+  if(!pool.length)return;
+  const N=8; const pick=shuffle(pool.slice());
   for(let i=0;i<N;i++){
-    const id=HERO_IDS[i%HERO_IDS.length];
+    const c=pick[i%pick.length];
     const d=document.createElement('div'); d.className='bg-card';
     d.style.left=((i%4)*25+3+Math.random()*7).toFixed(1)+'%';
     d.style.top=(Math.floor(i/4)*46+5+Math.random()*10).toFixed(1)+'%';
     d.style.setProperty('--rot',(Math.random()*20-10).toFixed(1)+'deg');
     d.style.setProperty('--dur',(7+Math.random()*5).toFixed(1)+'s');
     d.style.animationDelay=(-Math.random()*6).toFixed(1)+'s';
-    if(HERO_IMAGES[id])d.innerHTML=`<img src="${HERO_IMAGES[id]}">`;
+    const src=cardImgSrc(c); if(src)d.innerHTML=`<img src="${src}" onerror="this.closest('.bg-card')&&this.closest('.bg-card').remove()">`;
     bg.appendChild(d);
   }
 }
@@ -2846,7 +2869,7 @@ function bfPlay(i,at){
   const card=G.playerHand[i]; if(!card)return;
   if(G.phase==='main'){
     if(G.mainConfirmed){bfToast('Você já agiu nesta fase');return;}
-    if(!isMonster(card)){bfToast('Monstros só na DOWN FASE — itens na fase ITENS');return;}
+    if(!isMonster(card)){bfToast('Monstros só na GUERREIROS — itens na fase ITENS');return;}
     let slot=at&&at.kind==='slot'?at.idx:(isCommander(card)?4:[0,1,2,3].find(n=>!G.playerField[n]));
     if(slot==null){bfToast('Sem slot livre — solte numa casa vazia');return;}
     if(slot===4&&!isCommander(card)){bfToast('Só HERÓIS ocupam o slot de Comandante');return;}
@@ -2922,10 +2945,11 @@ async function bfFuseAnim(steps){
   ov.remove();
 }
 async function bfDoFusion(){
-  if(G.phase!=='main'||G.mainConfirmed){bfToast('Fusão só na DOWN FASE');return;}
+  if(G.phase!=='main'||G.mainConfirmed){bfToast('Fusão só na GUERREIROS');return;}
   if(BF.fusion.length<2){bfToast('Selecione ao menos 2 cartas');return;}
   const cap=(Save.data?(licenseFor(Save.data.duels).fusion||5):5);
   if(BF.fusion.length>cap){bfToast('Sua licença permite fundir até '+cap+' cartas');return;}
+  if((G.fusionsUsed||0)>=fusionLimit()){bfToast('Limite de fusões neste turno: '+fusionLimit());return;}
   const idxs=[...BF.fusion];
   const cards=idxs.map(i=>G.playerHand[i]);
   if(!cards.every(isMonster)){bfToast('Só dá pra fundir monstros');return;}
@@ -2938,8 +2962,10 @@ async function bfDoFusion(){
   await bfFuseAnim(out.steps);
   // materiais (e fusões intermediárias descartadas) vão pro cemitério
   out.grave.forEach(c=>G.playerGrave.push(c));
-  // a carta resultante vai pra MÃO (jogador escolhe onde baixar depois) — NÃO consome a DOWN FASE
+  // a carta resultante vai pra MÃO (jogador escolhe onde baixar depois) — NÃO consome a GUERREIROS
   G.playerHand.push(out.summon);
+  G.fusionsUsed=(G.fusionsUsed||0)+1;   // conta a fusão do turno
+  if(G.phase==='main'&&!G.mainConfirmed)setActionBar(phaseMainHint());
   bfToast('🌀 '+out.summon.name+' foi pra sua mão'); bfLog('Fusão → '+out.summon.name+' (foi pra mão)','green');
   updateDeckUI(); renderHand();
 }

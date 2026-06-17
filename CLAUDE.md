@@ -277,6 +277,15 @@ O engine real-time (lanes, ATB, gameLoop, etc.) ainda existe nas linhas 514-825 
 - [ ] Recompensa "Recrutar" entra só no baralho DA RUN (`APP.playerDeck`), não na coleção permanente — confirmar expectativa / repro.
 - [ ] Boss final no roguelite + item bônus ao vencer.
 
+### Sessão 2026-06-17 — Polish pré-apresentação
+- [x] **Fundo do menu** (`mountCardBg`): cartas **aleatórias do pool inteiro de artes** (sem fusões, com `onerror` que remove a que falhar), **re-sorteadas a cada tela** (troca em transições). Antes só heróis fixos.
+- [x] **Indicador de batalha no cabeçalho** (`#bf-battle`): "Batalha X/total" (ou 👑 CHEFE), atualizado no `startFight`.
+- [x] **Barra de ação maior** (`#action-bar` min-height 50px + wrap) — texto não corta mais.
+- [x] **Painel de coletados na run** (`#run-buffs`/`renderRunBuffs`) abaixo da barra de ação: lista buffs/artefatos/unidades pegos (rastreado em `pickReward` → `APP.runBuffs`).
+- [x] **Fusões por turno limitadas** (`fusionLimit()`/`G.fusionsUsed`, padrão **1**); contador no hint da fase; artefato `fusion1` (+1 fusão/turno) pode subir o limite numa run.
+- [x] **GUERREIROS auto-passa** quando o player não tem monstros na mão (espelha a fase de itens).
+- [x] **Renomeado DOWN FASE → GUERREIROS** (trilha de fases, hints, toasts).
+
 ### Sessão 2026-06-16 — Rogue (Etapa A) + Modos + Comandante
 **Feito:**
 - [x] **Modos do roguelite rebatizados** (`ROGUE_MODES`): **Rápido** (4 batalhas), **Longo** (10), **Boss Mode** (5, chefe na última). Tela de dificuldade atualizada.
